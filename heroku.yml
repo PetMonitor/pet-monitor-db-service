@@ -1,0 +1,11 @@
+setup:
+  addons:
+    - plan: heroku-postgresql
+      as: DATABASE
+
+build:
+  config:
+    NODE_ENV: $NODE_ENV
+    DATABASE_URL: $DATABASE_URL
+  docker:
+    web: Dockerfile

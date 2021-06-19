@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  db:
+    container_name: db
+    image: bitnami/postgresql
+    environment:
+      - POSTGRESQL_USERNAME=my_user
+      - POSTGRESQL_PASSWORD=password123
+      - POSTGRESQL_DATABASE=my_database
+    ports:
+      - "5432:5432"
+  web:
+    build: .
+    container_name: web
+    ports:
+      - "8000:8000"
+    depends_on: 
+      - db
