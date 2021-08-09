@@ -10,6 +10,7 @@ COPY app.js .
 COPY config/ config/
 COPY migrations/ migrations/
 COPY models/ models/
+COPY seeders/ seeders/
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 

@@ -23,6 +23,9 @@ module.exports = {
       leftEyeColor: {
         type: Sequelize.STRING
       },
+      breed: {
+        type: Sequelize.STRING
+      },
       size: {
         type: Sequelize.STRING
       },
@@ -34,6 +37,9 @@ module.exports = {
       },
       sex: {
         type: Sequelize.STRING
+      },
+      description: {
+        type: Sequelize.TEXT
       },
       userId: {
         type: Sequelize.UUID

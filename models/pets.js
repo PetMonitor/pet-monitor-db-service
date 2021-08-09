@@ -26,10 +26,13 @@ module.exports = (sequelize, DataTypes) => {
     furColor: DataTypes.STRING,
     rightEyeColor: DataTypes.STRING,
     leftEyeColor: DataTypes.STRING,
+    breed: DataTypes.STRING,
     size: DataTypes.STRING,
     lifeStage: DataTypes.STRING,
     age: DataTypes.INTEGER,
-    sex: DataTypes.STRING
+    sex: DataTypes.STRING,
+    description: DataTypes.TEXT,
+    userId: DataTypes.UUID
   }, {
     sequelize,
     modelName: 'Pets',

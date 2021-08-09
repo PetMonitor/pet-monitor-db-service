@@ -17,11 +17,11 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
-      created: {
+      createdAt: {
         allowNull: true,
         type: Sequelize.DATE
       },
-      updated: {
+      updatedAt: {
         allowNull: true,
         type: Sequelize.DATE
       }

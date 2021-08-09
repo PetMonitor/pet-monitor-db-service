@@ -17,20 +17,15 @@ app.get("/", (req, res) => {
 
 });
 
-app.get("/users/all", async (req, res) => {
-
+app.get("/users", async (req, res) => {
 
 	try {
-		console.log('model is : ' + db.Users);
-
 		db.Users.findAll({ attributes: ['username','email','password']})
 			.then((users) => { res.status(200).send(JSON.stringify(users)); });
- 
   	} catch (err) {
   		console.error(err);
   		res.status(500).send({"ERROR":err});
   	} 
-
 });
 
 /**
