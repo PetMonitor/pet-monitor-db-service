@@ -22,12 +22,25 @@ app.get('/', (req, res) => {
 	res.status(200).send('Now is the winter of our discontent');
 });
 
+<<<<<<< HEAD
 app.use('/users', users);
 app.use('/users/:userId/pets', pets);
 app.use('/users/:userId/notices', userNotices);
 app.use('/notices', notices);
 app.use('/users/:userId/pets/:petId/photos', petPhotos)
 app.use('/users/credentialValidation', credentialValidation);
+=======
+app.get("/users", async (req, res) => {
+
+	try {
+		db.Users.findAll({ attributes: ['username','email','password']})
+			.then((users) => { res.status(200).send(JSON.stringify(users)); });
+  	} catch (err) {
+  		console.error(err);
+  		res.status(500).send({"ERROR":err});
+  	} 
+});
+>>>>>>> 06a2ddf (Add seeders.)
 
 /**
 * Server Activation
