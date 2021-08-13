@@ -6,37 +6,42 @@ const port = process.env.PORT || "8000";
 const db = require('/usr/src/app/models/index.js');
 
 /**
-
 * Server Endpoints
-
 */
 
 app.get("/", (req, res) => {
-	
 	res.status(200).send("Now is the winter of our discontent");
-
 });
 
 app.get("/users", async (req, res) => {
-
 	try {
-		db.Users.findAll({ attributes: ['username','email','password']})
-			.then((users) => { res.status(200).send(JSON.stringify(users)); });
+		db.Users.findAll({ attributes: ['uuid','username', 'email'] })
+			.then((users) => { 
+				res.status(200).send(JSON.stringify(users)); 
+			});
   	} catch (err) {
   		console.error(err);
   		res.status(500).send({"ERROR":err});
   	} 
 });
 
+app.get("/users/:userId", async (req, res) => {
+	try {
+		db.Users.findByPk(req.params.userId, { attributes: ['uuid','username', 'email'] })
+			.then((user) => { 
+				res.status(200).send(JSON.stringify(user)); 
+			});
+  	} catch (err) {
+  		console.error(err);
+  		res.status(500).send({"ERROR": err});
+  	} 
+});
+
 /**
-
 * Server Activation
-
 */
 
 app.listen(port, () => {
-	
 	console.log(`Listening to requests on http://localhost:${port}`)
-
 });
 
