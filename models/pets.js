@@ -52,12 +52,8 @@ module.exports = (sequelize, DataTypes) => {
     age: DataTypes.INTEGER,
     sex: DataTypes.STRING,
     description: DataTypes.TEXT,
-<<<<<<< HEAD
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE
-=======
-    userId: DataTypes.UUID
->>>>>>> 06a2ddf (Add seeders.)
   }, {
     sequelize,
     modelName: 'Pets',
