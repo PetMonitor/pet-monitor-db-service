@@ -2,19 +2,31 @@ var express = require('express');
 var router = express.Router();
 
 var http = require('http-status-codes');
+<<<<<<< HEAD
 const db = require('../models/index.js');
+=======
+const db = require('/usr/src/app/models/index.js');
+>>>>>>> 7d7ab0d (Finish first integration for endpoints users, pets and notices)
 
 var router = express.Router({mergeParams: true});
 
 /**
+<<<<<<< HEAD
 * Pet CRUD endpoints.
 */
 
 router.get('/', async (req, res) => {
+=======
+ * Pet CRUD endpoints.
+ */
+
+ router.get('/', async (req, res) => {
+>>>>>>> 7d7ab0d (Finish first integration for endpoints users, pets and notices)
 	try {
         db.Pets.findAll({ 
 			where: { 
 				userId: req.params.userId 
+<<<<<<< HEAD
 			},
 			include: [{
 				model: db.PetPhotos,
@@ -54,6 +66,11 @@ router.get('/', async (req, res) => {
 			); 
 
             res.status(http.StatusCodes.OK).json(resObj); 
+=======
+			}
+		}).then((pets) => { 
+            res.status(http.StatusCodes.OK).send(JSON.stringify(pets)); 
+>>>>>>> 7d7ab0d (Finish first integration for endpoints users, pets and notices)
         }).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -144,7 +161,11 @@ router.post('/', async (req, res) => {
 			createdAt: new Date(),
 			updatedAt: new Date()
 		}).then((pet) => {
+<<<<<<< HEAD
 		    res.status(http.StatusCodes.CREATED).json(pet); 
+=======
+		    res.status(http.StatusCodes.CREATED).send(JSON.stringify(pet)); 
+>>>>>>> 7d7ab0d (Finish first integration for endpoints users, pets and notices)
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -161,7 +182,10 @@ router.post('/', async (req, res) => {
 
 router.put('/:petId', async (req, res) => {
 	try {
+<<<<<<< HEAD
 		//TODO: check for _ref
+=======
+>>>>>>> 7d7ab0d (Finish first integration for endpoints users, pets and notices)
         var updatedPetFields = req.body
         updatedPetFields['updatedAt'] = new Date();
         db.Pets.update(updatedPetFields, { 
@@ -170,7 +194,11 @@ router.put('/:petId', async (req, res) => {
 				userId: req.params.userId 
 			}
 		}).then((result) => {
+<<<<<<< HEAD
 		    res.status(http.StatusCodes.OK).json(result); 
+=======
+		    res.status(http.StatusCodes.OK).send(JSON.stringify(result)); 
+>>>>>>> 7d7ab0d (Finish first integration for endpoints users, pets and notices)
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -193,7 +221,11 @@ router.delete('/:petId', async (req, res) => {
                 userId: req.params.userId
 			}
 		}).then((deletedCount) => {
+<<<<<<< HEAD
 		    res.status(http.StatusCodes.OK).json(deletedCount); 
+=======
+		    res.status(http.StatusCodes.OK).send(JSON.stringify(deletedCount)); 
+>>>>>>> 7d7ab0d (Finish first integration for endpoints users, pets and notices)
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 

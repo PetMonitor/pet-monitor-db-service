@@ -17,5 +17,4 @@ services:
     container_name: web
     ports:
       - "8000:8000"
-    depends_on: 
-      - db
+    command: dockerize -wait tcp://db:5432 /bin/bash entrypoint.sh

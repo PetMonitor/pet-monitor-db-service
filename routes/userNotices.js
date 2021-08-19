@@ -2,7 +2,11 @@ var express = require('express');
 var router = express.Router();
 
 var http = require('http-status-codes');
+<<<<<<< HEAD
 const db = require('../models/index.js');
+=======
+const db = require('/usr/src/app/models/index.js');
+>>>>>>> 7d7ab0d (Finish first integration for endpoints users, pets and notices)
 
 var router = express.Router({mergeParams: true});
 
@@ -17,7 +21,11 @@ var router = express.Router({mergeParams: true});
 				userId: req.params.userId 
 			}
 		}).then((notices) => { 
+<<<<<<< HEAD
             res.status(http.StatusCodes.OK).json(notices); 
+=======
+            res.status(http.StatusCodes.OK).send(JSON.stringify(notices)); 
+>>>>>>> 7d7ab0d (Finish first integration for endpoints users, pets and notices)
         }).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
