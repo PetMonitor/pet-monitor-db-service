@@ -154,11 +154,7 @@ router.delete('/:userId', async (req, res) => {
 				uuid: req.params.userId 
 			}
 		}).then((deletedCount) => {
-<<<<<<< HEAD
 		    res.status(http.StatusCodes.OK).json({'deletedCount': deletedCount }); 
-=======
-		    res.status(http.StatusCodes.OK).send(JSON.stringify(deletedCount)); 
->>>>>>> 7d7ab0d (Finish first integration for endpoints users, pets and notices)
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -175,23 +171,15 @@ router.delete('/:userId', async (req, res) => {
 
 router.put('/:userId', async (req, res) => {
 	try {
-<<<<<<< HEAD
 		//TODO: check for _ref
-=======
->>>>>>> 7d7ab0d (Finish first integration for endpoints users, pets and notices)
         var updateUserFields = req.body
         updateUserFields['updatedAt'] = new Date();
         db.Users.update(updateUserFields, { 
 			where: { 
 				uuid: req.params.userId 
 			}
-<<<<<<< HEAD
 		}).then((affectedRows) => {
 		    res.status(http.StatusCodes.OK).json({ 'updatedCount': affectedRows[0] }); 
-=======
-		}).then((result) => {
-		    res.status(http.StatusCodes.OK).send(JSON.stringify(result)); 
->>>>>>> 7d7ab0d (Finish first integration for endpoints users, pets and notices)
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
