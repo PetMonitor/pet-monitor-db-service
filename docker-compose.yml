@@ -17,4 +17,4 @@ services:
     container_name: web
     ports:
       - "8000:8000"
-    command: dockerize -wait tcp://db:5432 /bin/bash entrypoint.sh
+    command: "dockerize -wait ${DATABASE_URL} /bin/bash entrypoint.sh"
