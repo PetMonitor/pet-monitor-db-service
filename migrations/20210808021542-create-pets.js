@@ -6,6 +6,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
+        allowNull: false,
+        unique: true,
+        noUpdate: true
+      },
+      userId: {
+        primaryKey: true,
+        type: Sequelize.UUID,
         allowNull: false
       },
       type: {
@@ -40,9 +47,6 @@ module.exports = {
       },
       description: {
         type: Sequelize.TEXT
-      },
-      userId: {
-        type: Sequelize.UUID
       },
       createdAt: {
         allowNull: false,

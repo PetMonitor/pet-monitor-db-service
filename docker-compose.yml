@@ -10,10 +10,11 @@ services:
       - POSTGRESQL_DATABASE=my_database
     ports:
       - "5432:5432"
+    healthcheck:
+      test: exit 0
   web:
     build: .
     container_name: web
     ports:
       - "8000:8000"
-    depends_on: 
-      - db
+    command: dockerize -wait tcp://db:5432 /bin/bash entrypoint.sh

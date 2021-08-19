@@ -6,12 +6,28 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
+        allowNull: false,
+        noUpdate: true
+      },
+      petId: {
+        primaryKey: true,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        allowNull: false
+      },
+      userId: {
+        primaryKey: true,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
         allowNull: false
       },
       noticeType: {
         type: Sequelize.STRING
       },
-      eventLocation: {
+      eventLocationLat: {
+        type: Sequelize.STRING
+      },
+      eventLocationLong: {
         type: Sequelize.STRING
       },
       description: {
@@ -19,9 +35,6 @@ module.exports = {
       },
       eventTimestamp: {
         type: Sequelize.STRING
-      },
-      petId: {
-        type: Sequelize.UUID
       },
       createdAt: {
         allowNull: false,
@@ -38,6 +51,18 @@ module.exports = {
         name: 'fk_notices_pets_petId',
         references: {
           table: 'Pets',
+          field: 'uuid'
+        },
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      })
+    }).then(() => {
+      queryInterface.addConstraint('Notices', {
+        type: 'foreign key',
+        fields: ['userId'],
+        name: 'fk_notices_users_userId',
+        references: {
+          table: 'Users',
           field: 'uuid'
         },
         onDelete: 'cascade',

@@ -33,7 +33,7 @@ module.exports = {
         sex: 'FEMALE',
         breed: 'crossbreed',
         description: 'likes to chew furniture',
-        userId: '123e4567-e89b-12d3-a456-426614174000',
+        userId: '123e4567-e89b-12d3-a456-426614175000',
         createdAt: new Date(),
         updatedAt: new Date()
       }, 

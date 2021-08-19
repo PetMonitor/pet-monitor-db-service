@@ -19,7 +19,13 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      allowNull: false
+      allowNull: false,
+      noUpdate: true
+    },
+    userId: { 
+      primaryKey: true,
+      allowNull: false,
+      type: DataTypes.UUID 
     },
     type: DataTypes.STRING,
     name: DataTypes.STRING,
@@ -31,8 +37,7 @@ module.exports = (sequelize, DataTypes) => {
     lifeStage: DataTypes.STRING,
     age: DataTypes.INTEGER,
     sex: DataTypes.STRING,
-    description: DataTypes.TEXT,
-    userId: DataTypes.UUID
+    description: DataTypes.TEXT
   }, {
     sequelize,
     modelName: 'Pets',

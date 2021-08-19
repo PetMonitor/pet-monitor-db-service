@@ -17,10 +17,24 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+      noUpdate: true
+    },
+    petId: {
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false
+    },
+    userId: {
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false
     },
     noticeType: DataTypes.STRING,
-    eventLocation: DataTypes.STRING,
+    eventLocationLat: DataTypes.STRING,
+    eventLocationLong: DataTypes.STRING,
     description: DataTypes.STRING,
     eventTimestamp: DataTypes.STRING
   }, {

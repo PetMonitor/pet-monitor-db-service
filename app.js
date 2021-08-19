@@ -1,41 +1,28 @@
-const express = require("express")
-const path = require("path")
+const express = require('express')
 const app = express();
-const port = process.env.PORT || "8000";
+const port = process.env.PORT || '8000';
 
-const db = require('/usr/src/app/models/index.js');
+var pets = require('/usr/src/app/routes/pets.js');
+var notices = require('/usr/src/app/routes/notices.js');
+var users = require('/usr/src/app/routes/users.js');
+var userNotices = require('/usr/src/app/routes/userNotices.js');
+
+app.use(express.urlencoded({extended: true}));
+app.use(express.json())
 
 /**
 * Server Endpoints
 */
 
-app.get("/", (req, res) => {
-	res.status(200).send("Now is the winter of our discontent");
+app.get('/', (req, res) => {
+	res.status(200).send('Now is the winter of our discontent');
 });
 
-app.get("/users", async (req, res) => {
-	try {
-		db.Users.findAll({ attributes: ['uuid','username', 'email'] })
-			.then((users) => { 
-				res.status(200).send(JSON.stringify(users)); 
-			});
-  	} catch (err) {
-  		console.error(err);
-  		res.status(500).send({"ERROR":err});
-  	} 
-});
+app.use('/users', users);
+app.use('/users/:userId/pets', pets);
+app.use('/users/:userId/notices', userNotices);
+app.use('/notices', notices);
 
-app.get("/users/:userId", async (req, res) => {
-	try {
-		db.Users.findByPk(req.params.userId, { attributes: ['uuid','username', 'email'] })
-			.then((user) => { 
-				res.status(200).send(JSON.stringify(user)); 
-			});
-  	} catch (err) {
-  		console.error(err);
-  		res.status(500).send({"ERROR": err});
-  	} 
-});
 
 /**
 * Server Activation

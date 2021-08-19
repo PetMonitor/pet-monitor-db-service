@@ -6,10 +6,12 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
-        allowNull: false
+        allowNull: false,
+        noUpdate: true
       },
       username: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true
       },
       password: {
         type: Sequelize.STRING

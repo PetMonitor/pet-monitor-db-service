@@ -6,7 +6,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
-        allowNull: false
+        allowNull: false,
+        unique: true,
+        noUpdate: true
       },
       photo: {
         type: Sequelize.BLOB

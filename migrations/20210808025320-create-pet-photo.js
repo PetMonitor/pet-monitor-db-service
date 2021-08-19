@@ -1,29 +1,21 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('petPhotos', {
-      uuid: {
+    await queryInterface.createTable('PetPhotos', {
+      petId: {
         primaryKey: true,
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false
-      },
-      petId: {
-        type: Sequelize.UUID
+        allowNull: false,
+        noUpdate: true
       },
       photoId: {
-        type: Sequelize.UUID
-      },
-      createdAt: {
+        primaryKey: true,
+        type: Sequelize.UUID,
         allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+        noUpdate: true
       }
     }).then(() => {
-      queryInterface.addConstraint('petPhotos', {
+      queryInterface.addConstraint('PetPhotos', {
         type: 'foreign key',
         fields: ['petId'],
         name: 'fk_pets_petPhotos_petId',
@@ -35,7 +27,7 @@ module.exports = {
         onUpdate: 'no action',
       })
     }).then(() => {
-      queryInterface.addConstraint('petPhotos', {
+      queryInterface.addConstraint('PetPhotos', {
         type: 'foreign key',
         fields: ['photoId'],
         name: 'fk_photos_petPhotos_photoId',
@@ -49,6 +41,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('petPhotos');
+    await queryInterface.dropTable('PetPhotos');
   }
 };
