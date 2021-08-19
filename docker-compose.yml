@@ -1,4 +1,4 @@
-version: "3.8"
+version: "2"
 
 services:
   db:
@@ -17,4 +17,5 @@ services:
     container_name: web
     ports:
       - "8000:8000"
-    command: dockerize -wait $DATABASE_URL /bin/bash entrypoint.sh
+    depends_on: 
+      - db
