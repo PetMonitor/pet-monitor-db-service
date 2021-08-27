@@ -60,6 +60,7 @@ router.post('/', async (req, res) => {
 		console.log(`Creating notice ${req.body.uuid}`);
 		db.Notices.create({
 			uuid: req.body.uuid,
+			_ref: req.body._ref,
 			petId: req.body.petId,
             userId: req.params.userId,
 			noticeType: req.body.noticeType,
@@ -87,6 +88,7 @@ router.post('/', async (req, res) => {
 
 router.put('/:noticeId', async (req, res) => {
 	try {
+		//TODO: check for _ref
         var updatedNoticeFields = req.body
         updatedNoticeFields['updatedAt'] = new Date();
         db.Notices.update(updatedNoticeFields, { 

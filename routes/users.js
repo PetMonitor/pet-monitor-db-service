@@ -10,7 +10,7 @@ const db = require('/usr/src/app/models/index.js');
 
 router.get('/', async (req, res) => {
 	try {
-		db.Users.findAll({ attributes: ['uuid', 'username', 'email'] })
+		db.Users.findAll({ attributes: ['uuid', '_ref', 'username', 'email'] })
 			.then((users) => { 
 				res.status(http.StatusCodes.OK).send(JSON.stringify(users)); 
 			}).catch(err => {
@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:userId', async (req, res) => {
 	try {
-		db.Users.findByPk(req.params.userId, { attributes: ['uuid', 'username', 'email'] })
+		db.Users.findByPk(req.params.userId, { attributes: ['uuid', '_ref', 'username', 'email'] })
 			.then((user) => { 
 				res.status(http.StatusCodes.OK).send(JSON.stringify(user)); 
 			}).catch(err => {
@@ -51,6 +51,7 @@ router.post('/', async (req, res) => {
 		console.log(`Creating user ${req.body.uuid}`);
 		db.Users.create({
 			uuid: req.body.uuid,
+			_ref: req.body._ref,
 			username: req.body.username,
 			password: req.body.password,
 			email: req.body.email,
@@ -97,6 +98,7 @@ router.delete('/:userId', async (req, res) => {
 
 router.put('/:userId', async (req, res) => {
 	try {
+		//TODO: check for _ref
         var updateUserFields = req.body
         updateUserFields['updatedAt'] = new Date();
         db.Users.update(updateUserFields, { 

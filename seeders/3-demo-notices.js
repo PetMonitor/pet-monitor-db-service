@@ -5,6 +5,7 @@ module.exports = {
     return queryInterface.bulkInsert('Notices', [
       {
         uuid: '123e4567-e89b-12d3-a456-426614175555',
+        _ref: 'cfdc6ee2-5c26-41dc-83f8-3ba40bae2df0',
         petId: '123e4567-e89b-12d3-a456-426614174001',
         userId: '123e4567-e89b-12d3-a456-426614174000',
         noticeType: 'LOST',
@@ -17,6 +18,7 @@ module.exports = {
       },
       {
         uuid: '123e4567-e89b-12d3-a456-426614176666',
+        _ref: 'bd6fbdce-e742-4ed4-8470-3c1703aaaf8f',
         petId: '123e4567-e89b-12d3-a456-426614174002',
         userId: '123e4567-e89b-12d3-a456-426614175000',
         noticeType: 'FOUND',

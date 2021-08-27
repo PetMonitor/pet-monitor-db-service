@@ -13,6 +13,14 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
         noUpdate: true
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
       }
     }).then(() => {
       queryInterface.addConstraint('PetPhotos', {

@@ -1,6 +1,7 @@
 'use strict';
 
 const { Model } = require('sequelize');
+const db = require('.');
 
 module.exports = (sequelize, DataTypes) => {
   class Pets extends Model {
@@ -10,7 +11,15 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      console.log('Running Pets associate to Users.')
+      Pets.belongsTo(models.Users, {
+        name: 'userId',
+        foreignKey:'uuid'
+      });
+
+      Pets.hasMany(models.PetPhotos, {
+        foreignKey: 'petId'
+      });
     }
   };
 
@@ -21,6 +30,11 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       noUpdate: true
+    },
+    _ref: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false
     },
     userId: { 
       primaryKey: true,
@@ -37,7 +51,9 @@ module.exports = (sequelize, DataTypes) => {
     lifeStage: DataTypes.STRING,
     age: DataTypes.INTEGER,
     sex: DataTypes.STRING,
-    description: DataTypes.TEXT
+    description: DataTypes.TEXT,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Pets',

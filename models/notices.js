@@ -20,6 +20,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       noUpdate: true
     },
+    _ref: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false
+    },
     petId: {
       primaryKey: true,
       type: DataTypes.UUID,
@@ -36,7 +41,9 @@ module.exports = (sequelize, DataTypes) => {
     eventLocationLat: DataTypes.STRING,
     eventLocationLong: DataTypes.STRING,
     description: DataTypes.STRING,
-    eventTimestamp: DataTypes.STRING
+    eventTimestamp: DataTypes.STRING,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Notices',

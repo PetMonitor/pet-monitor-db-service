@@ -10,7 +10,6 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
     }
   };
   
@@ -22,7 +21,9 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       noUpdate: true
     },
-    photo: DataTypes.BLOB
+    photo: DataTypes.BLOB,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   },
   {
     sequelize,
