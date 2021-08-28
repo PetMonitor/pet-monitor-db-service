@@ -22,7 +22,7 @@ module.exports = {
         dialectOptions: {}
     },
     test: {
-        username: 'root',
+        username: 'postgres',
         password: null,
         database: 'pet-monitor-db',
         host: '127.0.0.1',
