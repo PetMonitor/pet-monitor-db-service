@@ -1,4 +1,4 @@
-# Pet Monitor Database Service
+# Pet Monitor Database Service [![Build Status](https://app.travis-ci.com/PetMonitor/pet-monitor-db-service.svg?branch=master)](https://app.travis-ci.com/PetMonitor/pet-monitor-db-service)
 
 ## Requirements
 
