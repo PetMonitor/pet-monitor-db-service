@@ -1,7 +1,7 @@
 'use strict';
 
 var fs = require('fs');
-const imageContent = fs.readFileSync('/usr/src/app/seeders/resources/dogImage.txt', 'base64');
+const imageContent = fs.readFileSync('./resources/dogImage.txt', 'base64');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
