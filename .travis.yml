@@ -1,4 +1,11 @@
 language: node_js
+
+services:
+  - postgresql
+
+addons:
+  postgresql: "9.5"
+  
 node_js:
   - 16
 # install dependencies
