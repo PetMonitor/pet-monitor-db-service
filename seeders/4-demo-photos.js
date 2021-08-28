@@ -1,7 +1,7 @@
 'use strict';
 
 var fs = require('fs');
-const imageContent = process.env.TRAVIS_BUILD_DIR + fs.readFileSync('/seeders/resources/dogImage.txt', 'base64');
+const imageContent = fs.readFileSync('./seeders/resources/dogImage.txt', 'base64');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
