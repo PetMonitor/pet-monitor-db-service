@@ -1,6 +1,6 @@
 const chai = require('chai')
 const request = require('supertest');
-const server = require('app');
+const server = require('../app');
 const { expect } = require('chai');
 
 EXPECTED_USERS = [
