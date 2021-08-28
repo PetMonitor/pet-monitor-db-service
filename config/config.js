@@ -24,7 +24,7 @@ module.exports = {
     test: {
         username: 'root',
         password: null,
-        database: 'pet-monitor-db-service_test',
+        database: 'pet-monitor-db',
         host: '127.0.0.1',
         dialect: 'postgres'
     }
