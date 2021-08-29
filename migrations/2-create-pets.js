@@ -10,8 +10,12 @@ module.exports = {
         unique: true,
         noUpdate: true
       },
+      _ref: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        allowNull: false
+      },
       userId: {
-        primaryKey: true,
         type: Sequelize.UUID,
         allowNull: false
       },

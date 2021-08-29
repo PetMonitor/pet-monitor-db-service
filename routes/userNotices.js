@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var http = require('http-status-codes');
-const db = require('/usr/src/app/models/index.js');
+const db = require('../models/index.js');
 
 var router = express.Router({mergeParams: true});
 
@@ -17,7 +17,7 @@ var router = express.Router({mergeParams: true});
 				userId: req.params.userId 
 			}
 		}).then((notices) => { 
-            res.status(http.StatusCodes.OK).send(JSON.stringify(notices)); 
+            res.status(http.StatusCodes.OK).json(notices); 
         }).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -40,7 +40,7 @@ router.get('/:noticeId', async (req, res) => {
 			    userId: req.params.userId 
             }
 		}).then((notice) => { 
-			res.status(http.StatusCodes.OK).send(JSON.stringify(notice)); 
+			res.status(http.StatusCodes.OK).json(notice); 
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -60,6 +60,7 @@ router.post('/', async (req, res) => {
 		console.log(`Creating notice ${req.body.uuid}`);
 		db.Notices.create({
 			uuid: req.body.uuid,
+			_ref: req.body._ref,
 			petId: req.body.petId,
             userId: req.params.userId,
 			noticeType: req.body.noticeType,
@@ -70,7 +71,7 @@ router.post('/', async (req, res) => {
 			createdAt: new Date(),
 			updatedAt: new Date()
 		}).then((notice) => {
-		    res.status(http.StatusCodes.CREATED).send(JSON.stringify(notice)); 
+		    res.status(http.StatusCodes.CREATED).json(notice); 
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -87,6 +88,7 @@ router.post('/', async (req, res) => {
 
 router.put('/:noticeId', async (req, res) => {
 	try {
+		//TODO: check for _ref
         var updatedNoticeFields = req.body
         updatedNoticeFields['updatedAt'] = new Date();
         db.Notices.update(updatedNoticeFields, { 
@@ -95,7 +97,7 @@ router.put('/:noticeId', async (req, res) => {
 				userId: req.params.userId 
 			}
 		}).then((result) => {
-		    res.status(http.StatusCodes.OK).send(JSON.stringify(result)); 
+		    res.status(http.StatusCodes.OK).json(result); 
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -118,7 +120,7 @@ router.delete('/:noticeId', async (req, res) => {
                 userId: req.params.userId
 			}
 		}).then((deletedCount) => {
-		    res.status(http.StatusCodes.OK).send(JSON.stringify(deletedCount)); 
+		    res.status(http.StatusCodes.OK).json(deletedCount); 
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 

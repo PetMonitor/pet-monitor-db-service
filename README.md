@@ -1,4 +1,4 @@
-# Pet Monitor Database Service
+# Pet Monitor Database Service [![Build Status](https://app.travis-ci.com/PetMonitor/pet-monitor-db-service.svg?branch=master)](https://app.travis-ci.com/PetMonitor/pet-monitor-db-service)
 
 ## Requirements
 
@@ -11,6 +11,22 @@
 `docker compose up`
 
 2. A postgresql database will be set up at 0.0.0.0:5432
+
+## Run tests locally
+
+Set up a local database for testing. Use either:
+
+`docker run -e POSTGRESQL_USERNAME=postgres -e POSTGRESQL_DATABASE=pet-monitor-db -e POSTGRESQL_PASSWORD=pass -p 5432:5432 bitnami/postgresql`
+
+or
+
+`npx sequelize db:create`
+
+And set credentials accordinly at config/config.js file.
+
+Run tests using:
+
+`npm test`
 
 ## Deploy to Heroku
 

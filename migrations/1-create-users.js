@@ -9,6 +9,11 @@ module.exports = {
         allowNull: false,
         noUpdate: true
       },
+      _ref: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        allowNull: false
+      },
       username: {
         type: Sequelize.STRING,
         unique: true

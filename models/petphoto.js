@@ -9,12 +9,22 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      PetPhotos.belongsTo(models.Photos, {
+        foreignKey: 'photoId'      
+      });
     }
   };
   PetPhotos.init({
-    petId: DataTypes.UUID,
-    photoId: DataTypes.UUID
+    petId: {
+      primaryKey: true,
+      type: DataTypes.UUID
+    },
+    photoId: {
+      primaryKey: true,
+      type: DataTypes.UUID
+    },
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'PetPhotos',
