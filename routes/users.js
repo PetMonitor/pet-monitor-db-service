@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var http = require('http-status-codes');
-const db = require('/usr/src/app/models/index.js');
+const db = require('../models/index.js');
 
 /**
  * User CRUD endpoints.
@@ -12,7 +12,8 @@ router.get('/', async (req, res) => {
 	try {
 		db.Users.findAll({ attributes: ['uuid', '_ref', 'username', 'email'] })
 			.then((users) => { 
-				res.status(http.StatusCodes.OK).send(JSON.stringify(users)); 
+				console.log(`Returning users ${JSON.stringify(users)}`);
+				res.status(http.StatusCodes.OK).json(users); 
 			}).catch(err => {
 				console.error(err);
 				res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -31,7 +32,7 @@ router.get('/:userId', async (req, res) => {
 	try {
 		db.Users.findByPk(req.params.userId, { attributes: ['uuid', '_ref', 'username', 'email'] })
 			.then((user) => { 
-				res.status(http.StatusCodes.OK).send(JSON.stringify(user)); 
+				res.status(http.StatusCodes.OK).json(user); 
 			}).catch(err => {
 				console.error(err);
 				res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -58,7 +59,7 @@ router.post('/', async (req, res) => {
 			createdAt: new Date(),
 			updatedAt: new Date()
 		}).then((user) => {
-		    res.status(http.StatusCodes.CREATED).send(JSON.stringify(user)); 
+		    res.status(http.StatusCodes.CREATED).json(user); 
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -81,7 +82,7 @@ router.delete('/:userId', async (req, res) => {
 				uuid: req.params.userId 
 			}
 		}).then((deletedCount) => {
-		    res.status(http.StatusCodes.OK).send(JSON.stringify(deletedCount)); 
+		    res.status(http.StatusCodes.OK).json(deletedCount); 
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -106,7 +107,7 @@ router.put('/:userId', async (req, res) => {
 				uuid: req.params.userId 
 			}
 		}).then((result) => {
-		    res.status(http.StatusCodes.OK).send(JSON.stringify(result)); 
+		    res.status(http.StatusCodes.OK).json(result); 
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 

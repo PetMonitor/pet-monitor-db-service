@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var http = require('http-status-codes');
-const db = require('/usr/src/app/models/index.js');
+const db = require('../models/index.js');
 
 var router = express.Router({mergeParams: true});
 
@@ -53,7 +53,7 @@ router.get('/', async (req, res) => {
 				})
 			); 
 
-            res.status(http.StatusCodes.OK).send(JSON.stringify(resObj)); 
+            res.status(http.StatusCodes.OK).json(resObj); 
         }).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -107,7 +107,7 @@ router.get('/:petId', async (req, res) => {
 				)
 			})
 		    
-			res.status(http.StatusCodes.OK).send(JSON.stringify(resObj)); 
+			res.status(http.StatusCodes.OK).json(resObj); 
 
 		}).catch(err => {
 			console.error(err);
@@ -144,7 +144,7 @@ router.post('/', async (req, res) => {
 			createdAt: new Date(),
 			updatedAt: new Date()
 		}).then((pet) => {
-		    res.status(http.StatusCodes.CREATED).send(JSON.stringify(pet)); 
+		    res.status(http.StatusCodes.CREATED).json(pet); 
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -170,7 +170,7 @@ router.put('/:petId', async (req, res) => {
 				userId: req.params.userId 
 			}
 		}).then((result) => {
-		    res.status(http.StatusCodes.OK).send(JSON.stringify(result)); 
+		    res.status(http.StatusCodes.OK).json(result); 
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -193,7 +193,7 @@ router.delete('/:petId', async (req, res) => {
                 userId: req.params.userId
 			}
 		}).then((deletedCount) => {
-		    res.status(http.StatusCodes.OK).send(JSON.stringify(deletedCount)); 
+		    res.status(http.StatusCodes.OK).json(deletedCount); 
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 

@@ -1,15 +1,15 @@
 const express = require('express')
-const app = express();
 const port = process.env.PORT || '8000';
 
-var pets = require('/usr/src/app/routes/pets.js');
-var petPhotos = require('/usr/src/app/routes/petPhotos.js');
-var notices = require('/usr/src/app/routes/notices.js');
-var users = require('/usr/src/app/routes/users.js');
-var userNotices = require('/usr/src/app/routes/userNotices.js');
-
-app.use(express.urlencoded({extended: true}));
+var app = express();
 app.use(express.json())
+app.use(express.urlencoded({extended: true}));
+
+var pets = require('./routes/pets.js');
+var petPhotos = require('./routes/petPhotos.js');
+var notices = require('./routes/notices.js');
+var users = require('./routes/users.js');
+var userNotices = require('./routes/userNotices.js');
 
 /**
 * Server Endpoints
