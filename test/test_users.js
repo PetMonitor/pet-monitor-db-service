@@ -19,8 +19,8 @@ EXPECTED_USERS = [
   ]
 
 describe('Get all users test', function() {
-    it('Gets all users', function(done) {
-      request(server)
+    it('Gets all users', async () => {
+      await request(server)
         .get('/users')
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
@@ -28,8 +28,7 @@ describe('Get all users test', function() {
         .then(response => {
           console.log(`TEST LOG: Response was ${response.body}`)
           expect(response.body).to.have.deep.members(EXPECTED_USERS)
-          done();
-        }).catch(err => done(err));
+        });
     });
 });
 
