@@ -14,15 +14,11 @@
 
 ## Run tests locally
 
-Set up a local database for testing. Use either:
+Set up a local database for testing:
 
 `docker run -e POSTGRESQL_USERNAME=postgres -e POSTGRESQL_DATABASE=pet-monitor-db -e POSTGRESQL_PASSWORD=pass -p 5432:5432 bitnami/postgresql`
 
-or
-
-`npx sequelize db:create`
-
-And set credentials accordinly at config/config.js file.
+And set credentials accordinly at config/config.js file, in the test configuration section.
 
 Run tests using:
 
