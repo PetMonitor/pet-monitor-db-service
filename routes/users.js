@@ -82,7 +82,7 @@ router.delete('/:userId', async (req, res) => {
 				uuid: req.params.userId 
 			}
 		}).then((deletedCount) => {
-		    res.status(http.StatusCodes.OK).json(deletedCount); 
+		    res.status(http.StatusCodes.OK).json({'deletedCount': deletedCount }); 
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
