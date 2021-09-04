@@ -106,8 +106,8 @@ router.put('/:userId', async (req, res) => {
 			where: { 
 				uuid: req.params.userId 
 			}
-		}).then((result) => {
-		    res.status(http.StatusCodes.OK).json(result); 
+		}).then((affectedRows) => {
+		    res.status(http.StatusCodes.OK).json({ 'updatedCount': affectedRows[0] }); 
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 

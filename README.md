@@ -21,7 +21,7 @@ Set up a local database for testing:
 And set credentials accordinly at config/config.js file, in the test configuration section.
 
 Run tests using:
-
+`export NODE_ENV=test`
 `npm test`
 
 ## Deploy to Heroku

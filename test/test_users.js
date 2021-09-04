@@ -22,46 +22,34 @@ EXPECTED_USERS = [
 
 describe('Users test case', function() {
 
-  this.beforeEach(function(){
-          
-    EXPECTED_USERS.forEach(async function(user) {
-      await db.Users.create({
-        uuid:user['uuid'],
-        _ref: user['_ref'], 
-        username: user['username'], 
-        email: user['email'],
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })
-      .then(() => {
-        console.log('Successfully deleted all records from Users database.');
-      })
-      .catch(err => {
-        console.error('Error deleting all records from Users database.');
-        console.error(err)
-      });
-    });
-
-
-    console.log(TEST_SEPARATOR)
-  })
-
-  this.afterEach(async() => {
-    console.log(TEST_SEPARATOR)
-
+  this.beforeEach('After users test', function() {
     // Re-initialize database
-    await db.Users.destroy({
-      where: {},
-      force: true,
-    })
-    .then(() => {
-      console.log('Successfully deleted all records from Users database.');
-    })
-    .catch(err => {
-      console.error('Error deleting all records from Users database.');
-      console.error(err)
-    });    
-  })
+    return db.Users.bulkCreate(EXPECTED_USERS)
+          .then((res) => {
+            console.log(`TEST LOG: Successfully created user records ${res}`);
+            console.log(TEST_SEPARATOR)
+          })
+          .catch(err => {
+            console.error(`TEST LOG: Error creating user records ${err}`);
+          });
+
+  });
+
+  this.afterEach('After users test', function() {
+    // Clean database
+    return db.Users.destroy({
+          where: {},
+          force: true,
+        })
+        .then(() => {
+          console.log(`TEST LOG: Successfully deleted all records from Users table.`);
+          console.log(TEST_SEPARATOR)
+        })
+        .catch(err => {
+          console.error(`TEST LOG: Error deleting all records from Users table ${err}`);
+          console.log(TEST_SEPARATOR)
+        });
+  });
 
   it('Get all users endpoint returns all users', async () => {
     await request(server)
@@ -107,44 +95,34 @@ describe('Users test case', function() {
 
 describe('User by id test case', function() {
 
-  this.beforeEach(function(){
-    EXPECTED_USERS.forEach(async function(user) {
-      await db.Users.create({
-        uuid:user['uuid'],
-        _ref: user['_ref'], 
-        username: user['username'], 
-        email: user['email'],
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })
-      .then(() => {
-        console.log('Successfully deleted all records from Users database.');
-      })
-      .catch(err => {
-        console.error('Error deleting all records from Users database.');
-        console.error(err)
-      });
-    });
-
-    console.log(TEST_SEPARATOR)
-  })
-
-  this.afterEach(async() => {
-    console.log(TEST_SEPARATOR)
-
+  this.beforeEach('After users test', function() {
     // Re-initialize database
-    await db.Users.destroy({
-      where: {},
-      force: true,
-    })
-    .then(() => {
-      console.log('Successfully deleted all records from Users database.');
-    })
-    .catch(err => {
-      console.error('Error deleting all records from Users database.');
-      console.error(err)
-    });
-  })
+    return db.Users.bulkCreate(EXPECTED_USERS)
+          .then((res) => {
+            console.log(`TEST LOG: Successfully created user records ${res}`);
+            console.log(TEST_SEPARATOR)
+          })
+          .catch(err => {
+            console.error(`TEST LOG: Error creating user records ${err}`);
+          });
+
+  });
+
+  this.afterEach('After users test', function() {
+    // Clean database
+    return db.Users.destroy({
+          where: {},
+          force: true,
+        })
+        .then(() => {
+          console.log(`TEST LOG: Successfully deleted all records from Users table.`);
+          console.log(TEST_SEPARATOR)
+        })
+        .catch(err => {
+          console.error(`TEST LOG: Error deleting all records from Users table ${err}`);
+          console.log(TEST_SEPARATOR)
+        });
+  });
 
   it('Get endpoint retrieves user with specified id', async () => {
     await request(server)
@@ -184,46 +162,68 @@ describe('User by id test case', function() {
 });
 
 describe('User by id put test case', function() {
-  after(async () => {
+
+  this.beforeEach('After users test', function() {
     // Re-initialize database
-    await db.Users.destroy({
-      where: {},
-      force: true,
-    })
-    .then(() => {
-      console.log('Successfully deleted all records from Users database.');
-    })
-    .catch(err => {
-      console.error('Error deleting all records from Users database.');
-      console.error(err)
-    });
-    
-    EXPECTED_USERS.forEach(async function(user) {
-      await db.Users.create({
-        uuid:user['uuid'],
-        _ref: user['_ref'], 
-        username: user['username'], 
-        email: user['email'],
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })
-      .then(() => {
-        console.log('Successfully deleted all records from Users database.');
-      })
-      .catch(err => {
-        console.error('Error deleting all records from Users database.');
-        console.error(err)
-      });
-    });
+    return db.Users.bulkCreate(EXPECTED_USERS)
+          .then((res) => {
+            console.log(`TEST LOG: Successfully created user records ${res}`);
+            console.log(TEST_SEPARATOR)
+          })
+          .catch(err => {
+            console.error(`TEST LOG: Error creating user records ${err}`);
+          });
+
   });
 
-  this.beforeEach(function(){
-    console.log(TEST_SEPARATOR)
-  })
+  this.afterEach('After users test', function() {
+    // Clean database
+    return db.Users.destroy({
+          where: {},
+          force: true,
+        })
+        .then(() => {
+          console.log(`TEST LOG: Successfully deleted all records from Users table.`);
+          console.log(TEST_SEPARATOR)
+        })
+        .catch(err => {
+          console.error(`TEST LOG: Error deleting all records from Users table ${err}`);
+          console.log(TEST_SEPARATOR)
+        });
+  });
 
-  this.afterEach(function(){
-    console.log(TEST_SEPARATOR)
-  })
+  it('Update endpoint updates user with specified id', async () => {
 
+    UPDATED_USER = {
+      uuid: '123e4567-e89b-12d3-a456-426614174000',
+      _ref: '94aa64c9-b966-4bc0-b422-0830fce1ac5c',
+      username: 'TerryPratchett',
+      email: 'terrypratchett@goodomens.com'
+    }
+
+    await request(server)
+      .put('/users/123e4567-e89b-12d3-a456-426614174000')
+      .set('Accept', 'application/json')
+      .send(UPDATED_USER)
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then(response => {
+        console.log(`TEST LOG: Response was ${JSON.stringify(response.body)}`)
+        expect(response.body['updatedCount']).to.equal(1)
+      });
+
+    await request(server)
+      .get('/users/123e4567-e89b-12d3-a456-426614174000')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then(response => {
+        console.log(`TEST LOG: Response was ${JSON.stringify(response.body)}`)
+        expect(response.body).to.deep.equal(UPDATED_USER)
+      });
+  });
+
+  //it('Update with old reference fails', async () => {
+  //});
 
 });
