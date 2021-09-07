@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var passwordHasher = require('../utils/passwordHasher.js');
 
 var http = require('http-status-codes');
 const db = require('../models/index.js');
@@ -54,7 +55,7 @@ router.post('/', async (req, res) => {
 			uuid: req.body.uuid,
 			_ref: req.body._ref,
 			username: req.body.username,
-			password: req.body.password,
+			password: passwordHasher(req.body.password),
 			email: req.body.email,
 			createdAt: new Date(),
 			updatedAt: new Date()
