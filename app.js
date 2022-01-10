@@ -1,9 +1,13 @@
 const express = require('express')
+const bodyParser = require("body-parser");
+
 const port = process.env.PORT || '8000';
 
 var app = express();
-app.use(express.json())
-app.use(express.urlencoded({extended: true}));
+app.use(bodyParser.json({ limit:"200mb", type:'application/json' }));
+app.use(bodyParser.urlencoded({ limit: "200mb", extended: true, parameterLimit: 50000 }));
+//app.use(express.json({ limit:1024*1024*10, type:'application/json' }))
+//app.use(express.urlencoded({ limit: "100mb", extended: true, parameterLimit: 50000 }));
 
 var pets = require('./routes/pets.js');
 var petPhotos = require('./routes/petPhotos.js');
