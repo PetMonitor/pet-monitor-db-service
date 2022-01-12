@@ -22,11 +22,11 @@ describe('Users credential validation test case', function() {
     // Re-initialize database
     return db.Users.bulkCreate(USERS)
           .then((res) => {
-            console.log(`TEST LOG: Successfully created user records ${res}`);
+            // console.log(`TEST LOG: Successfully created user records ${res}`);
             console.log(TEST_SEPARATOR)
           })
           .catch(err => {
-            console.error(`TEST LOG: Error creating user records ${err}`);
+            console.error(`BEFORE TEST LOG: Error creating user records ${err}`);
           });
 
   });
@@ -38,11 +38,11 @@ describe('Users credential validation test case', function() {
           force: true,
         })
         .then(() => {
-          console.log(`TEST LOG: Successfully deleted all records from Users table.`);
+          // console.log(`TEST LOG: Successfully deleted all records from Users table.`);
           console.log(TEST_SEPARATOR)
         })
         .catch(err => {
-          console.error(`TEST LOG: Error deleting all records from Users table ${err}`);
+          console.error(`AFTER TEST LOG: Error deleting all records from Users table ${err}`);
           console.log(TEST_SEPARATOR)
         });
   });

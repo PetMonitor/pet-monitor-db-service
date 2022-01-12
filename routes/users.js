@@ -51,6 +51,8 @@ router.get('/:userId', async (req, res) => {
 
 router.post('/', async (req, res) => {
 	// TODO: improve password hashing method
+	console.log('Attempting to create new user...');
+
 	const hashedPwd = passwordHasher(req.body.password);
 	const tx = await db.sequelize.transaction();
 	try {
@@ -64,10 +66,13 @@ router.post('/', async (req, res) => {
 			updatedAt: new Date()
 		}, { transaction: tx });
 
-		if (req.body.pets.length === 0) {
+
+		if (req.body.pets === undefined || req.body.pets.length === 0) {
 			await tx.commit();
-			console.log('Successfully created user!');
-			return res.status(http.StatusCodes.CREATED); 
+			console.log('No pets registered for user!');
+
+			console.log('Successfully created new user!');
+			return res.status(http.StatusCodes.CREATED).json(user); 
 		}
 
 		const petList = req.body.pets.map(pet => { return {
@@ -85,6 +90,8 @@ router.post('/', async (req, res) => {
 			createdAt: new Date(),
 			updatedAt: new Date()
 		}});
+
+		console.log('Attempting to create new pets for user!');
 
 		const pets = await db.Pets.bulkCreate(petList, {transaction: tx});
 
