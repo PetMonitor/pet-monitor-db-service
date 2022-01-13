@@ -102,8 +102,8 @@ router.post('/', async (req, res) => {
 			return pet.photos.map(photo => {
 
 				const petPhoto = {
-					uuid: uuid.v4(),
-					photo: Buffer.from(photo,'base64'),
+					uuid: photo.uuid,
+					photo: Buffer.from(photo.photo,'base64'),
 					createdAt: new Date(),
 					updatedAt: new Date()
 				}

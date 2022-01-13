@@ -1,8 +1,9 @@
 const request = require('supertest');
 const server = require('../app');
-const { expect, assert } = require('chai');
+const { expect } = require('chai');
 var db = require('../models/index.js');
 var passwordHasher = require('../utils/passwordHasher.js');
+var fs = require('fs');
 
 TEST_SEPARATOR = '=====================================================================';
 
@@ -49,6 +50,25 @@ PETS = [
     description: 'likes to chew furniture'
   }
 ]
+
+const IMAGE_CONTENT = fs.readFileSync('./seeders/resources/dogImage.txt', 'base64');
+
+PHOTOS = [
+  {
+    uuid: '126e4567-e89b-12d3-a456-426614176001',
+    photo: IMAGE_CONTENT
+  },
+  {
+    uuid: '126e4567-e89b-12d3-a456-426614176002',
+    photo: IMAGE_CONTENT
+  },
+  {
+    uuid: '126e4567-e89b-12d3-a456-426614176003',
+    photo: IMAGE_CONTENT
+  }
+]
+
+
 
 describe('Users test case', function() {
 
@@ -180,14 +200,79 @@ describe('Users test case', function() {
 
   });
 
-  /*it('Post user endpoint creates new user with pet and pet photos', async () => {
+  it('Post user endpoint creates new user with pets and pet photos', async () => {
+
+    NEW_PET_0 = Object.assign({}, PETS[0])
+    NEW_PET_1 = Object.assign({}, PETS[1])
+
+    NEW_PET_0['photos'] = [ PHOTOS[0] ]
+    NEW_PET_1['photos'] = [ PHOTOS[1], PHOTOS[2] ]
+
+    NEW_USER = {
+      uuid: '123e4567-e89b-12d3-a456-426614176000',
+      _ref: '1a919ac7-ca87-427d-9b82-3a8c57860833',
+      username: 'IanMcEwan',
+      email: 'ianmcewan@gmail.com',
+      password: 'atonement456',
+      pets: [ NEW_PET_0, NEW_PET_1 ]
+    }
+
+    EXPECTED_USER = Object.assign({}, NEW_USER);
+    delete EXPECTED_USER['pets']
+
+    console.log('Starting test create user')
+    await request(server)
+      .post('/users')
+      .set('Accept', 'application/json')
+      .send(NEW_USER)
+      .expect('Content-Type', /json/)
+      .expect(201);
+
+    EXPECTED_USER['password'] = passwordHasher(NEW_USER['password']);
     
+    const users = await db.Users.findByPk(NEW_USER['uuid'], {
+      attributes: ['uuid', '_ref', 'username', 'email', 'password']
+    });
+
+    const pet0 = await db.Pets.findByPk(PETS[0]['uuid'], {
+      attributes: ['uuid', '_ref', 'type', 'name', 'furColor', 'size', 'lifeStage', 'sex', 'breed', 'description']
+    });
+
+    const pet1 = await db.Pets.findByPk(PETS[1]['uuid'], {
+      attributes: ['uuid', '_ref', 'type', 'name', 'furColor', 'size', 'lifeStage', 'sex', 'breed', 'description']
+    });
+
+
+    const photo0 = await db.Photos.findByPk(PHOTOS[0]['uuid'], { attributes: ['uuid', 'photo'] });
+    const photo1 = await db.Photos.findByPk(PHOTOS[1]['uuid'], { attributes: ['uuid', 'photo'] });
+    const photo2 = await db.Photos.findByPk(PHOTOS[2]['uuid'], { attributes: ['uuid', 'photo'] });
+
+    const pet0Photos = await db.PetPhotos.findAll({ where: { petId: PETS[0]['uuid'] } ,  attributes: ['petId', 'photoId'] });
+    const pet1Photos = await db.PetPhotos.findAll({ where: { petId: PETS[1]['uuid'] } ,  attributes: ['petId', 'photoId'] });
+
+    //console.log(`TEST LOG: Response was ${JSON.stringify(users)}`);
+
+    expect(users['dataValues']).to.deep.equal(EXPECTED_USER);
+
+    expect(pet0['dataValues']).to.deep.equal(PETS[0]);
+    expect(pet1['dataValues']).to.deep.equal(PETS[1]);
+
+    //Before comparing, field 'photo' must be changed back to base64
+    expect(Buffer.from(photo0['dataValues']['photo']).toString('base64')).to.equal(PHOTOS[0]['photo']);
+    expect(Buffer.from(photo1['dataValues']['photo']).toString('base64')).to.equal(PHOTOS[1]['photo']); 
+    expect(Buffer.from(photo2['dataValues']['photo']).toString('base64')).to.equal(PHOTOS[2]['photo']); 
+
+    expect(pet0Photos[0]['dataValues']['photoId']).to.equal(PHOTOS[0]['uuid']);
+    expect(pet0Photos[0]['dataValues']['petId']).to.equal(PETS[0]['uuid']);
+
+    expect(pet1Photos[0]['dataValues']['photoId']).to.equal(PHOTOS[1]['uuid']);
+    expect(pet1Photos[0]['dataValues']['petId']).to.equal(PETS[1]['uuid']);
+
+    expect(pet1Photos[1]['dataValues']['photoId']).to.equal(PHOTOS[2]['uuid']);
+    expect(pet1Photos[1]['dataValues']['petId']).to.equal(PETS[1]['uuid']);
   });
 
-  it('Post user endpoint creates new user with multiple pets and photos', async () => {
-    
-  });
-
+  /*
   it('Post user endpoint if creation fails then no users or pets are created', async () => {
     
   });*/
