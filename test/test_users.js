@@ -1,6 +1,6 @@
 const request = require('supertest');
 const server = require('../app');
-const { expect, assert } = require('chai');
+const { expect } = require('chai');
 var db = require('../models/index.js');
 var passwordHasher = require('../utils/passwordHasher.js');
 var fs = require('fs');
