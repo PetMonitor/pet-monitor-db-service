@@ -53,7 +53,6 @@ router.post('/', async (req, res) => {
 	// TODO: improve password hashing method
 	console.log('Attempting to create new user...');
 
-	const hashedPwd = passwordHasher(req.body.password);
 	const tx = await db.sequelize.transaction();
 	try {
 		const user = await db.Users.create({
