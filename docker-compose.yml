@@ -10,6 +10,8 @@ services:
       - POSTGRESQL_DATABASE=my_database
     ports:
       - "5432:5432"
+    healthcheck:
+      test: exit 0
   web:
     build: .
     container_name: web

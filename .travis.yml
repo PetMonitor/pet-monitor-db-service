@@ -1,0 +1,22 @@
+language: node_js
+services:
+  - postgresql
+
+addons:
+  postgresql: "9.5"
+  
+node_js:
+  - 16
+# install dependencies
+install:
+  - npm install
+  - npm install dotenv
+# run tests
+script:
+  - npm test
+notifications:
+  email:
+    recipients:
+      - mmariotti@fi.uba.ar
+    on_success: change
+    on_failure: always

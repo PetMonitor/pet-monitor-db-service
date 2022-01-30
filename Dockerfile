@@ -6,11 +6,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Copy application source code files
-COPY app.js .
-COPY config/ config/
-COPY migrations/ migrations/
-COPY models/ models/
-COPY entrypoint.sh .
+COPY . .
 RUN chmod +x entrypoint.sh
 
 EXPOSE 8000

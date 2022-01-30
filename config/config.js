@@ -20,5 +20,14 @@ module.exports = {
         dialect: 'postgres',
         protocol: 'postgres',
         dialectOptions: {}
+    },
+    test: {
+        username: 'postgres',
+        password: 'pass',
+        database: 'pet-monitor-db',
+        host: '127.0.0.1',
+        port: 5432,
+        dialect: 'postgres',
+        protocol: 'postgres'
     }
 };

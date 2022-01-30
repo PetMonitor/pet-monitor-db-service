@@ -1,47 +1,40 @@
-const express = require("express")
-const path = require("path")
-const app = express();
-const port = process.env.PORT || "8000";
+const express = require('express')
+const bodyParser = require("body-parser");
 
-const db = require('/usr/src/app/models/index.js');
+const port = process.env.PORT || '8000';
+
+var app = express();
+app.use(bodyParser.json({ limit:"200mb", type:'application/json' }));
+app.use(bodyParser.urlencoded({ limit: "200mb", extended: true, parameterLimit: 50000 }));
+
+var pets = require('./routes/pets.js');
+var petPhotos = require('./routes/petPhotos.js');
+var notices = require('./routes/notices.js');
+var users = require('./routes/users.js');
+var userNotices = require('./routes/userNotices.js');
+var credentialValidation = require('./routes/credentialValidator.js');
 
 /**
-
 * Server Endpoints
-
 */
 
-app.get("/", (req, res) => {
-	
-	res.status(200).send("Now is the winter of our discontent");
-
+app.get('/', (req, res) => {
+	res.status(200).send('Now is the winter of our discontent');
 });
 
-app.get("/users/all", async (req, res) => {
-
-
-	try {
-		console.log('model is : ' + db.Users);
-
-		db.Users.findAll({ attributes: ['username','email','password']})
-			.then((users) => { res.status(200).send(JSON.stringify(users)); });
- 
-  	} catch (err) {
-  		console.error(err);
-  		res.status(500).send({"ERROR":err});
-  	} 
-
-});
+app.use('/users', users);
+app.use('/users/:userId/pets', pets);
+app.use('/users/:userId/notices', userNotices);
+app.use('/notices', notices);
+app.use('/users/:userId/pets/:petId/photos', petPhotos)
+app.use('/users/credentialValidation', credentialValidation);
 
 /**
-
 * Server Activation
-
 */
 
 app.listen(port, () => {
-	
 	console.log(`Listening to requests on http://localhost:${port}`)
-
 });
 
+module.exports = app

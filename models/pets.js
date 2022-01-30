@@ -1,23 +1,29 @@
 'use strict';
 
 const { Model } = require('sequelize');
+const db = require('.');
 
 module.exports = (sequelize, DataTypes) => {
-  class Users extends Model {
+  class Pets extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Users.hasMany(models.Pets, {
+      console.log('Running Pets associate to Users.')
+      Pets.belongsTo(models.Users, {
         name: 'userId',
         foreignKey:'uuid'
       });
+
+      Pets.hasMany(models.PetPhotos, {
+        foreignKey: 'petId'
+      });
     }
   };
-  
-  Users.init({
+
+  Pets.init({
     uuid: {
       primaryKey: true,
       type: DataTypes.UUID,
@@ -30,20 +36,27 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       allowNull: false
     },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false
+    userId: { 
+      primaryKey: true,
+      allowNull: false,
+      type: DataTypes.UUID 
     },
-    email: DataTypes.STRING,
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
+    type: DataTypes.STRING,
+    name: DataTypes.STRING,
+    furColor: DataTypes.STRING,
+    rightEyeColor: DataTypes.STRING,
+    leftEyeColor: DataTypes.STRING,
+    breed: DataTypes.STRING,
+    size: DataTypes.STRING,
+    lifeStage: DataTypes.STRING,
+    age: DataTypes.INTEGER,
+    sex: DataTypes.STRING,
+    description: DataTypes.TEXT,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE
   }, {
     sequelize,
-    modelName: 'Users',
+    modelName: 'Pets',
   });
-  return Users;
+  return Pets;
 };
