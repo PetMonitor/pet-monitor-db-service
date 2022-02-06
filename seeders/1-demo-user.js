@@ -10,6 +10,11 @@ module.exports = {
         username: 'TerryPratchett',
         password: passwordHasher('discworld123'),
         email: 'terrypratchett@discworld.com',
+        name: 'Terry Pratchett',
+        phoneNumber: '222-000-666',
+        profilePicture: '123e4567-e89b-12d3-a456-556614173000',
+        alertsActivated: true,
+        alertRadius: 1,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -19,6 +24,11 @@ module.exports = {
         username: 'NeilGaiman',
         password: passwordHasher('coraline1960'),
         email: 'neilgaiman@gmail.com',
+        name: 'Neil Gaiman',
+        phoneNumber: '222-000-667',
+        profilePicture: '123e4567-e89b-12d3-a456-556614173001',
+        alertsActivated: false,
+        alertRadius: 1,
         createdAt: new Date(),
         updatedAt: new Date()
       }

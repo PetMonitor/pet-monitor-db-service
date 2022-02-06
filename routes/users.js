@@ -5,6 +5,7 @@ var uuid = require('uuid');
 
 var http = require('http-status-codes');
 const db = require('../models/index.js');
+const { up } = require('../migrations/1-create-users.js');
 
 /**
  * User CRUD endpoints.
@@ -32,7 +33,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:userId', async (req, res) => {
 	try {
-		db.Users.findByPk(req.params.userId, { attributes: ['uuid', '_ref', 'username', 'email'] })
+		db.Users.findByPk(req.params.userId, { attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phoneNumber', 'alertsActivated', 'alertRadius', 'profilePicture' ] })
 			.then((user) => { 
 				res.status(http.StatusCodes.OK).json(user); 
 			}).catch(err => {
@@ -176,6 +177,39 @@ router.put('/:userId', async (req, res) => {
         db.Users.update(updateUserFields, { 
 			where: { 
 				uuid: req.params.userId 
+			}
+		}).then((affectedRows) => {
+		    res.status(http.StatusCodes.OK).json({ 'updatedCount': affectedRows[0] }); 
+		}).catch(err => {
+			console.error(err);
+			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
+			  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
+			});
+		});
+	} catch (err) {
+		console.error(err);
+		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
+		  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
+	    });		
+	}
+});
+
+router.put('/:userId/password', async (req, res) => {
+	try {
+		//TODO: check for _ref
+
+        var updateUserFields = req.body
+
+		const newPassword = { 
+			_ref: updateUserFields._ref,
+			password: passwordHasher(updateUserFields.newPassword),
+			updatedAt: new Date()
+		}
+
+        db.Users.update(newPassword, { 
+			where: { 
+				uuid: req.params.userId,
+				password: passwordHasher(updateUserFields.oldPassword) 
 			}
 		}).then((affectedRows) => {
 		    res.status(http.StatusCodes.OK).json({ 'updatedCount': affectedRows[0] }); 

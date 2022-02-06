@@ -18,12 +18,31 @@ module.exports = {
         type: Sequelize.STRING,
         unique: true
       },
+      name: {
+        type: Sequelize.STRING
+      },
       password: {
         type: Sequelize.STRING,
         allowNull: false
       },
       email: {
         type: Sequelize.STRING
+      },
+      phoneNumber: {
+        type: Sequelize.STRING
+      },
+      profilePicture: {
+        type: Sequelize.UUID
+      },
+      alertsActivated: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+      },
+      alertRadius: {
+        type: Sequelize.INTEGER,
+        defaultValue: 1,
+        allowNull: false
       },
       createdAt: {
         allowNull: true,
@@ -33,6 +52,18 @@ module.exports = {
         allowNull: true,
         type: Sequelize.DATE
       }
+    }).then(() => {
+      queryInterface.addConstraint('Users', {
+        type: 'foreign key',
+        fields: ['profilePicture'],
+        name: 'fk_photos_users_profilePicture',
+        references: {
+          table: 'Photos',
+          field: 'uuid'
+        },
+        onDelete: 'cascade',
+        onUpdate: 'no action',
+      })
     })
   },
   down: async (queryInterface, Sequelize) => {

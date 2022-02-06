@@ -7,6 +7,18 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('Photos', [
       {
+        uuid: '123e4567-e89b-12d3-a456-556614173000',
+        photo: Buffer.from(imageContent, "base64"),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        uuid: '123e4567-e89b-12d3-a456-556614173001',
+        photo: Buffer.from(imageContent, "base64"),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
         uuid: '123e4567-e89b-12d3-a456-556614174001',
         photo: Buffer.from(imageContent, "base64"),
         createdAt: new Date(),
