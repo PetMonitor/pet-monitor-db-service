@@ -6,21 +6,26 @@ var passwordHasher = require('../utils/passwordHasher.js');
 
 TEST_SEPARATOR = '=====================================================================';
 
-USERS = [
+VALIDATION_USERS = [
     {
       uuid: '123e4567-e89b-12d3-a456-426614175000',
       _ref: '1a919ac7-ca87-427d-9b82-3a8c5786082a',
       username: 'NeilGaiman',
       email: 'neilgaiman@gmail.com',
-      password:  passwordHasher('goodOmens2022')
+      password:  passwordHasher('goodOmens2022'),
+      name: 'Neil Gaiman',
+      phoneNumber: '222-000-777',
+      profilePicture: null,
+      alertsActivated: true,
+      alertRadius: 1,
     }
   ]
 
 describe('Users credential validation test case', function() {
 
-  this.beforeEach('Before users credential validation test', function() {
+  this.beforeEach('Before users credential validation test', async function() {
     // Re-initialize database
-    return db.Users.bulkCreate(USERS)
+    return await db.Users.bulkCreate(VALIDATION_USERS)
           .then((res) => {
             // console.log(`TEST LOG: Successfully created user records ${res}`);
             console.log(TEST_SEPARATOR)
@@ -31,9 +36,9 @@ describe('Users credential validation test case', function() {
 
   });
 
-  this.afterEach('After users credential validation test', function() {
+  this.afterEach('After users credential validation test', async function() {
     // Clean database
-    return db.Users.destroy({
+    return await db.Users.destroy({
           where: {},
           force: true,
         })
@@ -49,7 +54,7 @@ describe('Users credential validation test case', function() {
 
   it('Post at credentialsValidation returns OK if password matches user', async () => {
 
-    USER_INFO = Object.assign({}, USERS[1])
+    USER_INFO = Object.assign({}, VALIDATION_USERS[0])
     delete USER_INFO['password']
 
     await request(server)

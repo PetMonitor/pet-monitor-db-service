@@ -13,7 +13,7 @@ const { up } = require('../migrations/1-create-users.js');
 
 router.get('/', async (req, res) => {
 	try {
-		db.Users.findAll({ attributes: ['uuid', '_ref', 'username', 'email'] })
+		db.Users.findAll({ attributes: ['uuid', '_ref', 'name', 'username', 'email', 'phoneNumber', 'alertRadius', 'alertsActivated', 'profilePicture'] })
 			.then((users) => { 
 				console.log(`Returning users ${JSON.stringify(users)}`);
 				res.status(http.StatusCodes.OK).json(users); 

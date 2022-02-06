@@ -19,7 +19,7 @@ router.post('/', async (req, res) => {
         const hashedPwd = passwordHasher(userCredentials['password'])
 
         db.Users.findOne({ 
-            attributes: ['uuid', '_ref', 'username', 'email'],
+            attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phoneNumber', 'alertRadius', 'alertsActivated', 'profilePicture'],
             where: { 
                 username: userCredentials['username'],
                 password: hashedPwd
