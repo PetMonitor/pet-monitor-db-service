@@ -61,6 +61,11 @@ router.post('/', async (req, res) => {
 			_ref: req.body._ref,
 			username: req.body.username,
 			password: passwordHasher(req.body.password),
+			phoneNumber: '',
+			name: '',
+			profilePicture: '',
+			alertsActivated: false,
+			alertRadius: -1,
 			email: req.body.email,
 			createdAt: new Date(),
 			updatedAt: new Date()
