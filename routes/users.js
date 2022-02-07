@@ -63,7 +63,7 @@ router.post('/', async (req, res) => {
 			password: passwordHasher(req.body.password),
 			phoneNumber: '',
 			name: '',
-			profilePicture: '',
+			profilePicture: null,
 			alertsActivated: false,
 			alertRadius: -1,
 			email: req.body.email,
