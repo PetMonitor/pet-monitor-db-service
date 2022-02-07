@@ -5,24 +5,24 @@ module.exports = {
       petId: {
         primaryKey: true,
         type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
         allowNull: false,
         noUpdate: true
       },
       photoId: {
         primaryKey: true,
         type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
         allowNull: false,
         noUpdate: true
       },
       createdAt: {
         allowNull: false,
-        noUpdate: true
+        type: Sequelize.DATE
       },
-      photoId: {
-        primaryKey: true,
-        type: Sequelize.UUID,
+      updatedAt: {
         allowNull: false,
-        noUpdate: true
+        type: Sequelize.DATE
       }
     }).then(() => {
       queryInterface.addConstraint('PetPhotos', {
