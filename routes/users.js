@@ -5,7 +5,7 @@ var uuid = require('uuid');
 
 var http = require('http-status-codes');
 const db = require('../models/index.js');
-const { up } = require('../migrations/1-create-users.js');
+var sharp = require('sharp');
 
 /**
  * User CRUD endpoints.
@@ -96,43 +96,60 @@ router.post('/', async (req, res) => {
 			updatedAt: new Date()
 		}});
 
-		console.log('Attempting to create new pets for user!');
+		console.log('Attempting to create new pets for user...');
 
 		const pets = await db.Pets.bulkCreate(petList, {transaction: tx});
 
 		let petPhotosList = [];
+		let photosList = []
 
-		let photosList = req.body.pets.map(pet => {
+		for (var i = 0; i < req.body.pets.length; i++) {
+			console.log(`Processing photos ${JSON.stringify(req.body.pets[i].photos.length)} for pet ${JSON.stringify(req.body.pets[i].uuid)}`);
 
-			return pet.photos.map(photo => {
+			for (var j = 0; j < req.body.pets[i].photos.length; j++) {
+				console.log(`Processing photo number ${j} for pet ${JSON.stringify(req.body.pets[i].uuid)}`);
+
+				const photoBuffer = Buffer.from(req.body.pets[i].photos[j].photo,'base64');
+				let lowResPhoto = sharp(photoBuffer).resize(130, 130);
+				lowResPhotoBuffer = await lowResPhoto.toBuffer();
+
+					
+				console.log(`2: Resized photo ${lowResPhotoBuffer !== undefined}`);
 
 				const petPhoto = {
-					uuid: photo.uuid,
-					photo: Buffer.from(photo.photo,'base64'),
+					uuid: req.body.pets[i].photos[j].uuid,
+					photo: photoBuffer,
+					lowResPhoto: lowResPhotoBuffer,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				}
 
 				petPhotosList.push({
-					petId: pet.uuid,
+					petId: req.body.pets[i].uuid,
 					photoId: petPhoto.uuid,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				});
 
-				return petPhoto;
-			});
-			
-		});
+				photosList.push(petPhoto);
+			}
 
-		photosList = photosList.flat();
+		}
+
+
+		await Promise.all(photosList);
 
 		// Add pet photos
+		//await db.Photos.bulkCreate(photosList, { transaction: tx });
 		for (const photo of photosList) {
+			console.log(`Inserting photo ${photo.uuid} ${photo.lowResPhoto}`);
 			await db.Photos.create(photo, { transaction: tx });
 		}
 
+		console.log(`Inserting pet photos ${petPhotosList.length}`);
+
 		// Link photos to pets
+		//await db.Photos.bulkCreate(petPhotosList, { transaction: tx });
 		for (const petPhoto of petPhotosList) {
 			await db.PetPhotos.create(petPhoto, { transaction: tx });
 		}

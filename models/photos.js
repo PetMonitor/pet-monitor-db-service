@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       noUpdate: true
     },
     photo: DataTypes.BLOB,
+    lowResPhoto: DataTypes.BLOB,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE
   },

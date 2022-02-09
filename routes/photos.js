@@ -15,12 +15,12 @@ var router = express.Router({mergeParams: true});
 router.get('/:photoId', async (req, res) => {
 	try {
 		console.log(`Attempting to fetch photos with id ${req.params.photoId}`);
-		db.Photos.findByPk(req.params.photoId, { attributes: ['uuid', 'photo'] })
+		db.Photos.findByPk(req.params.photoId, { attributes: ['uuid', 'lowResPhoto'] })
 			.then((photo) => { 
-				console.log(`Sending image ${photo}`); 
+				console.log(`Sending image ${photo.uuid}`); 
 				res.status(http.StatusCodes.OK)
 				.setHeader('Content-Type', 'image/png')
-				.send(Buffer.from(photo.photo, 'base64'));
+				.send(Buffer.from(photo.lowResPhoto, 'base64'));
 			}).catch(err => {
 				console.error(err);
 				res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
