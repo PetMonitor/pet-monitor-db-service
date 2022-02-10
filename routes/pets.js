@@ -46,8 +46,7 @@ router.get('/', async (req, res) => {
 					description: pet.description,
 					photos: pet.PetPhotos.map(petPhoto =>
 						Object.assign({},{ 
-							photoId: petPhoto.photoId,
-							// photoContent: Buffer.from(petPhoto.Photo.photo).toString('base64')
+							photoId: petPhoto.photoId
 						})
 					)
 				})
@@ -101,8 +100,7 @@ router.get('/:petId', async (req, res) => {
 				description: pet.description,
                 photos: pet.PetPhotos.map(petPhoto =>
 					Object.assign({},{ 
-						photoId: petPhoto.photoId,
-                        //photoContent: petPhoto.Photo.photo.toString('base64')
+						photoId: petPhoto.photoId
 					})
 				)
 			})

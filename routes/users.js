@@ -7,6 +7,8 @@ var http = require('http-status-codes');
 const db = require('../models/index.js');
 var sharp = require('sharp');
 
+LOW_RES_PHOTO_DIMENSION = 130
+
 /**
  * User CRUD endpoints.
  */
@@ -108,7 +110,7 @@ router.post('/', async (req, res) => {
 			for (var j = 0; j < req.body.pets[i].photos.length; j++) {
 
 				const photoBuffer = Buffer.from(req.body.pets[i].photos[j].photo,'base64');
-				let lowResPhoto = sharp(photoBuffer).resize(130, 130);
+				let lowResPhoto = sharp(photoBuffer).resize(LOW_RES_PHOTO_DIMENSION, LOW_RES_PHOTO_DIMENSION);
 				lowResPhotoBuffer = await lowResPhoto.toBuffer();
 
 				const petPhoto = {
