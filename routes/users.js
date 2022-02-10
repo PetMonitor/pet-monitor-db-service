@@ -104,17 +104,12 @@ router.post('/', async (req, res) => {
 		let photosList = []
 
 		for (var i = 0; i < req.body.pets.length; i++) {
-			console.log(`Processing photos ${JSON.stringify(req.body.pets[i].photos.length)} for pet ${JSON.stringify(req.body.pets[i].uuid)}`);
 
 			for (var j = 0; j < req.body.pets[i].photos.length; j++) {
-				console.log(`Processing photo number ${j} for pet ${JSON.stringify(req.body.pets[i].uuid)}`);
 
 				const photoBuffer = Buffer.from(req.body.pets[i].photos[j].photo,'base64');
 				let lowResPhoto = sharp(photoBuffer).resize(130, 130);
 				lowResPhotoBuffer = await lowResPhoto.toBuffer();
-
-					
-				console.log(`2: Resized photo ${lowResPhotoBuffer !== undefined}`);
 
 				const petPhoto = {
 					uuid: req.body.pets[i].photos[j].uuid,
