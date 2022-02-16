@@ -13,14 +13,24 @@ USERS = [
       _ref: '94aa64c9-b966-4bc0-b422-0830fce1ac5c',
       username: 'TerryPratchett',
       email: 'terrypratchett@discworld.com',
-      password: passwordHasher('discworld123')
+      password: passwordHasher('discworld123'),
+      name: 'Terry Pratchett',
+      phoneNumber: '222-000-666',
+      profilePicture: null,
+      alertsActivated: true,
+      alertRadius: 1
     },
     {
       uuid: '123e4567-e89b-12d3-a456-426614175000',
       _ref: '1a919ac7-ca87-427d-9b82-3a8c5786082a',
       username: 'NeilGaiman',
       email: 'neilgaiman@gmail.com',
-      password: passwordHasher('goodOmens2022')
+      password: passwordHasher('goodOmens2022'),
+      name: 'Neil Gaiman',
+      phoneNumber: '222-000-777',
+      profilePicture: null,
+      alertsActivated: true,
+      alertRadius: 1,
     }
 ]
 
@@ -51,12 +61,12 @@ PETS = [
   }
 ]
 
-const IMAGE_CONTENT = fs.readFileSync('./seeders/resources/dogImage.txt', 'base64');
+const IMAGE_CONTENT = fs.readFileSync('./seeders/resources/dogImage.txt', 'utf-8');
 
 PHOTOS = [
   {
     uuid: '126e4567-e89b-12d3-a456-426614176001',
-    photo: IMAGE_CONTENT
+    photo: IMAGE_CONTENT,
   },
   {
     uuid: '126e4567-e89b-12d3-a456-426614176002',
@@ -72,10 +82,11 @@ PHOTOS = [
 
 describe('Users test case', function() {
 
-  this.beforeEach('Before users test', function() {
+  this.beforeEach('Before users test', async function() {
     // Re-initialize database
-    return db.Users.bulkCreate(USERS)
+    await db.Users.bulkCreate(USERS)
           .then((res) => {
+            console.log('Created test users');
             // console.log(`BEFORE TEST LOG: Successfully created user records ${res}`);
             console.log(TEST_SEPARATOR)
           })
@@ -85,13 +96,12 @@ describe('Users test case', function() {
 
   });
 
-  this.afterEach('After users test', function() {
+  this.afterEach('After users test', async function() {
     // Clean database
-    return db.Users.destroy({
+    await db.Users.destroy({
           where: {},
           force: true,
-        })
-        .then(() => {
+        }).then(() => {
           // console.log(`AFTER TEST LOG: Successfully deleted all records from Users table.`);
           console.log(TEST_SEPARATOR)
         })
@@ -337,10 +347,9 @@ describe('User by id test case', function() {
       });
 
     return db.Users
-      .findAll({ attributes: ['uuid', '_ref', 'username', 'email', 'password'] })
+      .findAll({ attributes: [ 'uuid', '_ref', 'password', 'username', 'email', 'name', 'phoneNumber',  'profilePicture', 'alertsActivated', 'alertRadius']})
       .then(users => {
-        console.log(`TEST LOG: Response was ${JSON.stringify(users)}`)
-        
+        console.log(`TEST LOG: Response was ${JSON.stringify(users)}`)        
         expect(users[0]['dataValues']).to.deep.equal(USERS[1])
       });
   });
@@ -352,7 +361,12 @@ describe('User by id test case', function() {
       uuid: '123e4567-e89b-12d3-a456-426614174000',
       _ref: '94aa64c9-b966-4bc0-b422-0830fce1ac5c',
       username: 'TerryPratchett',
-      email: 'terrypratchett@goodomens.com'
+      email: 'terrypratchett@goodomens.com',
+      name: 'Terry Pratchett',
+      phoneNumber: '222-000-666',
+      profilePicture: '126e4567-e89b-12d3-a456-426614176001',
+      alertsActivated: true,
+      alertRadius: 1
     }
 
     await request(server)

@@ -13,6 +13,10 @@ module.exports = {
       photo: {
         type: Sequelize.BLOB
       },
+      lowResPhoto: {
+        type: Sequelize.BLOB,
+        allowNull: true
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

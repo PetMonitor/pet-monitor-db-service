@@ -1,6 +1,6 @@
 'use strict';
 
-const { Model } = require('sequelize');
+const { Model, Sequelize } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Users extends Model {
@@ -13,6 +13,11 @@ module.exports = (sequelize, DataTypes) => {
       Users.hasMany(models.Pets, {
         name: 'userId',
         foreignKey:'uuid'
+      });
+
+      Users.belongsTo(models.Photos, {
+        name: 'profilePicture',
+        foreignKey:'uuid'      
       });
     }
   };
@@ -35,6 +40,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     email: DataTypes.STRING,
+    name: DataTypes.STRING,
+    phoneNumber: DataTypes.STRING,
+    profilePicture: Sequelize.UUIDV4,
+    alertsActivated: Sequelize.BOOLEAN,
+    alertRadius: Sequelize.INTEGER,
     password: {
       type: DataTypes.STRING,
       allowNull: false

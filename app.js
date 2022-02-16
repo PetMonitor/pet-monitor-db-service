@@ -11,6 +11,7 @@ var pets = require('./routes/pets.js');
 var petPhotos = require('./routes/petPhotos.js');
 var notices = require('./routes/notices.js');
 var users = require('./routes/users.js');
+var photos = require('./routes/photos.js');
 var userNotices = require('./routes/userNotices.js');
 var credentialValidation = require('./routes/credentialValidator.js');
 
@@ -26,6 +27,7 @@ app.use('/users', users);
 app.use('/users/:userId/pets', pets);
 app.use('/users/:userId/notices', userNotices);
 app.use('/notices', notices);
+app.use('/photos', photos);
 app.use('/users/:userId/pets/:petId/photos', petPhotos)
 app.use('/users/credentialValidation', credentialValidation);
 

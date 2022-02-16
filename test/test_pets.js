@@ -11,14 +11,24 @@ USERS = [
       _ref: '94aa64c9-b966-4bc0-b422-0830fce1ac5c',
       username: 'TerryPratchett',
       email: 'terrypratchett@discworld.com',
-      password: 'discworld123'
+      password: 'discworld123',
+      name: 'Terry Pratchett',
+      phoneNumber: '222-000-666',
+      profilePicture: '126e4567-e89b-12d3-a456-426614176001',
+      alertsActivated: true,
+      alertRadius: 1
     },
     {
       uuid: '123e4567-e89b-12d3-a456-426614175000',
       _ref: '1a919ac7-ca87-427d-9b82-3a8c5786082a',
       username: 'NeilGaiman',
       email: 'neilgaiman@gmail.com',
-      password: 'goodOmens2022'
+      password: 'goodOmens2022',
+      name: 'Neil Gaiman',
+      phoneNumber: '222-000-777',
+      profilePicture: '126e4567-e89b-12d3-a456-426614176002',
+      alertsActivated: true,
+      alertRadius: 1,
     }
   ]
 
@@ -61,9 +71,9 @@ EXPECTED_PETS = [
 
 describe('Pets test case', function() {
 
-  this.beforeEach('Before pets test', function() {
+  this.beforeEach('Before pets test', async function() {
     // Re-initialize database
-    return db.Users.bulkCreate(USERS)
+    await db.Users.bulkCreate(USERS)
         .then((res) => {
           console.log(`TEST LOG: Successfully created user records ${res}`);
           return db.Pets.bulkCreate(EXPECTED_PETS)
@@ -82,9 +92,9 @@ describe('Pets test case', function() {
         });
     });
 
-    this.afterEach('After pets test', function() {
+    this.afterEach('After pets test', async function() {
         // Clean database
-        return db.Users.destroy({
+        await db.Users.destroy({
               where: {},
               force: true,
             })

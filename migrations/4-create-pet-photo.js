@@ -5,12 +5,14 @@ module.exports = {
       petId: {
         primaryKey: true,
         type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
         allowNull: false,
         noUpdate: true
       },
       photoId: {
         primaryKey: true,
         type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
         allowNull: false,
         noUpdate: true
       },

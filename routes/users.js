@@ -5,6 +5,9 @@ var uuid = require('uuid');
 
 var http = require('http-status-codes');
 const db = require('../models/index.js');
+var sharp = require('sharp');
+
+LOW_RES_PHOTO_DIMENSION = 130
 
 /**
  * User CRUD endpoints.
@@ -12,7 +15,7 @@ const db = require('../models/index.js');
 
 router.get('/', async (req, res) => {
 	try {
-		db.Users.findAll({ attributes: ['uuid', '_ref', 'username', 'email'] })
+		db.Users.findAll({ attributes: ['uuid', '_ref', 'name', 'username', 'email', 'phoneNumber', 'alertRadius', 'alertsActivated', 'profilePicture'] })
 			.then((users) => { 
 				console.log(`Returning users ${JSON.stringify(users)}`);
 				res.status(http.StatusCodes.OK).json(users); 
@@ -32,7 +35,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:userId', async (req, res) => {
 	try {
-		db.Users.findByPk(req.params.userId, { attributes: ['uuid', '_ref', 'username', 'email'] })
+		db.Users.findByPk(req.params.userId, { attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phoneNumber', 'alertsActivated', 'alertRadius', 'profilePicture' ] })
 			.then((user) => { 
 				res.status(http.StatusCodes.OK).json(user); 
 			}).catch(err => {
@@ -53,7 +56,6 @@ router.post('/', async (req, res) => {
 	// TODO: improve password hashing method
 	console.log('Attempting to create new user...');
 
-	const hashedPwd = passwordHasher(req.body.password);
 	const tx = await db.sequelize.transaction();
 	try {
 		const user = await db.Users.create({
@@ -61,6 +63,11 @@ router.post('/', async (req, res) => {
 			_ref: req.body._ref,
 			username: req.body.username,
 			password: passwordHasher(req.body.password),
+			phoneNumber: '',
+			name: '',
+			profilePicture: null,
+			alertsActivated: false,
+			alertRadius: -1,
 			email: req.body.email,
 			createdAt: new Date(),
 			updatedAt: new Date()
@@ -91,43 +98,55 @@ router.post('/', async (req, res) => {
 			updatedAt: new Date()
 		}});
 
-		console.log('Attempting to create new pets for user!');
+		console.log('Attempting to create new pets for user...');
 
 		const pets = await db.Pets.bulkCreate(petList, {transaction: tx});
 
 		let petPhotosList = [];
+		let photosList = []
 
-		let photosList = req.body.pets.map(pet => {
+		for (var i = 0; i < req.body.pets.length; i++) {
 
-			return pet.photos.map(photo => {
+			for (var j = 0; j < req.body.pets[i].photos.length; j++) {
+
+				const photoBuffer = Buffer.from(req.body.pets[i].photos[j].photo,'base64');
+				let lowResPhoto = sharp(photoBuffer).resize(LOW_RES_PHOTO_DIMENSION, LOW_RES_PHOTO_DIMENSION);
+				lowResPhotoBuffer = await lowResPhoto.toBuffer();
 
 				const petPhoto = {
-					uuid: photo.uuid,
-					photo: Buffer.from(photo.photo,'base64'),
+					uuid: req.body.pets[i].photos[j].uuid,
+					photo: photoBuffer,
+					lowResPhoto: lowResPhotoBuffer,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				}
 
 				petPhotosList.push({
-					petId: pet.uuid,
+					petId: req.body.pets[i].uuid,
 					photoId: petPhoto.uuid,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				});
 
-				return petPhoto;
-			});
-			
-		});
+				photosList.push(petPhoto);
+			}
 
-		photosList = photosList.flat();
+		}
+
+
+		await Promise.all(photosList);
 
 		// Add pet photos
+		//await db.Photos.bulkCreate(photosList, { transaction: tx });
 		for (const photo of photosList) {
+			console.log(`Inserting photo ${photo.uuid} ${photo.lowResPhoto}`);
 			await db.Photos.create(photo, { transaction: tx });
 		}
 
+		console.log(`Inserting pet photos ${petPhotosList.length}`);
+
 		// Link photos to pets
+		//await db.Photos.bulkCreate(petPhotosList, { transaction: tx });
 		for (const petPhoto of petPhotosList) {
 			await db.PetPhotos.create(petPhoto, { transaction: tx });
 		}
@@ -177,6 +196,39 @@ router.put('/:userId', async (req, res) => {
         db.Users.update(updateUserFields, { 
 			where: { 
 				uuid: req.params.userId 
+			}
+		}).then((affectedRows) => {
+		    res.status(http.StatusCodes.OK).json({ 'updatedCount': affectedRows[0] }); 
+		}).catch(err => {
+			console.error(err);
+			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
+			  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
+			});
+		});
+	} catch (err) {
+		console.error(err);
+		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
+		  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
+	    });		
+	}
+});
+
+router.put('/:userId/password', async (req, res) => {
+	try {
+		//TODO: check for _ref
+
+        var updateUserFields = req.body
+
+		const newPassword = { 
+			_ref: updateUserFields._ref,
+			password: passwordHasher(updateUserFields.newPassword),
+			updatedAt: new Date()
+		}
+
+        db.Users.update(newPassword, { 
+			where: { 
+				uuid: req.params.userId,
+				password: passwordHasher(updateUserFields.oldPassword) 
 			}
 		}).then((affectedRows) => {
 		    res.status(http.StatusCodes.OK).json({ 'updatedCount': affectedRows[0] }); 
