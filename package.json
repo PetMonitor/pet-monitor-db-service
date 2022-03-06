@@ -25,7 +25,7 @@
     "sequelize": "6.6.5",
     "sequelize-cli": "6.2.0",
     "sequelize-noupdate-attributes": "1.0.0",
-    "sharp": "^0.30.0",
+    "sharp": "^0.30.2",
     "supertest": "^6.1.6",
     "uuid": "^8.3.2"
   }

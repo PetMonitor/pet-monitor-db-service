@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('users', {
       uuid: {
         primaryKey: true,
         type: Sequelize.UUID,
@@ -28,18 +28,18 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
-      phoneNumber: {
+      phone_number: {
         type: Sequelize.STRING
       },
-      profilePicture: {
+      profile_picture: {
         type: Sequelize.UUID
       },
-      alertsActivated: {
+      alerts_activated: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: false
       },
-      alertRadius: {
+      alert_radius: {
         type: Sequelize.INTEGER,
         defaultValue: 1,
         allowNull: false
@@ -53,12 +53,12 @@ module.exports = {
         type: Sequelize.DATE
       }
     }).then(() => {
-      queryInterface.addConstraint('Users', {
+      queryInterface.addConstraint('users', {
         type: 'foreign key',
-        fields: ['profilePicture'],
-        name: 'fk_photos_users_profilePicture',
+        fields: ['profile_picture'],
+        name: 'fk_photos_users_profile_picture',
         references: {
-          table: 'Photos',
+          table: 'photos',
           field: 'uuid'
         },
         onDelete: 'cascade',
@@ -67,6 +67,6 @@ module.exports = {
     })
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('users');
   }
 };

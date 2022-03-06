@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Notices', {
+    await queryInterface.createTable('notices', {
       uuid: {
         primaryKey: true,
         type: Sequelize.UUID,
@@ -14,31 +14,31 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
         allowNull: false
       },
-      petId: {
+      pet_id: {
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
         allowNull: false
       },
-      userId: {
+      user_id: {
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
         allowNull: false
       },
-      noticeType: {
+      notice_type: {
         type: Sequelize.STRING
       },
-      eventLocationLat: {
+      event_location_lat: {
         type: Sequelize.STRING
       },
-      eventLocationLong: {
+      event_location_long: {
         type: Sequelize.STRING
       },
       description: {
         type: Sequelize.STRING
       },
-      eventTimestamp: {
+      event_timestamp: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -50,24 +50,24 @@ module.exports = {
         type: Sequelize.DATE
       }
     }).then(() => {
-      queryInterface.addConstraint('Notices', {
+      queryInterface.addConstraint('notices', {
         type: 'foreign key',
-        fields: ['petId'],
-        name: 'fk_notices_pets_petId',
+        fields: ['pet_id'],
+        name: 'fk_notices_pets_pet_id',
         references: {
-          table: 'Pets',
+          table: 'pets',
           field: 'uuid'
         },
         onDelete: 'cascade',
         onUpdate: 'cascade',
       })
     }).then(() => {
-      queryInterface.addConstraint('Notices', {
+      queryInterface.addConstraint('notices', {
         type: 'foreign key',
-        fields: ['userId'],
-        name: 'fk_notices_users_userId',
+        fields: ['user_id'],
+        name: 'fk_notices_users_user_id',
         references: {
-          table: 'Users',
+          table: 'users',
           field: 'uuid'
         },
         onDelete: 'cascade',
@@ -76,6 +76,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Notices');
+    await queryInterface.dropTable('notices');
   }
 };

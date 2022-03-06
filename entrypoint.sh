@@ -3,6 +3,7 @@
 
 npm install
 npm install dotenv
+npm install --platform=linux --arch=arm64v8 sharp
 
 if [[ "${ENVIRONMENT}" != "production" ]]; then
    apt-get update && apt-get install -y wget

@@ -3,7 +3,7 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class Photos extends Model {
+  class photos extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   
-  Photos.init({
+  photos.init({
     uuid: {
       primaryKey: true,
       type: DataTypes.UUID,
@@ -22,13 +22,13 @@ module.exports = (sequelize, DataTypes) => {
       noUpdate: true
     },
     photo: DataTypes.BLOB,
-    lowResPhoto: DataTypes.BLOB,
+    low_res_photo: DataTypes.BLOB,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE
   },
   {
     sequelize,
-    modelName: 'Photos',
+    modelName: 'photos',
   });
-  return Photos;
+  return photos;
 };

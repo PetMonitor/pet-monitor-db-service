@@ -4,7 +4,7 @@ const { Model } = require('sequelize');
 const db = require('.');
 
 module.exports = (sequelize, DataTypes) => {
-  class Pets extends Model {
+  class pets extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -12,18 +12,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       console.log('Running Pets associate to Users.')
-      Pets.belongsTo(models.Users, {
-        name: 'userId',
+      pets.belongsTo(models.users, {
+        name: 'user_id',
         foreignKey:'uuid'
       });
 
-      Pets.hasMany(models.PetPhotos, {
-        foreignKey: 'petId'
+      pets.hasMany(models.pet_photos, {
+        foreignKey: 'pet_id'
       });
     }
   };
 
-  Pets.init({
+  pets.init({
     uuid: {
       primaryKey: true,
       type: DataTypes.UUID,
@@ -36,19 +36,19 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       allowNull: false
     },
-    userId: { 
+    user_id: { 
       primaryKey: true,
       allowNull: false,
       type: DataTypes.UUID 
     },
     type: DataTypes.STRING,
     name: DataTypes.STRING,
-    furColor: DataTypes.STRING,
-    rightEyeColor: DataTypes.STRING,
-    leftEyeColor: DataTypes.STRING,
+    fur_color: DataTypes.STRING,
+    right_eye_color: DataTypes.STRING,
+    left_eye_color: DataTypes.STRING,
     breed: DataTypes.STRING,
     size: DataTypes.STRING,
-    lifeStage: DataTypes.STRING,
+    life_stage: DataTypes.STRING,
     age: DataTypes.INTEGER,
     sex: DataTypes.STRING,
     description: DataTypes.TEXT,
@@ -56,7 +56,7 @@ module.exports = (sequelize, DataTypes) => {
     updatedAt: DataTypes.DATE
   }, {
     sequelize,
-    modelName: 'Pets',
+    modelName: 'pets',
   });
-  return Pets;
+  return pets;
 };

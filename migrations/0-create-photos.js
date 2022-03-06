@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Photos', {
+    await queryInterface.createTable('photos', {
       uuid: {
         primaryKey: true,
         type: Sequelize.UUID,
@@ -13,7 +13,7 @@ module.exports = {
       photo: {
         type: Sequelize.BLOB
       },
-      lowResPhoto: {
+      low_res_photo: {
         type: Sequelize.BLOB,
         allowNull: true
       },
@@ -28,6 +28,6 @@ module.exports = {
     })
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Photos');
+    await queryInterface.dropTable('photos');
   }
 };
