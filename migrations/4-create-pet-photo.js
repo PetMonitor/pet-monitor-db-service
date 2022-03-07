@@ -1,15 +1,15 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('pet_photos', {
-      pet_id: {
+    await queryInterface.createTable('PetPhotos', {
+      petId: {
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
         allowNull: false,
         noUpdate: true
       },
-      photo_id: {
+      photoId: {
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -30,24 +30,24 @@ module.exports = {
         type: Sequelize.DATE
       }
     }).then(() => {
-      queryInterface.addConstraint('pet_photos', {
+      queryInterface.addConstraint('PetPhotos', {
         type: 'foreign key',
-        fields: ['pet_id'],
-        name: 'fk_pets_petPhotos_pet_id',
+        fields: ['petId'],
+        name: 'fk_pets_petPhotos_petId',
         references: {
-          table: 'pets',
+          table: 'Pets',
           field: 'uuid'
         },
         onDelete: 'cascade',
         onUpdate: 'no action',
       })
     }).then(() => {
-      queryInterface.addConstraint('pet_photos', {
+      queryInterface.addConstraint('PetPhotos', {
         type: 'foreign key',
-        fields: ['photo_id'],
-        name: 'fk_photos_petPhotos_photo_id',
+        fields: ['photoId'],
+        name: 'fk_photos_petPhotos_photoId',
         references: {
-          table: 'photos',
+          table: 'Photos',
           field: 'uuid'
         },
         onDelete: 'cascade',
@@ -56,6 +56,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('pet_photos');
+    await queryInterface.dropTable('PetPhotos');
   }
 };

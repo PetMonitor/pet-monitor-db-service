@@ -15,7 +15,7 @@ LOW_RES_PHOTO_DIMENSION = 130
 
 router.get('/', async (req, res) => {
 	try {
-		db.Users.findAll({ attributes: ['uuid', '_ref', 'name', 'username', 'email', 'phone_number', 'alert_radius', 'alerts_activated', 'profile_picture'] })
+		db.Users.findAll({ attributes: ['uuid', '_ref', 'name', 'username', 'email', 'phoneNumber', 'alertRadius', 'alertsActivated', 'profilePicture'] })
 			.then((users) => { 
 				console.log(`Returning users ${JSON.stringify(users)}`);
 				res.status(http.StatusCodes.OK).json(users); 
@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:userId', async (req, res) => {
 	try {
-		db.Users.findByPk(req.params.userId, { attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phone_number', 'alerts_activated', 'alert_radius', 'profile_picture' ] })
+		db.Users.findByPk(req.params.userId, { attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phoneNumber', 'alertsActivated', 'alertRadius', 'profilePicture' ] })
 			.then((user) => { 
 				res.status(http.StatusCodes.OK).json(user); 
 			}).catch(err => {
@@ -63,11 +63,11 @@ router.post('/', async (req, res) => {
 			_ref: req.body._ref,
 			username: req.body.username,
 			password: passwordHasher(req.body.password),
-			phone_number: '',
+			phoneNumber: '',
 			name: '',
-			profile_picture: null,
-			alerts_activated: false,
-			alert_radius: -1,
+			profilePicture: null,
+			alertsActivated: false,
+			alertRadius: -1,
 			email: req.body.email,
 			createdAt: new Date(),
 			updatedAt: new Date()
@@ -85,13 +85,13 @@ router.post('/', async (req, res) => {
 		const petList = req.body.pets.map(pet => { return {
 			uuid: pet.uuid,
 			_ref: pet._ref,
-			user_id: user.uuid,
+			userId: user.uuid,
 			type: pet.type,
 			name: pet.name,
-			fur_color: pet.furColor,
+			furColor: pet.furColor,
 			breed: pet.breed,
 			size: pet.size,
-			life_stage: pet.lifeStage,
+			lifeStage: pet.lifeStage,
 			sex: pet.sex,
 			description: pet.description,
 			createdAt: new Date(),
@@ -116,14 +116,14 @@ router.post('/', async (req, res) => {
 				const petPhoto = {
 					uuid: req.body.pets[i].photos[j].uuid,
 					photo: photoBuffer,
-					low_res_photo: lowResPhotoBuffer,
+					lowResPhoto: lowResPhotoBuffer,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				}
 
 				petPhotosList.push({
-					pet_id: req.body.pets[i].uuid,
-					photo_id: petPhoto.uuid,
+					petId: req.body.pets[i].uuid,
+					photoId: petPhoto.uuid,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				});

@@ -19,8 +19,8 @@ def getTopKNearestNeighbours(dbConnInfo, petId, k=15):
     connString = "host={} port={} dbname={} user={} password={}".format(dbConnInfo['host'], dbConnInfo['port'], dbConnInfo['db'], dbConnInfo['username'], dbConnInfo['pwd'])
 
     try:
-        sqlCommandExcludePetEmbeddings = "SELECT pet_id, embedding FROM public.pet_photos WHERE pet_id != '{}';".format(petId)
-        sqlCommandPetEmbeddings = "SELECT pet_id, embedding FROM public.pet_photos WHERE pet_id = '{}';".format(petId)
+        sqlCommandExcludePetEmbeddings = """SELECT "petId", embedding FROM "PetPhotos" WHERE "petId" != '{}'""".format(petId)
+        sqlCommandPetEmbeddings = """SELECT "petId", embedding FROM "PetPhotos" WHERE "petId" = '{}'""".format(petId)
 
         with psycopg2.connect(connString) as conn:
             
@@ -31,9 +31,9 @@ def getTopKNearestNeighbours(dbConnInfo, petId, k=15):
             searchedPetData = pd.read_sql(sqlCommandPetEmbeddings, conn)
 
             # Encode pet ids into numerical values
-            petIdsSet = pd.unique(dataTrain.pet_id.to_numpy())
+            petIdsSet = pd.unique(dataTrain.petId.to_numpy())
             labelEncoder.fit(petIdsSet)
-            numericPetIds = labelEncoder.transform(dataTrain.pet_id.to_numpy())
+            numericPetIds = labelEncoder.transform(dataTrain.petId.to_numpy())
 
             # train the classifier model
             model.fit(np.array(dataTrain.embedding.values.tolist()), numericPetIds)
@@ -43,7 +43,6 @@ def getTopKNearestNeighbours(dbConnInfo, petId, k=15):
             
             # pick top k predictions
             # returns k picks: from least to most probable
-            
             topK = np.argsort(probabilities, axis=1)[:,-k:]
             topKPredictions = np.empty(topK.shape, dtype=object)
             predictionFreqMap = {}
@@ -93,7 +92,6 @@ def getTopKNearestNeighbours(dbConnInfo, petId, k=15):
                     topKPetIds.append(heapq.heappop(maxScoreHeap)[1])
            
             return topKPetIds
-            
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

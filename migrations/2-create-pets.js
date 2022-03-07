@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('pets', {
+    await queryInterface.createTable('Pets', {
       uuid: {
         primaryKey: true,
         type: Sequelize.UUID,
@@ -15,7 +15,7 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
         allowNull: false
       },
-      user_id: {
+      userId: {
         type: Sequelize.UUID,
         allowNull: false
       },
@@ -25,13 +25,13 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      fur_color: {
+      furColor: {
         type: Sequelize.STRING //TBD: if this is going to be an array should we have a predefined list of colors to help the search? Otherwise, this should just be a string/text field
       },
-      right_eye_color: {
+      rightEyeColor: {
         type: Sequelize.STRING //Same as with the fur color
       },
-      left_eye_color: {
+      leftEyeColor: {
         type: Sequelize.STRING
       },
       breed: {
@@ -40,7 +40,7 @@ module.exports = {
       size: {
         type: Sequelize.STRING
       },
-      life_stage: {
+      lifeStage: {
         type: Sequelize.STRING
       },
       age: {
@@ -61,12 +61,12 @@ module.exports = {
         type: Sequelize.DATE
       }
     }).then(() => {
-      queryInterface.addConstraint('pets', {
+      queryInterface.addConstraint('Pets', {
         type: 'foreign key',
-        fields: ['user_id'],
-        name: 'fk_pets_users_user_id',
+        fields: ['userId'],
+        name: 'fk_pets_users_userId',
         references: {
-          table: 'users',
+          table: 'Users',
           field: 'uuid'
         },
         onDelete: 'cascade',
@@ -75,6 +75,6 @@ module.exports = {
     })
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('pets');
+    await queryInterface.dropTable('Pets');
   }
 };
