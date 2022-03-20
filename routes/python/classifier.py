@@ -52,7 +52,6 @@ def getTopKNearestNeighbours(dbConnInfo, petId, k=15):
                 # Save prediction labels for embedding i (pet ids), 
                 topKPredictions[i] = labelEncoder.inverse_transform(embeddingPredictions)
 
-                #TODO: test from here down
                 for j in range(topK.shape[1]):
                     predictedClass = topKPredictions[i][j]
                     if not predictedClass in predictionFreqMap:
