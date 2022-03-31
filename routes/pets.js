@@ -1,10 +1,12 @@
 var express = require('express');
-var router = express.Router();
-
-var http = require('http-status-codes');
+var sharp = require('sharp');
 const db = require('../models/index.js');
+const http = require('http-status-codes');
+const axios = require('axios').default; 
 
 var router = express.Router({mergeParams: true});
+
+const FACE_REC_PORT = process.env.FACE_REC_PORT || '5001';
 
 /**
 * Pet CRUD endpoints.
@@ -122,34 +124,73 @@ router.get('/:petId', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
+	const tx = await db.sequelize.transaction();
+
     try {
-		console.log(`Creating pet ${req.body.uuid}`);
-		db.Pets.create({
+		console.log(`Creating pet ${JSON.stringify(req.body)}`);
+
+		let resEmbeddings = []
+		if (req.body.photos.length > 0) {
+			resEmbeddings = await getEmbeddingsForDogPhotos(req.body.photos);
+		}
+
+		const pet = await db.Pets.create({
 			uuid: req.body.uuid,
 			_ref: req.body._ref,
 			userId: req.params.userId,
 			type: req.body.type,
 			name: req.body.name,
 			furColor: req.body.furColor,
-			rightEyeColor: req.body.rightEyeColor,
-			leftEyeColor: req.body.leftEyeColor,
             breed: req.body.breed,
 			size: req.body.size,
 			lifeStage: req.body.lifeStage,
-			age: req.body.age,
             sex: req.body.sex,
 			description: req.body.description,
 			createdAt: new Date(),
 			updatedAt: new Date()
-		}).then((pet) => {
-		    res.status(http.StatusCodes.CREATED).json(pet); 
-		}).catch(err => {
-			console.error(err);
-			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
-			  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
+		}, { transaction: tx });
+
+		let photosList = []
+		let petPhotosList = []
+
+		for (var i = 0; i < req.body.photos.length; i++) {
+
+			const photoBuffer = Buffer.from(req.body.photos[i].photo,'base64');
+			let lowResPhoto = sharp(photoBuffer).resize(LOW_RES_PHOTO_DIMENSION, LOW_RES_PHOTO_DIMENSION);
+			lowResPhotoBuffer = await lowResPhoto.toBuffer();				
+
+			photosList.push({
+				uuid: req.body.photos[i].uuid,
+				photo: photoBuffer,
+				lowResPhoto: lowResPhotoBuffer,
+				createdAt: new Date(),
+				updatedAt: new Date()
 			});
-		});
+
+			petPhotosList.push({
+				petId: pet.uuid,
+				photoId: req.body.photos[i].uuid,
+				embedding: resEmbeddings.data.embeddings[req.body.photos[i].uuid],
+				createdAt: new Date(),
+				updatedAt: new Date()
+			})
+		};
+
+
+		// Add pet photos
+		await db.Photos.bulkCreate(photosList, { transaction: tx });
+
+		console.log(`Inserting pet photos ${petPhotosList.length}`);
+
+		// Link photos to pets
+		await db.PetPhotos.bulkCreate(petPhotosList, { transaction: tx });
+
+		await tx.commit();
+		console.log(`Successfully created pet ${pet.uuid} - ${pet.name} !`);
+
+		return res.status(http.StatusCodes.CREATED).json(pet); 
 	} catch (err) {
+		await tx.rollback();
 		console.error(err);
 		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 		  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
@@ -205,5 +246,11 @@ router.delete('/:petId', async (req, res) => {
 	    });
 	} 
 });
+
+async function getEmbeddingsForDogPhotos(photos) {
+	return axios.post(`http://host.docker.internal:${FACE_REC_PORT}/api/v0/dogs/embedding`, {
+		dogs: photos
+	});
+};
 
 module.exports = router;

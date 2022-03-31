@@ -8,11 +8,11 @@ var sharp = require('sharp');
 
 var passwordHasher = require('../utils/passwordHasher.js');
 
-const faceRecPort = process.env.FACE_REC_PORT || '5001';
 
 const axios = require('axios').default; 
 
 LOW_RES_PHOTO_DIMENSION = 130
+const FACE_REC_PORT = process.env.FACE_REC_PORT || '5001';
 
 /**
  * User CRUD endpoints.
@@ -68,11 +68,11 @@ router.post('/', async (req, res) => {
 			_ref: req.body._ref,
 			username: req.body.username,
 			password: passwordHasher(req.body.password),
-			phoneNumber: '',
-			name: '',
+			phoneNumber: req.body.phoneNumber?  req.body.phoneNumber : '',
+			name: req.body.name? req.body.name: '',
 			profilePicture: null,
-			alertsActivated: false,
-			alertRadius: -1,
+			alertsActivated: req.body.alertsActivated? req.body.alertsActivated : false,
+			alertRadius: req.body.alertRadius? req.body.alertRadius : -1,
 			email: req.body.email,
 			createdAt: new Date(),
 			updatedAt: new Date()
@@ -92,12 +92,13 @@ router.post('/', async (req, res) => {
 			_ref: pet._ref,
 			userId: user.uuid,
 			type: pet.type,
-			name: pet.name,
+			name: pet.name? pet.name : '',
 			furColor: pet.furColor,
-			breed: pet.breed,
+			breed: pet.breed? pet.breed : '',
 			size: pet.size,
 			lifeStage: pet.lifeStage,
 			sex: pet.sex,
+			age: pet.age? pet.age : null,
 			description: pet.description,
 			createdAt: new Date(),
 			updatedAt: new Date()
@@ -140,9 +141,6 @@ router.post('/', async (req, res) => {
 			}
 
 		}
-
-
-		await Promise.all(photosList);
 
 		// Add pet photos
 		await db.Photos.bulkCreate(photosList, { transaction: tx });
@@ -248,7 +246,7 @@ router.put('/:userId/password', async (req, res) => {
 });
 
 async function getEmbeddingsForDogPhotos(photos) {
-	return axios.post(`http://host.docker.internal:${faceRecPort}/api/v0/dogs/embedding`, {
+	return axios.post(`http://host.docker.internal:${FACE_REC_PORT}/api/v0/dogs/embedding`, {
 		dogs: photos
 	});
 };

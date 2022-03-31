@@ -44,6 +44,9 @@ router.get('/:petId', async (req, res) => {
 
     process.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`);
+        return res
+                .send(data.toString())
+                .status(http.StatusCodes.INTERNAL_SERVER_ERROR);
     });
       
     // Takes stdout data from script which executed
