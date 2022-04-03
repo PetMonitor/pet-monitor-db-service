@@ -1,5 +1,4 @@
 var express = require('express');
-var router = express.Router();
 
 var http = require('http-status-codes');
 const db = require('../models/index.js');

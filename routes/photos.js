@@ -1,5 +1,4 @@
 var express = require('express');
-var router = express.Router();
 
 var http = require('http-status-codes');
 const db = require('../models/index.js');
@@ -16,8 +15,8 @@ router.get('/:photoId', async (req, res) => {
 	try {
 		console.log(`Attempting to fetch photos with id ${req.params.photoId}`);
 		db.Photos.findByPk(req.params.photoId, { attributes: ['uuid', 'lowResPhoto'] })
-			.then((photo) => { 
-				console.log(`Sending image ${photo.uuid}`); 
+			.then((photo) => {
+				console.log(`Sending image ${photo.uuid}`);
 				res.status(http.StatusCodes.OK)
 				.setHeader('Content-Type', 'image/png')
 				.send(Buffer.from(photo.lowResPhoto, 'base64'));
