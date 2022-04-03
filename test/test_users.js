@@ -61,20 +61,21 @@ PETS = [
   }
 ]
 
-const IMAGE_CONTENT = fs.readFileSync('./seeders/resources/dogImage.txt', 'utf-8');
+const IMAGE_CONTENT = fs.readFileSync('./seeders/resources/dogImage.json');
+const IMAGE_CONTENT_BLOB = Buffer.from(JSON.parse(IMAGE_CONTENT).image, 'base64');
 
 PHOTOS = [
   {
     uuid: '126e4567-e89b-12d3-a456-426614176001',
-    photo: IMAGE_CONTENT,
+    photo: IMAGE_CONTENT_BLOB,
   },
   {
     uuid: '126e4567-e89b-12d3-a456-426614176002',
-    photo: IMAGE_CONTENT
+    photo: IMAGE_CONTENT_BLOB
   },
   {
     uuid: '126e4567-e89b-12d3-a456-426614176003',
-    photo: IMAGE_CONTENT
+    photo: IMAGE_CONTENT_BLOB
   }
 ]
 
