@@ -10,8 +10,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Notices.belongsTo(models.Pets, {
+        foreignKey: 'petId'
+      });
     }
-  };
+  }
   Notices.init({
     uuid: {
       primaryKey: true,

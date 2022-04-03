@@ -1,7 +1,7 @@
 var express = require('express');
 var sharp = require('sharp');
+var http = require('http-status-codes');
 const db = require('../models/index.js');
-const http = require('http-status-codes');
 const axios = require('axios').default; 
 
 var router = express.Router({mergeParams: true});
