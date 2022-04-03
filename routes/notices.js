@@ -11,20 +11,14 @@ const db = require('../models/index.js');
  router.get('/', async (req, res) => {
 	try {
         db.Notices.findAll({
-			// where: {
-			// 	userId: req.params.userId
-			// },
 			include: [{
 				model: db.Pets,
-				//inner join
 				required: false,
 				include: [{
 					model: db.PetPhotos,
-					//inner join
 					required: false,
 					include: [{
 						model: db.Photos,
-						//inner join
 						required: false
 					}]
 				}]
