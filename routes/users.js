@@ -1,13 +1,18 @@
 var express = require('express');
+
 var router = express.Router();
-var passwordHasher = require('../utils/passwordHasher.js');
-var uuid = require('uuid');
 
 var http = require('http-status-codes');
 const db = require('../models/index.js');
 var sharp = require('sharp');
 
+var passwordHasher = require('../utils/passwordHasher.js');
+
+
+const axios = require('axios').default; 
+
 LOW_RES_PHOTO_DIMENSION = 130
+const FACE_REC_PORT = process.env.FACE_REC_PORT || '5001';
 
 /**
  * User CRUD endpoints.
@@ -63,11 +68,11 @@ router.post('/', async (req, res) => {
 			_ref: req.body._ref,
 			username: req.body.username,
 			password: passwordHasher(req.body.password),
-			phoneNumber: '',
-			name: '',
+			phoneNumber: req.body.phoneNumber?  req.body.phoneNumber : '',
+			name: req.body.name? req.body.name: '',
 			profilePicture: null,
-			alertsActivated: false,
-			alertRadius: -1,
+			alertsActivated: req.body.alertsActivated? req.body.alertsActivated : false,
+			alertRadius: req.body.alertRadius? req.body.alertRadius : -1,
 			email: req.body.email,
 			createdAt: new Date(),
 			updatedAt: new Date()
@@ -87,12 +92,13 @@ router.post('/', async (req, res) => {
 			_ref: pet._ref,
 			userId: user.uuid,
 			type: pet.type,
-			name: pet.name,
+			name: pet.name? pet.name : '',
 			furColor: pet.furColor,
-			breed: pet.breed,
+			breed: pet.breed? pet.breed : '',
 			size: pet.size,
 			lifeStage: pet.lifeStage,
 			sex: pet.sex,
+			age: pet.age? pet.age : null,
 			description: pet.description,
 			createdAt: new Date(),
 			updatedAt: new Date()
@@ -107,14 +113,16 @@ router.post('/', async (req, res) => {
 
 		for (var i = 0; i < req.body.pets.length; i++) {
 
+			let resEmbeddings = await getEmbeddingsForDogPhotos(req.body.pets[i].photos);
+			
 			for (var j = 0; j < req.body.pets[i].photos.length; j++) {
-
-				const photoBuffer = Buffer.from(req.body.pets[i].photos[j].photo,'base64');
+				const photo = req.body.pets[i].photos[j];
+				const photoBuffer = Buffer.from(photo.photo,'base64');
 				let lowResPhoto = sharp(photoBuffer).resize(LOW_RES_PHOTO_DIMENSION, LOW_RES_PHOTO_DIMENSION);
-				lowResPhotoBuffer = await lowResPhoto.toBuffer();
-
+				lowResPhotoBuffer = await lowResPhoto.toBuffer();				
+				
 				const petPhoto = {
-					uuid: req.body.pets[i].photos[j].uuid,
+					uuid: photo.uuid,
 					photo: photoBuffer,
 					lowResPhoto: lowResPhotoBuffer,
 					createdAt: new Date(),
@@ -124,6 +132,7 @@ router.post('/', async (req, res) => {
 				petPhotosList.push({
 					petId: req.body.pets[i].uuid,
 					photoId: petPhoto.uuid,
+					embedding: resEmbeddings.data.embeddings[photo.uuid],
 					createdAt: new Date(),
 					updatedAt: new Date()
 				});
@@ -133,23 +142,13 @@ router.post('/', async (req, res) => {
 
 		}
 
-
-		await Promise.all(photosList);
-
 		// Add pet photos
-		//await db.Photos.bulkCreate(photosList, { transaction: tx });
-		for (const photo of photosList) {
-			console.log(`Inserting photo ${photo.uuid} ${photo.lowResPhoto}`);
-			await db.Photos.create(photo, { transaction: tx });
-		}
+		await db.Photos.bulkCreate(photosList, { transaction: tx });
 
 		console.log(`Inserting pet photos ${petPhotosList.length}`);
 
 		// Link photos to pets
-		//await db.Photos.bulkCreate(petPhotosList, { transaction: tx });
-		for (const petPhoto of petPhotosList) {
-			await db.PetPhotos.create(petPhoto, { transaction: tx });
-		}
+		await db.PetPhotos.bulkCreate(petPhotosList, { transaction: tx });
 
 		await tx.commit();
 		console.log('Successfully created user and pets!');
@@ -245,5 +244,12 @@ router.put('/:userId/password', async (req, res) => {
 	    });		
 	}
 });
+
+async function getEmbeddingsForDogPhotos(photos) {
+	return axios.post(`http://host.docker.internal:${FACE_REC_PORT}/api/v0/dogs/embedding`, {
+		dogs: photos
+	});
+};
+
 
 module.exports = router;
