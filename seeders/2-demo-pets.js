@@ -27,7 +27,7 @@ module.exports = {
         type: 'DOG',
         name: 'blondie',
         furColor: 'blonde',
-        rightEyeColor: 'blue', 
+        rightEyeColor: 'blue',
         leftEyeColor: 'gray',
         size: 'MEDIUM',
         lifeStage: 'BABY',

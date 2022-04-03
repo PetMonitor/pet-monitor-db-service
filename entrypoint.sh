@@ -3,6 +3,7 @@
 
 npm install
 npm install dotenv
+npm install --platform=linux --arch=arm64v8 sharp
 
 if [[ "${ENVIRONMENT}" != "production" ]]; then
    apt-get update && apt-get install -y wget
@@ -17,6 +18,6 @@ else
 fi
 
 npx sequelize-cli db:migrate
-npx sequelize-cli db:seed:all
+#npx sequelize-cli db:seed:all
 
 node app.js

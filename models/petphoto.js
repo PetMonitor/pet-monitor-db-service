@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       PetPhotos.belongsTo(models.Photos, {
-        foreignKey: 'photoId'      
+        foreignKey: 'photoId'
       });
     }
   };
@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
     photoId: {
       primaryKey: true,
       type: DataTypes.UUID
+    },
+    embedding: {
+      primaryKey: false,
+      type: DataTypes.ARRAY(DataTypes.FLOAT)
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE

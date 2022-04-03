@@ -16,6 +16,11 @@ module.exports = {
         allowNull: false,
         noUpdate: true
       },
+      embedding: {
+        primaryKey: false,
+        type: Sequelize.ARRAY(Sequelize.FLOAT),
+        defaultValue: []
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

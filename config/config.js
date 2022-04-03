@@ -19,7 +19,9 @@ module.exports = {
         port: 5432,
         dialect: 'postgres',
         protocol: 'postgres',
-        dialectOptions: {}
+        dialectOptions: {},
+        seederStorage: 'sequelize',
+        seederStorageTableName: 'sequelize_data'
     },
     test: {
         username: 'postgres',
