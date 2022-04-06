@@ -17,7 +17,7 @@ else
    echo "Don't wait. Run migrations." 
 fi
 
-npx sequelize-cli db:migrate
+#npx sequelize-cli db:migrate
 #npx sequelize-cli db:seed:all
 
 node app.js

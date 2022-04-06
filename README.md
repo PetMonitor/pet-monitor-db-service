@@ -27,3 +27,21 @@ Run tests using:
 ## Deploy to Heroku
 
 1. You must create a heroku application and apply the heroku-postgresql addon. For the application to run, you will need to set the database URL through as a config var DATABASE_URL.
+
+## Restore Database from backup
+
+For this step to work, the commands in 'entrypoint.sh' file that run migration and seeding MUST BE commented out. 
+
+To restore database from backup:
+
+    1) Copy backup file to project root (backup.sql.zip) into copy to container:
+        `docker cp backup.sql db:/tmp`
+    2) Exec into container command line:
+        `docker exec -it db /bin/bash`
+    3) Restore database table and contents by running this command:
+        `psql -U my_user -d my_database -f /tmp/backup.sql`
+
+## Run Migrations and use Seeds
+
+If you choose to run migrations and use seeder values, uncomment lines to run
+migration and seeding respectively in 'entrypoint.sh' file.
