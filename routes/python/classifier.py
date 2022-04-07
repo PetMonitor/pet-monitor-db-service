@@ -19,7 +19,7 @@ def getTopKNearestNeighbours(dbConnInfo, petId, k=15):
     connString = "host={} port={} dbname={} user={} password={}".format(dbConnInfo['host'], dbConnInfo['port'], dbConnInfo['db'], dbConnInfo['username'], dbConnInfo['pwd'])
 
     try:
-        sqlCommandExcludePetEmbeddings = """SELECT "petId", embedding FROM "PetPhotos" WHERE "petId" != '{}'""".format(petId)
+        sqlCommandExcludePetEmbeddings = """SELECT public."Notices"."petId", embedding FROM public."PetPhotos" INNER JOIN public."Notices" ON public."PetPhotos"."petId" = public."Notices"."petId" WHERE public."Notices"."petId" != '{}'""".format(petId)
         sqlCommandPetEmbeddings = """SELECT "petId", embedding FROM "PetPhotos" WHERE "petId" = '{}'""".format(petId)
 
         with psycopg2.connect(connString) as conn:
