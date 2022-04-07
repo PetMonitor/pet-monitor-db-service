@@ -33,28 +33,46 @@ router.get('/:petId', async (req, res) => {
     };
 
     console.log("About to spawn process...");
-
-    var process = spawn('python', [ 
-        path.join(__dirname, '/python/classifier.py'),
-        JSON.stringify(databaseCredentials),
-        req.params.petId
-     ]);
-
-    console.log("Process spawned!");
-
-    process.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`);
+    
+    getPredictedPets(databaseCredentials, req.params.petId)
+    .then(data => {
         return res
-                .send(data.toString())
-                .status(http.StatusCodes.INTERNAL_SERVER_ERROR);
-    });
-      
-    // Takes stdout data from script which executed
-    // with arguments and send this data to res object
-    process.stdout.on('data', function(data) {
-        return res.send(data.toString());
+        .send({ "foundPets": data })
+        .status(http.StatusCodes.OK);
+    })
+    .catch(err => {
+        return res
+            .send(err.toString())
+            .status(http.StatusCodes.INTERNAL_SERVER_ERROR);
     });
 
 });
+
+const getPredictedPets = (databaseCredentials, petId) => {
+    var process = spawn('python', [ 
+        path.join(__dirname, '/python/classifier.py'),
+        JSON.stringify(databaseCredentials),
+        petId
+     ]);
+    
+     console.log("Process spawned!");
+     const regexListContent = /(?<=\[).+?(?=\])/g;
+     return new Promise((resolve, reject) => {
+        process.stdout.on('data', (data) => {
+            result = data.toString().match(regexListContent)[0].replaceAll("'","").replaceAll(" ","").split(",");
+
+            console.log("Python process returned " + result);
+            return result;
+        });
+        process.on('close', () => {
+            resolve(result)
+        });
+        process.on('error', (err) => {
+            reject(err)
+        });
+    });
+}
+
+
 
 module.exports = router;
