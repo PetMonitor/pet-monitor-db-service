@@ -8,11 +8,9 @@ var sharp = require('sharp');
 
 var passwordHasher = require('../utils/passwordHasher.js');
 
-
-const axios = require('axios').default; 
+const commons = require('../utils/common.js');
 
 LOW_RES_PHOTO_DIMENSION = 130
-const FACE_REC_PORT = process.env.FACE_REC_PORT || '5001';
 
 /**
  * User CRUD endpoints.
@@ -113,7 +111,7 @@ router.post('/', async (req, res) => {
 
 		for (var i = 0; i < req.body.pets.length; i++) {
 
-			let resEmbeddings = await getEmbeddingsForDogPhotos(req.body.pets[i].photos);
+			let resEmbeddings = await commons.getEmbeddingsForDogPhotos(req.body.pets[i].photos);
 			
 			for (var j = 0; j < req.body.pets[i].photos.length; j++) {
 				const photo = req.body.pets[i].photos[j];
@@ -244,12 +242,5 @@ router.put('/:userId/password', async (req, res) => {
 	    });		
 	}
 });
-
-async function getEmbeddingsForDogPhotos(photos) {
-	return axios.post(`http://host.docker.internal:${FACE_REC_PORT}/api/v0/dogs/embedding`, {
-		dogs: photos
-	});
-};
-
 
 module.exports = router;

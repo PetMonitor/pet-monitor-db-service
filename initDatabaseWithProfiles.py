@@ -31,7 +31,7 @@ def initDatabase():
         'FOUND': lambda r: createFoundNotice(r),
         'LOST': lambda r: createLostNotice(r),
     }
-    '''
+    
     with open(USER_PROFILES_PATH, 'r') as userProfilesCsv:
         csvUserProfilesReader = csv.DictReader(userProfilesCsv)
         # Make requests to create user profiles.
@@ -49,7 +49,7 @@ def initDatabase():
                 "phoneNumber": row['phoneNumber'],
                 "pets": []
             })
-    '''
+    
     with open(PET_PROFILES_PATH, 'r') as petProfilesCsv:         
         csvPetProfilesReader = csv.DictReader(petProfilesCsv)
         for row in csvPetProfilesReader:
