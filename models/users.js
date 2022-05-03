@@ -15,9 +15,9 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey:'uuid'
       });
 
-      Users.belongsTo(models.Photos, {
+      Users.hasOne(models.Photos, {
         name: 'profilePicture',
-        foreignKey:'uuid'      
+        foreignKey: 'uuid'      
       });
     }
   };
@@ -42,6 +42,10 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     name: DataTypes.STRING,
     phoneNumber: DataTypes.STRING,
+    facebookId: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     profilePicture: Sequelize.UUIDV4,
     alertsActivated: Sequelize.BOOLEAN,
     alertRadius: Sequelize.INTEGER,

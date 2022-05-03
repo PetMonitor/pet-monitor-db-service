@@ -55,20 +55,55 @@ router.get('/:userId', async (req, res) => {
   	} 
 });
 
+router.get('/facebook/:facebookId', async (req, res) => {
+	try {
+		db.Users.findAll( 
+			{ 
+				where: { facebookId: req.params.facebookId },
+				attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phoneNumber', 'alertsActivated', 'alertRadius', 'profilePicture' ] 
+			})
+			.then((user) => { 
+				res.status(http.StatusCodes.OK).json(user); 
+			}).catch(err => {
+				console.error(err);
+				res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
+				  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
+				});
+			});
+  	} catch (err) {
+  		console.error(err);
+  		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
+			error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
+	    });
+  	} 
+});
+
 router.post('/', async (req, res) => {
 	// TODO: improve password hashing method
-	console.log('Attempting to create new user...');
+	console.log(`Attempting to create new user... ${JSON.stringify(req.body)}`);
 
 	const tx = await db.sequelize.transaction();
 	try {
+
+		if (req.body.profilePicture) {
+			await db.Photos.create({
+				uuid: req.body.profilePicture.uuid,
+				photo: Buffer.from(req.body.profilePicture.photo, 'base64'),
+				lowResPhoto: null,
+				createdAt: new Date(),
+				updatedAt: new Date()
+			}, { transaction: tx });
+		}
+
 		const user = await db.Users.create({
 			uuid: req.body.uuid,
 			_ref: req.body._ref,
 			username: req.body.username,
-			password: passwordHasher(req.body.password),
+			password: req.body.password? passwordHasher(req.body.password): '',
+			facebookId: req.body.facebookId? req.body.facebookId : '',
 			phoneNumber: req.body.phoneNumber?  req.body.phoneNumber : '',
 			name: req.body.name? req.body.name: '',
-			profilePicture: null,
+			profilePicture: req.body.profilePicture? req.body.profilePicture.uuid : null,
 			alertsActivated: req.body.alertsActivated? req.body.alertsActivated : false,
 			alertRadius: req.body.alertRadius? req.body.alertRadius : -1,
 			email: req.body.email,
@@ -106,8 +141,9 @@ router.post('/', async (req, res) => {
 
 		const pets = await db.Pets.bulkCreate(petList, {transaction: tx});
 
-		let petPhotosList = [];
 		let photosList = []
+		let petPhotosList = [];
+		
 
 		for (var i = 0; i < req.body.pets.length; i++) {
 
