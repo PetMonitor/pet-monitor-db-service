@@ -15,8 +15,28 @@ var router = express.Router({mergeParams: true});
 			where: { 
 				userId: req.params.userId 
 			}
-		}).then((notices) => { 
-            res.status(http.StatusCodes.OK).json(notices); 
+		}).then((notices) => {
+			const resObj = notices.map(notice => {
+				return Object.assign({},{
+					uuid: notice.uuid,
+					_ref: notice._ref,
+					userId: notice.userId,
+					noticeType: notice.noticeType,
+					eventLocationLat: notice.eventCoordinates.coordinates[1],
+					eventLocationLong: notice.eventCoordinates.coordinates[0],
+					street: notice.street,
+					neighbourhood: notice.neighbourhood,
+					locality: notice.locality,
+					country: notice.country,
+					description: notice.description,
+					eventTimestamp: notice.eventTimestamp,
+					createdAt: notice.createdAt,
+					updatedAt: notice.updatedAt,
+					petId: notice.petId,
+				})
+			});
+
+			res.status(http.StatusCodes.OK).json(resObj);
         }).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -38,8 +58,26 @@ router.get('/:noticeId', async (req, res) => {
 			    uuid: req.params.noticeId, 
 			    userId: req.params.userId 
             }
-		}).then((notice) => { 
-			res.status(http.StatusCodes.OK).json(notice); 
+		}).then((notice) => {
+			const resObj = Object.assign({},{
+				uuid: notice.uuid,
+				_ref: notice._ref,
+				userId: notice.userId,
+				noticeType: notice.noticeType,
+				eventLocationLat: notice.eventCoordinates.coordinates[1],
+				eventLocationLong: notice.eventCoordinates.coordinates[0],
+				street: notice.street,
+				neighbourhood: notice.neighbourhood,
+				locality: notice.locality,
+				country: notice.country,
+				description: notice.description,
+				eventTimestamp: notice.eventTimestamp,
+				createdAt: notice.createdAt,
+				updatedAt: notice.updatedAt,
+				petId: notice.petId,
+			});
+
+			res.status(http.StatusCodes.OK).json(resObj);
 		}).catch(err => {
 			console.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -63,8 +101,15 @@ router.post('/', async (req, res) => {
 			petId: req.body.petId,
             userId: req.params.userId,
 			noticeType: req.body.noticeType,
-			eventLocationLat: req.body.eventLocationLat,
-            eventLocationLong: req.body.eventLocationLong,
+			eventCoordinates: {
+				type: 'Point',
+				coordinates: [req.body.eventLocationLong, req.body.eventLocationLat],
+				crs: { type: 'name', properties: { name: 'EPSG:5343'} }
+			},
+			street: req.body.street,
+			neighbourhood: req.body.neighbourhood,
+			locality: req.body.locality,
+			country: req.body.country,
 			description: req.body.description,
             eventTimestamp: req.body.eventTimestamp,
 			createdAt: new Date(),
@@ -90,7 +135,12 @@ router.put('/:noticeId', async (req, res) => {
 		//TODO: check for _ref
         var updatedNoticeFields = req.body
         updatedNoticeFields['updatedAt'] = new Date();
-        db.Notices.update(updatedNoticeFields, { 
+		updatedNoticeFields['eventCoordinates'] = {
+			type: 'Point',
+				coordinates: [req.body.eventLocationLong, req.body.eventLocationLat],
+				crs: { type: 'name', properties: { name: 'EPSG:5343'} }
+		}
+		db.Notices.update(updatedNoticeFields, {
 			where: { 
 				uuid: req.params.noticeId,
 				userId: req.params.userId 

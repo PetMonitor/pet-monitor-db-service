@@ -29,10 +29,19 @@ module.exports = {
       noticeType: {
         type: Sequelize.STRING
       },
-      eventLocationLat: {
+      eventCoordinates: {
+        type: Sequelize.GEOMETRY
+      },
+      street: {
         type: Sequelize.STRING
       },
-      eventLocationLong: {
+      neighbourhood: {
+        type: Sequelize.STRING
+      },
+      locality: {
+        type: Sequelize.STRING
+      },
+      country: {
         type: Sequelize.STRING
       },
       description: {

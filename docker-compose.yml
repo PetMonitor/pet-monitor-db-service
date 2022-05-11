@@ -2,22 +2,27 @@ version: "3"
 
 services:
   db:
+    build:
+      context: .
+      dockerfile: Dockerfile-db
     container_name: db
-    image: bitnami/postgresql
     environment:
       - POSTGRESQL_USERNAME=my_user
       - POSTGRESQL_PASSWORD=password123
       - POSTGRESQL_DATABASE=my_database
+      - POSTGRESQL_POSTGRES_PASSWORD=password123
     ports:
       - "5432:5432"
     healthcheck:
       test: exit 0
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: web
-    volumes:
-      - ./:/usr/src/app
+#    volumes:
+#      - ./:/usr/src/app
     ports:
-      - "8000:8000"
-    depends_on: 
+      - "4000:8000"
+    depends_on:
       - db
