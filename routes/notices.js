@@ -34,16 +34,8 @@ const { Op } = require("sequelize");
 			model: db.PetPhotos,
 			required: true,
 			include: [{
-				model: db.Pets,
-				required: false,
-				include: [{
-					model: db.PetPhotos,
-					required: false,
-					include: [{
-						model: db.Photos,
-						required: false
-					}]
-				}]
+				model: db.Photos,
+				required: false
 			}]
 		}]
 	}
@@ -53,8 +45,8 @@ const { Op } = require("sequelize");
 		let withinRadiusQuery = db.sequelize.fn(
 			 'ST_DWithin',
 			 db.sequelize.col('eventCoordinates'),
-			 db.sequelize.fn('ST_GeomFromText',
-				 `POINT(${req.query.longitude} ${req.query.latitude})`, 5343),
+			 db.sequelize.fn('ST_GeographyFromText',
+				 `POINT(${req.query.longitude} ${req.query.latitude})`),
 			 parseInt(req.query.radiusKm) * 1000);
 
 		noticeOptions.where = withinRadiusQuery
@@ -159,5 +151,9 @@ const { Op } = require("sequelize");
 	  });
   	} 
 });
+
+function isEmptyObject(object) {
+	return Object.keys(object).length === 0
+}
 
 module.exports = router;

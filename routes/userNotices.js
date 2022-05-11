@@ -101,11 +101,7 @@ router.post('/', async (req, res) => {
 			petId: req.body.petId,
             userId: req.params.userId,
 			noticeType: req.body.noticeType,
-			eventCoordinates: {
-				type: 'Point',
-				coordinates: [req.body.eventLocationLong, req.body.eventLocationLat],
-				crs: { type: 'name', properties: { name: 'EPSG:5343'} }
-			},
+			eventCoordinates: db.sequelize.fn('ST_GeographyFromText', `SRID=4326;POINT (${req.body.eventLocationLong} ${req.body.eventLocationLat})`),
 			street: req.body.street,
 			neighbourhood: req.body.neighbourhood,
 			locality: req.body.locality,
@@ -135,11 +131,7 @@ router.put('/:noticeId', async (req, res) => {
 		//TODO: check for _ref
         var updatedNoticeFields = req.body
         updatedNoticeFields['updatedAt'] = new Date();
-		updatedNoticeFields['eventCoordinates'] = {
-			type: 'Point',
-				coordinates: [req.body.eventLocationLong, req.body.eventLocationLat],
-				crs: { type: 'name', properties: { name: 'EPSG:5343'} }
-		}
+		updatedNoticeFields['eventCoordinates'] = db.sequelize.fn('ST_GeographyFromText', `SRID=4326;POINT (${req.body.eventLocationLong} ${req.body.eventLocationLat})`)
 		db.Notices.update(updatedNoticeFields, {
 			where: { 
 				uuid: req.params.noticeId,

@@ -30,7 +30,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       eventCoordinates: {
-        type: Sequelize.GEOMETRY
+        type: Sequelize.GEOGRAPHY
       },
       street: {
         type: Sequelize.STRING

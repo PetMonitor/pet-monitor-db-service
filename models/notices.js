@@ -41,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     noticeType: DataTypes.STRING,
-    eventCoordinates: DataTypes.GEOMETRY('POINT', 5343),
+    eventCoordinates: DataTypes.GEOGRAPHY('POINT'),
     street: DataTypes.STRING,
     neighbourhood: DataTypes.STRING,
     locality: DataTypes.STRING,

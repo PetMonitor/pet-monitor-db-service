@@ -9,11 +9,7 @@ module.exports = {
         petId: '123e4567-e89b-12d3-a456-426614174001',
         userId: '123e4567-e89b-12d3-a456-426614174000',
         noticeType: 'LOST',
-        eventCoordinates: Sequelize.fn('ST_GeomFromGeoJSON', JSON.stringify({
-          type: 'Point',
-          coordinates: [-58.421737,-34.585816],
-          crs: { type: 'name', properties: { name: 'EPSG:5343'} }
-        })),
+        eventCoordinates: Sequelize.fn('ST_GeographyFromText', 'SRID=4326;POINT (-58.421737 -34.585816)'),
         street: 'Armenia',
         neighbourhood: 'Palermo',
         locality: 'Buenos Aires',
@@ -29,11 +25,7 @@ module.exports = {
         petId: '123e4567-e89b-12d3-a456-426614174002',
         userId: '123e4567-e89b-12d3-a456-426614175000',
         noticeType: 'FOUND',
-        eventCoordinates: Sequelize.fn('ST_GeomFromGeoJSON', JSON.stringify({
-          type: 'Point',
-          coordinates: [-58.419389,-34.584242],
-          crs: { type: 'name', properties: { name: 'EPSG:5343'} }
-        })),
+        eventCoordinates: Sequelize.fn('ST_GeographyFromText', 'SRID=4326;POINT (-58.419389 -34.584242)'),
         street: 'Guemes',
         neighbourhood: 'Palermo',
         locality: 'Buenos Aires',
