@@ -3,20 +3,13 @@ var router = express.Router();
 
 var http = require('http-status-codes');
 const db = require('../models/index.js');
-<<<<<<< Updated upstream
-=======
 const { Op } = require("sequelize");
->>>>>>> Stashed changes
 
 /**
  * Notices CRUD endpoints.
  */
 
  router.get('/', async (req, res) => {
-<<<<<<< Updated upstream
-	try {
-        db.Notices.findAll({
-=======
 	let queryParams = {}
 	if (req.query.petType != null) {
 		queryParams.petType = req.query.petType
@@ -40,7 +33,6 @@ const { Op } = require("sequelize");
 		include: [{
 			model: db.PetPhotos,
 			required: true,
->>>>>>> Stashed changes
 			include: [{
 				model: db.Pets,
 				required: false,
@@ -53,9 +45,6 @@ const { Op } = require("sequelize");
 					}]
 				}]
 			}]
-<<<<<<< Updated upstream
-		}).then((notices) => {
-=======
 		}]
 	}
 	let noticeOptions = {}
@@ -135,7 +124,6 @@ const { Op } = require("sequelize");
 	noticeOptions.include = [petOptions]
 	try {
         db.Notices.findAll(noticeOptions).then((notices) => {
->>>>>>> Stashed changes
 			const resObj = notices.map(notice => {
 				return Object.assign({},{
 					uuid: notice.uuid,
