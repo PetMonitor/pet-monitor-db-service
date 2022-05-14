@@ -56,4 +56,54 @@ const db = require('../models/index.js');
   	} 
 });
 
+router.get('/:noticeId', async (req, res) => {
+	try {
+		db.Notices.findOne({ 
+			where: { 
+			    uuid: req.params.noticeId 
+            },
+			include: [{
+				model: db.Pets,
+				required: false,
+				include: [{
+					model: db.PetPhotos,
+					required: false,
+					include: [{
+						model: db.Photos,
+						required: false
+					}]
+				}]
+			}]
+		}).then((notice) => { 
+
+			const resObj = Object.assign({},{
+				uuid: notice.uuid,
+				_ref: notice._ref,
+				userId: notice.userId,
+				noticeType: notice.noticeType,
+				eventLocationLat: notice.eventLocationLat,
+				eventLocationLong: notice.eventLocationLong,
+				description: notice.description,
+				eventTimestamp: notice.eventTimestamp,
+				createdAt: notice.createdAt,
+				updatedAt: notice.updatedAt,
+				petId: notice.petId,
+				petPhoto: notice.Pet.PetPhotos[0].Photo.lowResPhoto
+			})
+
+			res.status(http.StatusCodes.OK).json(resObj);
+		}).catch(err => {
+			console.error(err);
+			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
+			  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
+			});
+		});
+  	} catch (err) {
+  		console.error(err);
+  		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
+			error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
+	  });
+  	} 
+});
+
 module.exports = router;

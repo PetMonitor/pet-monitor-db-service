@@ -14,26 +14,26 @@ from sklearn.preprocessing import LabelEncoder
 model = SVC(kernel='rbf', C=100.0, gamma='scale', probability=True)
 
 
-def getTopKNearestNeighbours(dbConnInfo, petId, k=15):
+def getTopKNearestNeighbours(dbConnInfo, noticeId, k=15):
     labelEncoder = LabelEncoder()
     connString = "host={} port={} dbname={} user={} password={}".format(dbConnInfo['host'], dbConnInfo['port'], dbConnInfo['db'], dbConnInfo['username'], dbConnInfo['pwd'])
 
     try:
-        sqlCommandExcludePetEmbeddings = """SELECT public."Notices"."petId", embedding FROM public."PetPhotos" INNER JOIN public."Notices" ON public."PetPhotos"."petId" = public."Notices"."petId" WHERE public."Notices"."petId" != '{}'""".format(petId)
-        sqlCommandPetEmbeddings = """SELECT "petId", embedding FROM "PetPhotos" WHERE "petId" = '{}'""".format(petId)
+        sqlCommandPetEmbeddings = """SELECT public."PetPhotos"."petId", public."Notices"."noticeType", embedding FROM "PetPhotos" INNER JOIN public."Notices" ON public."PetPhotos"."petId" = public."Notices"."petId" WHERE public."Notices"."uuid" = '{}' LIMIT 1""".format(noticeId)
 
         with psycopg2.connect(connString) as conn:
-            
-            # Select embeddings for all pets that aren't searched pet
-            dataTrain = pd.read_sql(sqlCommandExcludePetEmbeddings, conn)
-            
             # Select embeddings for searched pet
             searchedPetData = pd.read_sql(sqlCommandPetEmbeddings, conn)
+            
+            sqlCommandExcludePetEmbeddings = """SELECT public."Notices"."uuid", embedding FROM public."PetPhotos" INNER JOIN public."Notices" ON public."PetPhotos"."petId" = public."Notices"."petId" WHERE public."Notices"."uuid" != '{}' AND public."Notices"."noticeType" != '{}' """.format(noticeId, searchedPetData.iloc[0]['noticeType'])
 
-            # Encode pet ids into numerical values
-            petIdsSet = pd.unique(dataTrain.petId.to_numpy())
-            labelEncoder.fit(petIdsSet)
-            numericPetIds = labelEncoder.transform(dataTrain.petId.to_numpy())
+            # Select embeddings for all pets that aren't searched pet
+            dataTrain = pd.read_sql(sqlCommandExcludePetEmbeddings, conn)
+
+            # Encode notice ids into numerical values
+            noticeIdsSet = pd.unique(dataTrain.uuid.to_numpy())
+            labelEncoder.fit(noticeIdsSet)
+            numericPetIds = labelEncoder.transform(dataTrain.uuid.to_numpy())
 
             # train the classifier model
             model.fit(np.array(dataTrain.embedding.values.tolist()), numericPetIds)
@@ -72,7 +72,7 @@ def getTopKNearestNeighbours(dbConnInfo, petId, k=15):
             maxScoreHeap = []
             heapq.heapify(maxScoreHeap)
 
-            for petId, probabilitiesList in predictionFreqMap.items():
+            for noticeId, probabilitiesList in predictionFreqMap.items():
                 mean = np.mean(probabilitiesList)
                 var = np.var(probabilitiesList) if (np.var(probabilitiesList) > 0) else 1
                 freq = len(probabilitiesList)
@@ -80,17 +80,16 @@ def getTopKNearestNeighbours(dbConnInfo, petId, k=15):
                 # python only supports min heaps.
                 # punish those lists with higher variability
                 score = (-1 * freq * mean) / var
-                heapq.heappush(maxScoreHeap, (score, petId))
+                heapq.heappush(maxScoreHeap, (score, noticeId))
 
-            topKPetIds = [ ]
+            topKNoticeIds = [ ]
             # TODO: should find out which of the returned classes is seen most
             # frequently and with more probability.
             # Return top K from that
             for i in range(k):
                 if len(maxScoreHeap) > 0:
-                    topKPetIds.append(heapq.heappop(maxScoreHeap)[1])
-           
-            return topKPetIds
+                    topKNoticeIds.append(heapq.heappop(maxScoreHeap)[1])
+            return topKNoticeIds
     except Exception as e:
         print(e)
 

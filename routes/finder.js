@@ -16,14 +16,14 @@ MIN_POSTS = 10
  * Pet Finder endpoints
  */
 
-router.get('/:petId', async (req, res) => {
-    const petId = req.params.petId;
+router.get('/:noticeId', async (req, res) => {
+    const noticeId = req.params.noticeId;
     const databaseCredentials = getDatabaseCredentials();
 
-    getPredictedPets(databaseCredentials, '/python/classifier.py', petId)
+    getPredictedPets(databaseCredentials, '/python/classifier.py', noticeId)
     .then(data => {
         return res
-        .send({ "foundPets": data })
+        .send({ "closestMatches": data })
         .status(http.StatusCodes.OK);
     })
     .catch(err => {
