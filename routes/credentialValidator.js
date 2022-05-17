@@ -15,13 +15,22 @@ router.post('/', async (req, res) => {
     try {
         userCredentials = req.body
 
-        const hashedPwd = passwordHasher(userCredentials['password'])
+        let searchCriteria = {}
+
+        if (req.body.facebookId) {
+            searchCriteria = { facebookId: req.body.facebookId }
+        } else {
+            searchCriteria = { 
+                username: userCredentials['username'],
+                password: passwordHasher(userCredentials['password'])
+            } 
+        }
+
 
         db.Users.findOne({ 
             attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phoneNumber', 'alertRadius', 'alertsActivated', 'profilePicture'],
             where: { 
-                username: userCredentials['username'],
-                password: hashedPwd
+                ...searchCriteria
             } 
         }).then((user) => {
             if (user == null) {

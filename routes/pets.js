@@ -2,11 +2,9 @@ var express = require('express');
 var sharp = require('sharp');
 var http = require('http-status-codes');
 const db = require('../models/index.js');
-const axios = require('axios').default; 
+const commons = require('../utils/common.js');
 
-var router = express.Router({mergeParams: true});
-
-const FACE_REC_PORT = process.env.FACE_REC_PORT || '5001';
+var router = express.Router({ mergeParams: true });
 
 /**
 * Pet CRUD endpoints.
@@ -131,7 +129,7 @@ router.post('/', async (req, res) => {
 
 		let resEmbeddings = []
 		if (req.body.photos.length > 0) {
-			resEmbeddings = await getEmbeddingsForDogPhotos(req.body.photos);
+			resEmbeddings = await commons.getEmbeddingsForDogPhotos(req.body.photos);
 		}
 
 		const pet = await db.Pets.create({
@@ -246,11 +244,5 @@ router.delete('/:petId', async (req, res) => {
 	    });
 	} 
 });
-
-async function getEmbeddingsForDogPhotos(photos) {
-	return axios.post(`http://host.docker.internal:${FACE_REC_PORT}/api/v0/dogs/embedding`, {
-		dogs: photos
-	});
-};
 
 module.exports = router;

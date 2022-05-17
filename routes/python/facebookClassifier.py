@@ -14,29 +14,30 @@ from sklearn.preprocessing import LabelEncoder
 model = SVC(kernel='rbf', C=100.0, gamma='scale', probability=True)
 
 
-def getTopKNearestNeighbours(dbConnInfo, noticeId, k=15):
+def getTopKNearestNeighbours(dbConnInfo, postId, k=3):
     labelEncoder = LabelEncoder()
     connString = "host={} port={} dbname={} user={} password={}".format(dbConnInfo['host'], dbConnInfo['port'], dbConnInfo['db'], dbConnInfo['username'], dbConnInfo['pwd'])
 
     try:
-        sqlCommandPetEmbeddings = """SELECT public."PetPhotos"."petId", public."Notices"."noticeType", embedding FROM "PetPhotos" INNER JOIN public."Notices" ON public."PetPhotos"."petId" = public."Notices"."petId" WHERE public."Notices"."uuid" = '{}' LIMIT 1""".format(noticeId)
+
+        sqlCommandExcludePetEmbeddings = """SELECT public."FacebookPosts"."postId", embedding FROM public."FacebookPosts" INNER JOIN public."FacebookPostsEmbeddings" ON public."FacebookPosts"."uuid" = public."FacebookPostsEmbeddings"."postId" WHERE public."FacebookPosts"."postId" != '{}'""".format(postId)
+        sqlCommandPetEmbeddings = """SELECT public."FacebookPosts"."postId", embedding FROM public."FacebookPosts" INNER JOIN public."FacebookPostsEmbeddings" ON public."FacebookPosts"."uuid" = public."FacebookPostsEmbeddings"."postId" WHERE public."FacebookPosts"."postId" = '{}'""".format(postId)
 
         with psycopg2.connect(connString) as conn:
-            # Select embeddings for searched pet
-            searchedPetData = pd.read_sql(sqlCommandPetEmbeddings, conn)
             
-            sqlCommandExcludePetEmbeddings = """SELECT public."Notices"."uuid", embedding FROM public."PetPhotos" INNER JOIN public."Notices" ON public."PetPhotos"."petId" = public."Notices"."petId" WHERE public."Notices"."uuid" != '{}' AND public."Notices"."noticeType" != '{}' """.format(noticeId, searchedPetData.iloc[0]['noticeType'])
-
             # Select embeddings for all pets that aren't searched pet
             dataTrain = pd.read_sql(sqlCommandExcludePetEmbeddings, conn)
+            
+            # Select embeddings for searched pet
+            searchedPetData = pd.read_sql(sqlCommandPetEmbeddings, conn)
 
-            # Encode notice ids into numerical values
-            noticeIdsSet = pd.unique(dataTrain.uuid.to_numpy())
-            labelEncoder.fit(noticeIdsSet)
-            numericPetIds = labelEncoder.transform(dataTrain.uuid.to_numpy())
+            # Encode post ids into numerical values
+            postIdsSet = pd.unique(dataTrain.postId.to_numpy())
+            labelEncoder.fit(postIdsSet)
+            numericPostIds = labelEncoder.transform(dataTrain.postId.to_numpy())
 
             # train the classifier model
-            model.fit(np.array(dataTrain.embedding.values.tolist()), numericPetIds)
+            model.fit(np.array(dataTrain.embedding.values.tolist()), numericPostIds)
             
             # predict probabilities for each embedding
             probabilities = model.predict_proba(searchedPetData.embedding.values.tolist())
@@ -72,7 +73,7 @@ def getTopKNearestNeighbours(dbConnInfo, noticeId, k=15):
             maxScoreHeap = []
             heapq.heapify(maxScoreHeap)
 
-            for noticeId, probabilitiesList in predictionFreqMap.items():
+            for postId, probabilitiesList in predictionFreqMap.items():
                 mean = np.mean(probabilitiesList)
                 var = np.var(probabilitiesList) if (np.var(probabilitiesList) > 0) else 1
                 freq = len(probabilitiesList)
@@ -80,16 +81,17 @@ def getTopKNearestNeighbours(dbConnInfo, noticeId, k=15):
                 # python only supports min heaps.
                 # punish those lists with higher variability
                 score = (-1 * freq * mean) / var
-                heapq.heappush(maxScoreHeap, (score, noticeId))
+                heapq.heappush(maxScoreHeap, (score, postId))
 
-            topKNoticeIds = [ ]
+            topKPostIds = [ ]
             # TODO: should find out which of the returned classes is seen most
             # frequently and with more probability.
             # Return top K from that
             for i in range(k):
                 if len(maxScoreHeap) > 0:
-                    topKNoticeIds.append(heapq.heappop(maxScoreHeap)[1])
-            return topKNoticeIds
+                    topKPostIds.append(heapq.heappop(maxScoreHeap)[1])
+           
+            return topKPostIds
     except Exception as e:
         print(e)
 

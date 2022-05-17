@@ -14,6 +14,8 @@ var users = require('./routes/users.js');
 var photos = require('./routes/photos.js');
 var userNotices = require('./routes/userNotices.js');
 var credentialValidation = require('./routes/credentialValidator.js');
+var socialMediaPosts = require('./routes/socialMediaPosts.js');
+
 var finder = require('./routes/finder.js');
 
 /**
@@ -33,6 +35,8 @@ app.use('/users/:userId/pets/:petId/photos', petPhotos)
 app.use('/users/credentialValidation', credentialValidation);
 
 app.use('/pets/finder', finder);
+
+app.use('/facebook/posts', socialMediaPosts);
 
 /**
 * Server Activation

@@ -10,12 +10,66 @@ const {spawn} = require('child_process')
 const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.js')[env];
 
+MIN_POSTS = 10
+
 /**
  * Pet Finder endpoints
  */
 
-router.get('/:petId', async (req, res) => {
+router.get('/:noticeId', async (req, res) => {
+    const noticeId = req.params.noticeId;
+    const databaseCredentials = getDatabaseCredentials();
 
+    getPredictedPets(databaseCredentials, '/python/classifier.py', noticeId)
+    .then(data => {
+        return res
+        .send({ "closestMatches": data })
+        .status(http.StatusCodes.OK);
+    })
+    .catch(err => {
+        return res
+            .send(err.toString())
+            .status(http.StatusCodes.INTERNAL_SERVER_ERROR);
+    });
+
+});
+
+router.get('/facebook/posts/:postId', async (req, res) => {
+    const postId = req.params.postId;
+    const databaseCredentials = getDatabaseCredentials();
+
+    const totalPosts = await db.FacebookPosts.count();
+
+    if (totalPosts < MIN_POSTS) {
+        return res
+        .send({ "foundPosts": [] })
+        .status(http.StatusCodes.OK); 
+    }
+
+    //TODO: FILTER BY NOTICE TYPE (LOST, FOUND, NONE)
+    
+    getPredictedPets(databaseCredentials, '/python/facebookClassifier.py', postId)
+    .then(async data => {
+
+        const closestPosts = await db.FacebookPosts.findAll({
+            where: {
+                postId: data
+            }
+        })
+
+        return res
+        .send({ "foundPosts": closestPosts })
+        .status(http.StatusCodes.OK);
+    })
+    .catch(err => {
+        return res
+            .send(err.toString())
+            .status(http.StatusCodes.INTERNAL_SERVER_ERROR);
+    });
+
+});
+
+function getDatabaseCredentials() {
     if (config.use_env_variable) {
         // TODO: connection string case should be considered
         console.log(`Using ENV database ${config.use_env_variable}`);
@@ -32,33 +86,25 @@ router.get('/:petId', async (req, res) => {
         pwd: config.password 
     };
 
+    return databaseCredentials;
+}
+
+const getPredictedPets = (databaseCredentials, filePath, sqlCommandPetEmbeddings, sqlCommandExcludePetEmbeddings) => {
     console.log("About to spawn process...");
-    
-    getPredictedPets(databaseCredentials, req.params.petId)
-    .then(data => {
-        return res
-        .send({ "foundPets": data })
-        .status(http.StatusCodes.OK);
-    })
-    .catch(err => {
-        return res
-            .send(err.toString())
-            .status(http.StatusCodes.INTERNAL_SERVER_ERROR);
-    });
 
-});
-
-const getPredictedPets = (databaseCredentials, petId) => {
     var process = spawn('python', [ 
-        path.join(__dirname, '/python/classifier.py'),
+        path.join(__dirname, filePath),
         JSON.stringify(databaseCredentials),
-        petId
+        sqlCommandPetEmbeddings, 
+        sqlCommandExcludePetEmbeddings
      ]);
     
      console.log("Process spawned!");
      const regexListContent = /(?<=\[).+?(?=\])/g;
      return new Promise((resolve, reject) => {
         process.stdout.on('data', (data) => {
+            console.log(`Python process returned raw result ${data}`);
+
             result = data.toString().match(regexListContent)[0].replaceAll("'","").replaceAll(" ","").split(",");
 
             console.log("Python process returned " + result);
@@ -68,6 +114,7 @@ const getPredictedPets = (databaseCredentials, petId) => {
             resolve(result)
         });
         process.on('error', (err) => {
+            console.error(err);
             reject(err)
         });
     });
