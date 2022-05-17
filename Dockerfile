@@ -3,9 +3,9 @@ FROM node:16
 #Create application directory
 WORKDIR /usr/src/app
 
-COPY . /usr/src/app
+COPY entrypoint.sh /usr/src/app
 
-RUN chmod +x entrypoint.sh
+RUN chmod +x /usr/src/app/entrypoint.sh
 
 # Install libs for python process
 RUN apt-get update && apt-get install -y python-pip
@@ -23,4 +23,4 @@ RUN pip install pandas==0.24.1
 
 EXPOSE 8000
 
-ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/usr/src/app/entrypoint.sh"]

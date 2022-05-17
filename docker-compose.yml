@@ -20,9 +20,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: web
-#    volumes:
-#      - ./:/usr/src/app
+    volumes:
+      - ./:/usr/src/app
     ports:
-      - "4000:8000"
+      - "8000:8000"
     depends_on:
       - db

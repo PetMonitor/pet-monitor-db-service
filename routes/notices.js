@@ -39,19 +39,8 @@ const { Op } = require("sequelize");
 			}]
 		}]
 	}
-	let noticeOptions = {}
-
-	if (req.query.radiusKm != null && req.query.latitude && req.query.longitude) {
-		let withinRadiusQuery = db.sequelize.fn(
-			 'ST_DWithin',
-			 db.sequelize.col('eventCoordinates'),
-			 db.sequelize.fn('ST_GeographyFromText',
-				 `POINT(${req.query.longitude} ${req.query.latitude})`),
-			 parseInt(req.query.radiusKm) * 1000);
-
-		noticeOptions.where = withinRadiusQuery
-	 }
-	if (!isEmptyObject(queryParams)) {
+	 let noticeOptions = {}
+	 if (!isEmptyObject(queryParams)) {
 		let where = {}
 		if (queryParams.petType != null && !isEmptyObject(queryParams.petType)) {
 			where.type = queryParams.petType
@@ -68,18 +57,20 @@ const { Op } = require("sequelize");
 			petOptions.where = where
 		}
 
+		let noticeConditions = []
 		let noticeTypeCondition
 		let regionCondition
+		let withinRadiusCondition
 		if (queryParams.noticeType != null && !isEmptyObject(queryParams.noticeType)) {
-			noticeTypeCondition = {
+			noticeConditions.push({
 				noticeType: {
 					[Op.or]: queryParams.noticeType
 				}
-			}
+			})
 		}
 
 		if (queryParams.noticeRegion != null && !isEmptyObject(queryParams.noticeRegion)) {
-			regionCondition = {
+			noticeConditions.push({
 				[Op.or]: [
 					{
 						street: {
@@ -102,16 +93,28 @@ const { Op } = require("sequelize");
 						}
 					}
 				]
+			})
+		}
+
+		if (req.query.radiusKm != null && req.query.latitude != null && req.query.longitude != null) {
+			withinRadiusCondition = db.sequelize.fn(
+				'ST_DWithin',
+				db.sequelize.col('eventCoordinates'),
+				db.sequelize.fn('ST_GeographyFromText',
+					`POINT(${req.query.longitude} ${req.query.latitude})`),
+				parseInt(req.query.radiusKm) * 1000);
+			if (noticeConditions.length === 0) {
+
 			}
 		}
 
-		if (noticeTypeCondition != null && regionCondition != null) {
-			noticeOptions.where = {...noticeTypeCondition, ...regionCondition}
-		} else if (noticeTypeCondition != null) {
-			noticeOptions.where = noticeTypeCondition
-		} else if (regionCondition != null) {
-			noticeOptions.where = regionCondition
-		}
+		// noticeOptions.where = {
+		// 	[Op.and]: [
+		// 		noticeTypeCondition,
+		// 		regionCondition,
+		// 		db.sequelize.where(withinRadiusCondition, {[Op.is]: true})
+		// 	]}
+
 	}
 	noticeOptions.include = [petOptions]
 	try {
