@@ -11,10 +11,10 @@ if [[ "${ENVIRONMENT}" != "production" ]]; then
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.6.1.tar.gz \
     && rm dockerize-linux-amd64-v0.6.1.tar.gz
 
-   echo "Running dockerize..." 
-   dockerize -wait tcp://db:5432   
-else 
-   echo "Don't wait. Run migrations." 
+   echo "Running dockerize..."
+   dockerize -wait tcp://db:5432
+else
+   echo "Don't wait. Run migrations."
 fi
 
 npx sequelize-cli db:migrate
