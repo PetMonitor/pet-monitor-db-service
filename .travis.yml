@@ -4,9 +4,9 @@ services:
 
 addons:
   postgresql: "9.5"
-  apt:
-    packages:
-      - postgresql-9.5-postgis-2.4
+#  apt:
+#    packages:
+#      - postgresql-9.5-postgis-2.4
 before_script:
   - psql -U postgres -c "create extension postgis"
   
@@ -23,5 +23,6 @@ notifications:
   email:
     recipients:
       - mmariotti@fi.uba.ar
+      - cdetrincheria@fi.uba.ar
     on_success: change
     on_failure: always
