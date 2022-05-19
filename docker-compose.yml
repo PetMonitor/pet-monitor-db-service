@@ -10,7 +10,6 @@ services:
       - POSTGRESQL_USERNAME=my_user
       - POSTGRESQL_PASSWORD=password123
       - POSTGRESQL_DATABASE=my_database
-      - POSTGRESQL_POSTGRES_PASSWORD=password123
     ports:
       - "5432:5432"
     healthcheck:
