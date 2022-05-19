@@ -9,8 +9,8 @@ sudo: true
 
 before_script:
   - sudo apt-get install postgresql-9.5-postgis-2.4 postgis -y -q
-  - psql -U postgres -c 'create database test'
-  - psql -U postgres -d test -c "create extension postgis"
+  - psql -U postgres -c "create database pet-monitor-db"
+  - psql -U postgres -d pet-monitor-db -c "create extension postgis"
   
 node_js:
   - 16
