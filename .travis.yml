@@ -8,8 +8,9 @@ addons:
 sudo: true
 
 before_script:
-  - sudo apt-get install postgresql-9.5-postgis-2.3 postgis -y -q
-  - psql -U postgres -c "create extension postgis"
+  - sudo apt-get install postgresql-9.5-postgis-2.4 postgis -y -q
+  - psql -U postgres -c 'create database test'
+  - psql -U postgres -d test -c "create extension postgis"
   
 node_js:
   - 16
