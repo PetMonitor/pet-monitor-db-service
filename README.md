@@ -16,7 +16,7 @@ To run this project locally you only need to have docker compose. Go to the proj
 
 Set up a local database for testing:
 
-`docker run -e POSTGRESQL_USERNAME=postgres -e POSTGRESQL_DATABASE=pet-monitor-db -e POSTGRESQL_PASSWORD=pass -p 5432:5432 bitnami/postgresql`
+`docker run -e POSTGRESQL_USERNAME=postgres -e POSTGRESQL_DATABASE=pet_monitor_db -e POSTGRESQL_PASSWORD=pass -p 5432:5432 bitnami/postgresql`
 
 And set credentials accordingly at config/config.js file, in the test configuration section.
 
