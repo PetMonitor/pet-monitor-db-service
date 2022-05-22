@@ -2,13 +2,12 @@ var express = require('express');
 
 var router = express.Router();
 
-var http = require('http-status-codes');
 const db = require('../models/index.js');
 var sharp = require('sharp');
-
-var passwordHasher = require('../utils/passwordHasher.js');
-
+var http = require('http-status-codes');
+const logger = require('../utils/logger.js');
 const commons = require('../utils/common.js');
+var passwordHasher = require('../utils/passwordHasher.js');
 
 LOW_RES_PHOTO_DIMENSION = 130
 
@@ -20,16 +19,16 @@ router.get('/', async (req, res) => {
 	try {
 		db.Users.findAll({ attributes: ['uuid', '_ref', 'name', 'username', 'email', 'phoneNumber', 'alertRadius', 'alertsActivated', 'profilePicture'] })
 			.then((users) => { 
-				console.log(`Returning users ${JSON.stringify(users)}`);
+				logger.info(`Returning users ${JSON.stringify(users)}`);
 				res.status(http.StatusCodes.OK).json(users); 
 			}).catch(err => {
-				console.error(err);
+				logger.error(err);
 				res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 				  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 				});
 			});
   	} catch (err) {
-  		console.error(err);
+  		logger.error(err);
   		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 			  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 		});
@@ -42,13 +41,13 @@ router.get('/:userId', async (req, res) => {
 			.then((user) => { 
 				res.status(http.StatusCodes.OK).json(user); 
 			}).catch(err => {
-				console.error(err);
+				logger.error(err);
 				res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 				  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 				});
 			});
   	} catch (err) {
-  		console.error(err);
+  		logger.error(err);
   		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 			error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 	    });
@@ -65,13 +64,13 @@ router.get('/facebook/:facebookId', async (req, res) => {
 			.then((user) => { 
 				res.status(http.StatusCodes.OK).json(user); 
 			}).catch(err => {
-				console.error(err);
+				logger.error(err);
 				res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 				  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 				});
 			});
   	} catch (err) {
-  		console.error(err);
+  		logger.error(err);
   		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 			error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 	    });
@@ -80,7 +79,7 @@ router.get('/facebook/:facebookId', async (req, res) => {
 
 router.post('/', async (req, res) => {
 	// TODO: improve password hashing method
-	console.log(`Attempting to create new user... ${JSON.stringify(req.body)}`);
+	// logger.log(`Attempting to create new user... ${JSON.stringify(req.body)}`);
 
 	const tx = await db.sequelize.transaction();
 	try {
@@ -114,9 +113,9 @@ router.post('/', async (req, res) => {
 
 		if (req.body.pets === undefined || req.body.pets.length === 0) {
 			await tx.commit();
-			console.log('No pets registered for user!');
+			logger.info('No pets registered for user!');
 
-			console.log('Successfully created new user!');
+			logger.info('Successfully created new user!');
 			return res.status(http.StatusCodes.CREATED).json(user); 
 		}
 
@@ -137,15 +136,19 @@ router.post('/', async (req, res) => {
 			updatedAt: new Date()
 		}});
 
-		console.log('Attempting to create new pets for user...');
+		logger.info(`Attempting to create ${JSON.stringify(petList)} new pets for user...`);
 
 		const pets = await db.Pets.bulkCreate(petList, {transaction: tx});
 
 		let photosList = []
 		let petPhotosList = [];
 		
+		logger.info(`Created pets ${JSON.stringify(petList)}`);
+
 
 		for (var i = 0; i < req.body.pets.length; i++) {
+
+			logger.info(`Attempting to create photo embeddings for pet ${req.body.pets[i].name}`);
 
 			let resEmbeddings = await commons.getEmbeddingsForDogPhotos(req.body.pets[i].photos);
 			
@@ -179,18 +182,18 @@ router.post('/', async (req, res) => {
 		// Add pet photos
 		await db.Photos.bulkCreate(photosList, { transaction: tx });
 
-		console.log(`Inserting pet photos ${petPhotosList.length}`);
+		logger.info(`Inserting pet photos ${petPhotosList.length}`);
 
 		// Link photos to pets
 		await db.PetPhotos.bulkCreate(petPhotosList, { transaction: tx });
 
 		await tx.commit();
-		console.log('Successfully created user and pets!');
+		logger.info('Successfully created user and pets!');
 		return res.status(http.StatusCodes.CREATED).json(user); 
 
 	} catch (error) {
 		await tx.rollback();
-		console.error(`User creation failed, rolling transaction back. ${error}`);
+		logger.error(`User creation failed, rolling transaction back. ${error}`, error);
 		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 		  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + error 
 	    });
@@ -208,13 +211,13 @@ router.delete('/:userId', async (req, res) => {
 		}).then((deletedCount) => {
 		    res.status(http.StatusCodes.OK).json({'deletedCount': deletedCount }); 
 		}).catch(err => {
-			console.error(err);
+			logger.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 			  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 			});
 		});
 	} catch (err) {
-		console.error(err);
+		logger.error(err);
 		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 		  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 	    });
@@ -233,13 +236,13 @@ router.put('/:userId', async (req, res) => {
 		}).then((affectedRows) => {
 		    res.status(http.StatusCodes.OK).json({ 'updatedCount': affectedRows[0] }); 
 		}).catch(err => {
-			console.error(err);
+			logger.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 			  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 			});
 		});
 	} catch (err) {
-		console.error(err);
+		logger.error(err);
 		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 		  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 	    });		
@@ -266,13 +269,13 @@ router.put('/:userId/password', async (req, res) => {
 		}).then((affectedRows) => {
 		    res.status(http.StatusCodes.OK).json({ 'updatedCount': affectedRows[0] }); 
 		}).catch(err => {
-			console.error(err);
+			logger.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 			  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 			});
 		});
 	} catch (err) {
-		console.error(err);
+		logger.error(err);
 		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 		  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 	    });		

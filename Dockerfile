@@ -3,6 +3,9 @@ FROM node:16
 #Create application directory
 WORKDIR /usr/src/app
 
+RUN mkdir logs
+RUN touch logs/app.log
+
 COPY entrypoint.sh /usr/src/app
 
 RUN chmod +x /usr/src/app/entrypoint.sh
