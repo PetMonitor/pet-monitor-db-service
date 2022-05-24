@@ -137,7 +137,7 @@ const { Op } = require("sequelize");
 					createdAt: notice.createdAt,
 					updatedAt: notice.updatedAt,
 					petId: notice.petId,
-					petPhoto: notice.Pet.PetPhotos[0].Photo.lowResPhoto
+					petPhoto: notice.Pet.PetPhotos[0].Photo.photo
 				})
 			});
 
@@ -196,7 +196,7 @@ router.get('/:noticeId', async (req, res) => {
 				createdAt: notice.createdAt,
 				updatedAt: notice.updatedAt,
 				petId: notice.petId,
-				petPhoto: notice.Pet.PetPhotos[0].Photo.lowResPhoto
+				petPhoto: notice.Pet.PetPhotos[0].Photo.photo
 			})
 
 			res.status(http.StatusCodes.OK).json(resObj);

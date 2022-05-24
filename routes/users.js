@@ -3,13 +3,11 @@ var express = require('express');
 var router = express.Router();
 
 const db = require('../models/index.js');
-var sharp = require('sharp');
 var http = require('http-status-codes');
 const logger = require('../utils/logger.js');
 const commons = require('../utils/common.js');
 var passwordHasher = require('../utils/passwordHasher.js');
 
-LOW_RES_PHOTO_DIMENSION = 130
 
 /**
  * User CRUD endpoints.
@@ -88,7 +86,6 @@ router.post('/', async (req, res) => {
 			await db.Photos.create({
 				uuid: req.body.profilePicture.uuid,
 				photo: Buffer.from(req.body.profilePicture.photo, 'base64'),
-				lowResPhoto: null,
 				createdAt: new Date(),
 				updatedAt: new Date()
 			}, { transaction: tx });
@@ -154,14 +151,11 @@ router.post('/', async (req, res) => {
 			
 			for (var j = 0; j < req.body.pets[i].photos.length; j++) {
 				const photo = req.body.pets[i].photos[j];
-				const photoBuffer = Buffer.from(photo.photo,'base64');
-				let lowResPhoto = sharp(photoBuffer).resize(LOW_RES_PHOTO_DIMENSION, LOW_RES_PHOTO_DIMENSION);
-				lowResPhotoBuffer = await lowResPhoto.toBuffer();				
+				const photoBuffer = Buffer.from(photo.photo,'base64');		
 				
 				const petPhoto = {
 					uuid: photo.uuid,
 					photo: photoBuffer,
-					lowResPhoto: lowResPhotoBuffer,
 					createdAt: new Date(),
 					updatedAt: new Date()
 				}

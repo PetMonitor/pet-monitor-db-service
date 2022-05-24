@@ -10,7 +10,7 @@ module.exports = {
                 rejectUnauthorized: false
             }
         },
-        logging: true
+        logging: false
     },
     development: {
         username: 'my_user',

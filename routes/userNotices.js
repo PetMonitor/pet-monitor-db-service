@@ -45,7 +45,7 @@ var router = express.Router({mergeParams: true});
 					createdAt: notice.createdAt,
 					updatedAt: notice.updatedAt,
 					petId: notice.petId,
-					petPhoto: notice.Pet.PetPhotos[0].Photo.lowResPhoto
+					petPhoto: notice.Pet.PetPhotos[0].Photo.photo
 				})
 			});
 
