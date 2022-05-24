@@ -154,13 +154,10 @@ router.post('/', async (req, res) => {
 		for (var i = 0; i < req.body.photos.length; i++) {
 
 			const photoBuffer = Buffer.from(req.body.photos[i].photo,'base64');
-			let lowResPhoto = sharp(photoBuffer).resize(LOW_RES_PHOTO_DIMENSION, LOW_RES_PHOTO_DIMENSION);
-			lowResPhotoBuffer = await lowResPhoto.toBuffer();				
 
 			photosList.push({
 				uuid: req.body.photos[i].uuid,
 				photo: photoBuffer,
-				lowResPhoto: lowResPhotoBuffer,
 				createdAt: new Date(),
 				updatedAt: new Date()
 			});

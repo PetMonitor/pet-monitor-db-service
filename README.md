@@ -18,7 +18,7 @@ Set up a local database for testing:
 
 `docker run -e POSTGRESQL_USERNAME=postgres -e POSTGRESQL_DATABASE=pet-monitor-db -e POSTGRESQL_PASSWORD=pass -p 5432:5432 bitnami/postgresql`
 
-And set credentials accordinly at config/config.js file, in the test configuration section.
+And set credentials accordingly at config/config.js file, in the test configuration section.
 
 Run tests using:
 `export NODE_ENV=test`
@@ -30,7 +30,7 @@ Run tests using:
 
 ## Restore Database from backup
 
-For this step to work, the commands in 'entrypoint.sh' file that run migration and seeding MUST BE commented out. 
+For this step to work, the commands in 'entrypoint.sh' file that run migration and seeding MUST BE commented out.
 
 To restore database from backup:
 

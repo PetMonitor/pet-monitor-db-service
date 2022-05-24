@@ -9,7 +9,8 @@ module.exports = {
                 require: true,
                 rejectUnauthorized: false
             }
-        }
+        },
+        logging: false
     },
     development: {
         username: 'my_user',
@@ -21,7 +22,8 @@ module.exports = {
         protocol: 'postgres',
         dialectOptions: {},
         seederStorage: 'sequelize',
-        seederStorageTableName: 'sequelize_data'
+        seederStorageTableName: 'sequelize_data',
+        logging: false
     },
     test: {
         username: 'postgres',
@@ -30,6 +32,7 @@ module.exports = {
         host: '127.0.0.1',
         port: 5432,
         dialect: 'postgres',
-        protocol: 'postgres'
+        protocol: 'postgres',
+        logging: false
     }
 };
