@@ -5,13 +5,6 @@ services:
 addons:
   postgresql: "9.5"
 
-sudo: true
-
-before_script:
-  - sudo apt-get install postgresql-9.5-postgis-2.4 postgis -y -q
-  - psql -U postgres -c "create database pet_monitor_db"
-  - psql -U postgres -d pet_monitor_db -c "create extension postgis"
-  
 node_js:
   - 16
 # install dependencies
@@ -25,6 +18,5 @@ notifications:
   email:
     recipients:
       - mmariotti@fi.uba.ar
-      - cdetrincheria@fi.uba.ar
     on_success: change
     on_failure: always
