@@ -24,7 +24,6 @@
     "npm-test": "^0.0.1",
     "pg": "8.6.0",
     "pg-hstore": "2.3.4",
-    "react-native-animated-loader": "^0.0.9",
     "sequelize": "6.6.5",
     "sequelize-cli": "6.2.0",
     "sequelize-noupdate-attributes": "1.0.0",
