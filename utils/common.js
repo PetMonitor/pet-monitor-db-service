@@ -13,6 +13,13 @@ async function getEmbeddingsForDogPhotos(photos) {
 			maxBodyLength: Infinity
 		}
 	);
-};
+}
 
-module.exports.getEmbeddingsForDogPhotos = getEmbeddingsForDogPhotos;
+function isEmptyObject(object) {
+	return object == null || Object.keys(object).length === 0
+}
+
+module.exports = {
+	getEmbeddingsForDogPhotos: getEmbeddingsForDogPhotos,
+	isEmptyObject: isEmptyObject,
+}

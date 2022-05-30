@@ -15,6 +15,7 @@ var photos = require('./routes/photos.js');
 var userNotices = require('./routes/userNotices.js');
 var credentialValidation = require('./routes/credentialValidator.js');
 var socialMediaPosts = require('./routes/socialMediaPosts.js');
+var fosterVolunteerProfiles = require('./routes/fosterVolunteerProfiles.js');
 
 var finder = require('./routes/finder.js');
 
@@ -33,6 +34,7 @@ app.use('/notices', notices);
 app.use('/photos', photos);
 app.use('/users/:userId/pets/:petId/photos', petPhotos)
 app.use('/users/credentialValidation', credentialValidation);
+app.use('/fosterVolunteerProfiles', fosterVolunteerProfiles);
 
 app.use('/pets/finder', finder);
 
