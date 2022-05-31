@@ -3,30 +3,22 @@ var express = require('express');
 var http = require('http-status-codes');
 const db = require('../models/index.js');
 const logger = require('../utils/logger.js');
-const { isEmptyObject } = require("../utils/common");
 
 var router = express.Router({mergeParams: true});
 
 /**
- * Foster volunteer profiles CRUD endpoints.
+ * Pets' foster history CRUD endpoints.
  */
 
 router.get('/', async (req, res) => {
 	try {
-		const queryParams = req.query;
-		const where = {}
-		if (!isEmptyObject(queryParams.userId)) {
-			where.userId = queryParams.userId;
-		}
-		if (!isEmptyObject(queryParams.available)) {
-			where.available = queryParams.available;
-		}
-        db.FosterVolunteerProfiles.findAll({
-			where: where
-
-		}).then((profiles) => {
-			logger.info(`Returning foster volunteer profiles ${JSON.stringify(profiles)}`);
-            res.status(http.StatusCodes.OK).json(profiles);
+        db.PetsFosterHistory.findAll({
+			where: {
+				petId: req.params.petId
+			}
+		}).then(history => {
+			logger.info(`Returning pet's foster history ${JSON.stringify(history)}`);
+			res.status(http.StatusCodes.OK).json(history);
         }).catch(err => {
 			logger.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -41,54 +33,52 @@ router.get('/', async (req, res) => {
   	} 
 });
 
-router.get('/:profileId', async (req, res) => {
+router.get('/:historyId', async (req, res) => {
 	try {
-		db.FosterVolunteerProfiles.findOne({
-			where: { 
-			    uuid: req.params.profileId,
-            }
-		}).then((profile) => {
-			if (profile != null) {
-				logger.info(`Returning foster volunteer profile ${JSON.stringify(profile)}`);
-				res.status(http.StatusCodes.OK).json(profile);
+		db.PetsFosterHistory.findOne({
+			where: {
+				uuid: req.params.historyId,
+				petId: req.params.petId
+			}
+		}).then((entry) => {
+			if (entry != null) {
+				logger.info(`Returning pet's foster history entry ${JSON.stringify(entry)}`);
+				res.status(http.StatusCodes.OK).json(entry);
 			} else {
 				res.status(http.StatusCodes.NOT_FOUND).send({
-					error: `No profile found for id ${req.params.profileId}`
+					error: `No history entry found for id ${req.params.historyId}`
 				});
 			}
 		}).catch(err => {
 			logger.error(err);
-			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
-			  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
+			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({
+				error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err
 			});
 		});
-  	} catch (err) {
+	} catch (err) {
 		logger.error(err);
-  		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
-			error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
-	  });
-  	} 
+		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({
+			error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err
+		});
+	}
 });
 
 router.post('/', async (req, res) => {
     try {
-		logger.info(`Creating foster volunteer profile ${req.body.uuid}`);
-		db.FosterVolunteerProfiles.create({
+		logger.info(`Creating pet's foster history entry ${req.body.uuid}`);
+		db.PetsFosterHistory.create({
 			uuid: req.body.uuid,
 			_ref: req.body._ref,
-            userId: req.body.userId,
-			petTypesToFoster: req.body.petTypesToFoster,
-			petSizesToFoster: req.body.petSizesToFoster,
-			location: req.body.location,
-			province: req.body.province,
-			additionalInformation: req.body.additionalInformation,
-			available: req.body.available,
-			averageRating: req.body.averageRating,
-			ratingAmount: req.body.ratingAmount,
+            petId: req.body.petId,
+			contactEmail: req.body.contactEmail,
+			contactPhone: req.body.contactPhone,
+			contactName: req.body.contactName,
+			sinceDate: req.body.sinceDate,
+			untilDate: req.body.untilDate,
 			createdAt: new Date(),
 			updatedAt: new Date()
-		}).then((profile) => {
-		    res.status(http.StatusCodes.CREATED).json(profile);
+		}).then((history) => {
+		    res.status(http.StatusCodes.CREATED).json(history);
 		}).catch(err => {
 			logger.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -103,14 +93,15 @@ router.post('/', async (req, res) => {
 	}
 });
 
-router.put('/:profileId', async (req, res) => {
+router.put('/:historyId', async (req, res) => {
 	try {
 		//TODO: check for _ref
-        var updatedProfileFields = req.body
-		updatedProfileFields['updatedAt'] = new Date();
-		db.FosterVolunteerProfiles.update(updatedProfileFields, {
+        var updatedHistoryFields = req.body
+		updatedHistoryFields['updatedAt'] = new Date();
+		db.PetsFosterHistory.update(updatedHistoryFields, {
 			where: { 
-				uuid: req.params.profileId
+				uuid: req.params.historyId,
+				petId: req.params.petId
 			},
 			returning: true,
 			plain: true
@@ -130,11 +121,12 @@ router.put('/:profileId', async (req, res) => {
 	}
 });
 
-router.delete('/:profileId', async (req, res) => {
+router.delete('/:historyId', async (req, res) => {
 	try {
-        db.FosterVolunteerProfiles.destroy({
+        db.PetsFosterHistory.destroy({
 			where: { 
-				uuid: req.params.profileId,
+				uuid: req.params.historyId,
+				petId: req.params.petId
 			}
 		}).then((deletedCount) => {
 		    res.status(http.StatusCodes.OK).json(deletedCount); 

@@ -22,6 +22,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete('notices', null, {});
+    return queryInterface.bulkDelete('FosterVolunteerProfiles', null, {});
   }
 };
