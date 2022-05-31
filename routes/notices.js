@@ -4,6 +4,7 @@ var router = express.Router();
 var http = require('http-status-codes');
 const db = require('../models/index.js');
 const { Op } = require("sequelize");
+const { isEmptyObject } = require("../utils/common");
 
 /**
  * Notices CRUD endpoints.
@@ -160,10 +161,6 @@ function getNoticeLocationWithinRadiusFilter(queryParams) {
 			`POINT(${queryParams.longitude} ${queryParams.latitude})`),
 		parseInt(queryParams.radiusKm) * 1000);
 	return db.sequelize.where(withinRadiusCondition, {[Op.is]: true});
-}
-
-function isEmptyObject(object) {
-	return object == null || Object.keys(object).length === 0
 }
 
 function mapToDomain(notice) {

@@ -2,6 +2,7 @@ var express = require('express');
 
 var http = require('http-status-codes');
 const db = require('../models/index.js');
+const logger = require('../utils/logger.js');
 
 var router = express.Router({mergeParams: true});
 
@@ -89,10 +90,9 @@ router.get('/:noticeId', async (req, res) => {
 				updatedAt: notice.updatedAt,
 				petId: notice.petId,
 			});
-
 			res.status(http.StatusCodes.OK).json(resObj);
 		}).catch(err => {
-			console.error(err);
+			this.logger.error(err);
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 			  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 			});
@@ -142,9 +142,14 @@ router.post('/', async (req, res) => {
 router.put('/:noticeId', async (req, res) => {
 	try {
 		//TODO: check for _ref
+		logger.info(`Updating notice ${req.params.noticeId} with content ${JSON.stringify(req.body)}`)
         var updatedNoticeFields = req.body
         updatedNoticeFields['updatedAt'] = new Date();
-		updatedNoticeFields['eventCoordinates'] = db.sequelize.fn('ST_GeographyFromText', `SRID=4326;POINT (${req.body.eventLocationLong} ${req.body.eventLocationLat})`)
+
+		if (req.body.eventLocationLong != undefined && req.body.eventLocationLat != undefined) {
+			updatedNoticeFields['eventCoordinates'] = db.sequelize.fn('ST_GeographyFromText', `SRID=4326;POINT (${req.body.eventLocationLong} ${req.body.eventLocationLat})`)
+		}
+
 		db.Notices.update(updatedNoticeFields, {
 			where: { 
 				uuid: req.params.noticeId,
@@ -153,7 +158,7 @@ router.put('/:noticeId', async (req, res) => {
 		}).then((result) => {
 		    res.status(http.StatusCodes.OK).json(result); 
 		}).catch(err => {
-			console.error(err);
+			logger.error(`Update notice ${req.params.noticeId} failed with error ${err}`)
 			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 			  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 			});
