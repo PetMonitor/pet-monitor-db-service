@@ -77,7 +77,7 @@ router.get('/facebook/:facebookId', async (req, res) => {
 
 router.post('/', async (req, res) => {
 	// TODO: improve password hashing method
-	// logger.log(`Attempting to create new user... ${JSON.stringify(req.body)}`);
+	//logger.info(`Attempting to create new user... ${JSON.stringify(req.body)}`);
 
 	const tx = await db.sequelize.transaction();
 	try {

@@ -5,6 +5,7 @@ const db = require('../models/index.js');
 const commons = require('../utils/common.js');
 
 var router = express.Router({ mergeParams: true });
+const logger = require('../utils/logger.js');
 
 /**
 * Pet CRUD endpoints.
@@ -194,25 +195,90 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:petId', async (req, res) => {
+	logger.info(`Updating data for pet ${req.params.petId}`)
+	const tx = await db.sequelize.transaction();
+
 	try {
 		//TODO: check for _ref
-        var updatedPetFields = req.body
+        var updatedPetFields = req.body.petData
         updatedPetFields['updatedAt'] = new Date();
-        db.Pets.update(updatedPetFields, { 
+
+        const result = await db.Pets.update(updatedPetFields, { 
 			where: { 
 				uuid: req.params.petId,
 				userId: req.params.userId 
 			}
-		}).then((result) => {
-		    res.status(http.StatusCodes.OK).json(result); 
-		}).catch(err => {
-			console.error(err);
-			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
-			  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
+		}, { transaction: tx });
+
+		// Create new photos
+
+		let photosList = []
+		let petPhotosList = []
+		let resEmbeddings = []
+		const newPhotos = req.body.newPhotos;
+
+		logger.info(`Adding photos to pet ${JSON.stringify(req.body)}`)
+
+		if (newPhotos.length > 0) {
+			resEmbeddings = await commons.getEmbeddingsForDogPhotos(newPhotos);
+		}
+
+		for (var i = 0; i < newPhotos.length; i++) {
+
+			const photoBuffer = Buffer.from(newPhotos[i].photo,'base64');
+
+			photosList.push({
+				uuid: newPhotos[i].uuid,
+				photo: photoBuffer,
+				createdAt: new Date(),
+				updatedAt: new Date()
 			});
-		});
+
+			petPhotosList.push({
+				petId: req.params.petId,
+				photoId: newPhotos[i].uuid,
+				embedding: resEmbeddings.data.embeddings[newPhotos[i].uuid],
+				createdAt: new Date(),
+				updatedAt: new Date()
+			})
+		};
+
+		if (photosList.length > 0 &&  petPhotosList.length > 0) {
+			await db.Photos.bulkCreate(photosList, { transaction: tx });
+			logger.info(`Adding new pet photos ${petPhotosList.length}`);
+			// Link photos to pets
+			await db.PetPhotos.bulkCreate(petPhotosList, { transaction: tx });
+		}
+
+		// Delete photos
+		const deletedPhotos = req.body.deletedPhotos;
+
+		if (deletedPhotos.length == 0) {
+			await tx.commit();
+			return res.status(http.StatusCodes.OK).json(result); 
+		}
+
+		logger.info(`Deleting pet photos ${deletedPhotos.length}`);
+
+		await db.PetPhotos.destroy({ 
+			where: { 
+				photoId: deletedPhotos,
+                petId: req.params.petId
+			}
+		}, { transaction: tx });
+        
+        await db.Photos.destroy({ 
+			where: { 
+				uuid: deletedPhotos
+			}
+		}, { transaction: tx });
+
+        await tx.commit();
+
+		res.status(http.StatusCodes.OK).json(result); 
 	} catch (err) {
-		console.error(err);
+		await tx.rollback();
+		logger.error(`Failed to update data for pet ${req.params.petId}: ${err}`);
 		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
 		  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
 	    });		

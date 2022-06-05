@@ -10,7 +10,7 @@ var router = express.Router({mergeParams: true});
  * User's notices CRUD endpoints.
  */
 
- router.get('/', async (req, res) => {
+router.get('/', async (req, res) => {
 	try {
         db.Notices.findAll({ 
 			where: { 
