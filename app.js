@@ -17,6 +17,7 @@ var credentialValidation = require('./routes/credentialValidator.js');
 var socialMediaPosts = require('./routes/socialMediaPosts.js');
 var fosterVolunteerProfiles = require('./routes/fosterVolunteerProfiles.js');
 var petsFosterHistory = require('./routes/petsFosterHistory.js');
+var predictionFeedbackLog = require('./routes/predictionFeedbackLog.js');
 
 var finder = require('./routes/finder.js');
 
@@ -37,6 +38,7 @@ app.use('/users/:userId/pets/:petId/photos', petPhotos)
 app.use('/users/credentialValidation', credentialValidation);
 app.use('/fosterVolunteerProfiles', fosterVolunteerProfiles);
 app.use('/pets/:petId/fosterHistory', petsFosterHistory);
+app.use('/prediction/result', predictionFeedbackLog);
 
 app.use('/pets/finder', finder);
 

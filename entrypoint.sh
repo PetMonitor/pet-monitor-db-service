@@ -12,7 +12,7 @@ if [[ "${ENVIRONMENT}" != "production" ]]; then
     && rm dockerize-linux-amd64-v0.6.1.tar.gz
 
    echo "Running dockerize..."
-   dockerize -wait tcp://db:5432
+   dockerize -wait tcp://db:5432 -timeout 10m
 else
    echo "Don't wait. Run migrations."
 fi
