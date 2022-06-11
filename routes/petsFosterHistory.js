@@ -70,6 +70,7 @@ router.post('/', async (req, res) => {
 			uuid: req.body.uuid,
 			_ref: req.body._ref,
             petId: req.body.petId,
+			userId: req.body.userId,
 			contactEmail: req.body.contactEmail,
 			contactPhone: req.body.contactPhone,
 			contactName: req.body.contactName,

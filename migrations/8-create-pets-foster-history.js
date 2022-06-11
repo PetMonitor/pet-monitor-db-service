@@ -20,6 +20,10 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
         allowNull: false
       },
+      userId: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+      },
       contactEmail: Sequelize.STRING,
       contactPhone: Sequelize.STRING,
       contactName: Sequelize.STRING,
