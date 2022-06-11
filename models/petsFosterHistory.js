@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
             PetsFosterHistory.belongsTo(models.Pets, {
                 foreignKey: 'petId'
             });
+
+            PetsFosterHistory.hasMany(models.Users, {
+                foreignKey: 'userId'
+            });
         }
     }
 
@@ -34,6 +38,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             allowNull: false
+        },
+        userId: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
         },
         contactEmail: DataTypes.STRING,
         contactPhone: DataTypes.STRING,

@@ -31,11 +31,8 @@ module.exports = {
         uuid: '92398d1b-dd3c-4b54-ae94-eb30e5f71f57',
         _ref: '5ee4095a-f7c1-476a-935c-dc0f917091fd',
         petId: '123e4567-e89b-12d3-a456-426614174002',
-        contactEmail: "stacy@gmail.com",
-        contactPhone: "113335578",
-        contactName: "Stacy Spears",
+        userId: '123e4567-e89b-12d3-a456-426614175000',
         sinceDate: new Date(2022, 3, 12),
-        untilDate: new Date(2022, 4, 15),
         createdAt: new Date(),
         updatedAt: new Date()
       },
