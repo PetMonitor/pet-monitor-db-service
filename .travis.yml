@@ -11,6 +11,12 @@ node_js:
 install:
   - npm install
   - npm install dotenv
+
+
+before_script:
+  - psql -c 'create database my_database;' -U postgres  
+  - psql -c 'GRANT ALL PRIVILEGES ON DATABASE my_database TO postgres; CREATE EXTENSION IF NOT EXISTS postgis;' -U postgres  
+
 # run tests
 script:
   - npm test
