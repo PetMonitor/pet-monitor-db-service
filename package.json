@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "pretest": "cross-env NODE_ENV=test npm run db:reset",
-    "db:reset": "npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate",
+    "db:reset": "npx sequelize-cli db:migrate",
     "test": "NODE_ENV=test mocha --reporter spec --exit --timeout 20000"
   },
   "keywords": [],
