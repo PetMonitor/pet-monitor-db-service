@@ -27,12 +27,12 @@ module.exports = {
     },
     test: {
         username: 'postgres',
-        password: 'pass',
-        database: 'pet-monitor-db',
+        password: '',
+        database: 'my_database',
         host: '127.0.0.1',
         port: 5432,
         dialect: 'postgres',
         protocol: 'postgres',
-        logging: false
+        logging: true
     }
 };
