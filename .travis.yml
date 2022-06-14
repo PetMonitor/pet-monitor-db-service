@@ -16,6 +16,10 @@ before_install:
 services:
   - postgresql
 
+env:
+  global:
+    - PGPORT=5433
+    
 node_js:
   - 16
 # install dependencies
