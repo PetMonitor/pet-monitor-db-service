@@ -5,6 +5,8 @@ services:
 addons:
   postgresql: "9.5"
 
+sudo: true
+
 node_js:
   - 16
 # install dependencies
@@ -14,6 +16,7 @@ install:
 
 
 before_script:
+  - sudo apt-get install postgresql-9.5-postgis-2.4 postgis -y -q
   - psql -c 'create database my_database;' -U postgres  
   - psql -c 'BEGIN; GRANT ALL PRIVILEGES ON DATABASE my_database TO postgres; CREATE EXTENSION IF NOT EXISTS postgis; COMMIT;' -U postgres  
 
