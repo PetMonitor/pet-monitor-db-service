@@ -8,7 +8,7 @@ services:
 
 before_install:
   - docker build -t petmonitor/postgres -f Dockerfile-db .
-  - docker run -e POSTGRESQL_USERNAME=my_user -e POSTGRESQL_DATABASE=my_database -e POSTGRESQL_PASSWORD=pass -p 5432:5432 petmonitor/postgres
+  - docker run -d -e POSTGRESQL_USERNAME=my_user -e POSTGRESQL_DATABASE=my_database -e POSTGRESQL_PASSWORD=pass -p 5432:5432 petmonitor/postgres
 #  - docker pull bitnami/postgresql
 #  - docker run bitnami/postgresql /bin/sh -c "BEGIN; GRANT ALL PRIVILEGES ON DATABASE my_database TO my_user; CREATE EXTENSION IF NOT EXISTS postgis; COMMIT;"
 #  - docker run -e POSTGRESQL_USERNAME=postgres -e POSTGRESQL_DATABASE=my_database -e POSTGRESQL_PASSWORD=pass -p 5432:5432 bitnami/postgresql
