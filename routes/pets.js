@@ -1,5 +1,4 @@
 var express = require('express');
-var sharp = require('sharp');
 var http = require('http-status-codes');
 const db = require('../models/index.js');
 const commons = require('../utils/common.js');

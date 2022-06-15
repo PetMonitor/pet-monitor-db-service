@@ -1,6 +1,5 @@
 'use strict';
 
-var sharp = require('sharp');
 var fs = require('fs');
 let buffer = fs.readFileSync('./seeders/resources/dogImage.json');
 const imageContent = Buffer.from(JSON.parse(buffer).image, 'base64');
