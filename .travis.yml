@@ -3,18 +3,16 @@ services:
   - postgresql
 
 addons:
-  postgresql: "14.3"
+  postgresql: 9.6
   apt:
     packages:
-    - postgresql-14.3-postgis-3.2.1
+    - postgresql-9.6-postgis-2.3
 
 sudo: true
 
 before_script:
-  - psql -c 'create database my_database;' -U postgres  
-  - psql -c 'BEGIN; GRANT ALL PRIVILEGES ON DATABASE my_database TO postgres; CREATE EXTENSION IF NOT EXISTS postgis; COMMIT;' -U postgres  
-
-
+  - psql -U postgres -c "create extension postgis"
+  
 node_js:
   - 16
 
