@@ -26,7 +26,7 @@ module.exports = {
         logging: false
     },
     test: {
-        username: 'postgres',
+        username: 'my_user',
         password: 'pass',
         database: 'my_database',
         host: '127.0.0.1',
