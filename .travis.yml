@@ -3,12 +3,14 @@ services:
   - postgresql
 
 addons:
-  postgresql: "14.3 "
+  postgresql: "14.3"
+  apt:
+    packages:
+    - postgresql-14.3-postgis-3.2.1
 
 sudo: true
 
 before_script:
-  - sudo apt-get install postgresql-14.3-postgis-3.1 postgis -y -q
   - psql -c 'create database my_database;' -U postgres  
   - psql -c 'BEGIN; GRANT ALL PRIVILEGES ON DATABASE my_database TO postgres; CREATE EXTENSION IF NOT EXISTS postgis; COMMIT;' -U postgres  
 
