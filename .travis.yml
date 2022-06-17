@@ -1,16 +1,24 @@
 language: node_js
-services:
-  - postgresql
 
-addons:
-  postgresql: "9.5"
+env:
+  - POSTGRESQL_DATABASE=my_database
+
+services:
+  - docker
+
+before_install:
+  - docker build -t petmonitor/postgres -f Dockerfile-db .
+  - docker run -d -e POSTGRESQL_USERNAME=my_user -e POSTGRESQL_DATABASE=my_database -e POSTGRESQL_PASSWORD=pass -p 5432:5432 petmonitor/postgres
+  - docker ps -a
 
 node_js:
   - 16
+
 # install dependencies
 install:
   - npm install
   - npm install dotenv
+
 # run tests
 script:
   - npm test
