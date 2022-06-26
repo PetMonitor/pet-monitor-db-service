@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey:'uuid'
       });
 
+      Users.hasMany(models.PetsFosterHistory, {
+        name: 'userId',
+        foreignKey:'uuid'
+      });
+
       Users.hasOne(models.Photos, {
         name: 'profilePicture',
         foreignKey: 'uuid'      

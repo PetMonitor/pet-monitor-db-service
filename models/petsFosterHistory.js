@@ -13,10 +13,6 @@ module.exports = (sequelize, DataTypes) => {
             PetsFosterHistory.belongsTo(models.Pets, {
                 foreignKey: 'petId'
             });
-
-            PetsFosterHistory.hasMany(models.Users, {
-                foreignKey: 'userId'
-            });
         }
     }
 

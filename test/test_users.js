@@ -14,7 +14,7 @@ var mock = new MockAdapter(axios);
 
 TEST_SEPARATOR = '=====================================================================';
 
-EMBEDDING = [ 
+EMBEDDING = [
   0.06037527,-0.01576912,0.07322315,-0.09460726,-0.08096360,-0.02301554,0.14367725,-0.08457291,
   -0.01227567,-0.11083049,-0.06902093,-0.07299378,-0.14857993,-0.08143593,0.00886787,-0.12142590,
   -0.05042028,-0.10201982,-0.02582854,-0.05871225,0.06041538,-0.03485662,-0.04477020,-0.10418238,
@@ -29,7 +29,7 @@ EMBEDDING = [
   0.08225141,-0.11055159,0.12676683,-0.08507260,0.05169133,0.09420424,-0.10848676,-0.05079362,-0.12370258,
   -0.11680937,-0.08039150,-0.06842650,0.12966783,0.10653536,-0.03532178,-0.08595541,0.14921825,-0.00625481,
   0.07807481,-0.01324250,-0.03535264,-0.14491458,0.09799559,0.15477061,0.08272006,0.05744857,-0.04393201,
-  -0.10136475,0.08224790,0.11506042,0.11539490,0.07415865,-0.10429314 
+  -0.10136475,0.08224790,0.11506042,0.11539490,0.07415865,-0.10429314
 ]
 
 USERS = [
@@ -89,7 +89,7 @@ PETS = [
 const IMAGE_CONTENT = fs.readFileSync('./seeders/resources/dogImage.json');
 const IMAGE_CONTENT_BLOB = Buffer.from(JSON.parse(IMAGE_CONTENT).image, 'base64');
 
-PHOTOS = [
+PET_PHOTOS = [
   {
     uuid: '126e4567-e89b-12d3-a456-426614176001',
     photo: IMAGE_CONTENT_BLOB,
@@ -101,11 +101,18 @@ PHOTOS = [
   {
     uuid: '126e4567-e89b-12d3-a456-426614176003',
     photo: IMAGE_CONTENT_BLOB
+  },
+]
+
+PROFILE_PHOTOS = [
+  {
+    uuid: 'e7e0b018-ec64-4c93-b374-3d014df9de57',
+    photo: IMAGE_CONTENT_BLOB
   }
 ]
 
 mock.onPost("http://host.docker.internal:5001/api/v0/dogs/embedding").reply(200, {
-  embeddings: [{ 
+  embeddings: [{
     '126e4567-e89b-12d3-a456-426614176001': EMBEDDING,
     '126e4567-e89b-12d3-a456-426614176002': EMBEDDING,
     '126e4567-e89b-12d3-a456-426614176003': EMBEDDING
@@ -139,6 +146,17 @@ describe('Users test case', function() {
         })
         .catch(err => {
           console.error(`AFTER TEST LOG: Error deleting all records from Users table ${err}`);
+          console.log(TEST_SEPARATOR)
+        });
+
+    await db.Photos.destroy({
+          where: {},
+          force: true,
+        }).then(() => {
+          console.log(TEST_SEPARATOR)
+        })
+        .catch(err => {
+          console.error(`AFTER TEST LOG: Error deleting all records from Photos table ${err}`);
           console.log(TEST_SEPARATOR)
         });
   });
@@ -185,7 +203,7 @@ describe('Users test case', function() {
       .expect(201);
 
     EXPECTED_USER['password'] = passwordHasher(NEW_USER['password']);
-    
+
     const users = await db.Users.findByPk('123e4567-e89b-12d3-a456-426614176000', {
       attributes: ['uuid', '_ref', 'username', 'email', 'password']
     });
@@ -222,7 +240,7 @@ describe('Users test case', function() {
       .expect(201);
 
     EXPECTED_USER['password'] = passwordHasher(NEW_USER['password']);
-    
+
     const users = await db.Users.findByPk(NEW_USER['uuid'], {
       attributes: ['uuid', '_ref', 'username', 'email', 'password']
     });
@@ -247,8 +265,8 @@ describe('Users test case', function() {
     NEW_PET_0 = Object.assign({}, PETS[0])
     NEW_PET_1 = Object.assign({}, PETS[1])
 
-    NEW_PET_0['photos'] = [ PHOTOS[0] ]
-    NEW_PET_1['photos'] = [ PHOTOS[1], PHOTOS[2] ]
+    NEW_PET_0['photos'] = [ PET_PHOTOS[0] ]
+    NEW_PET_1['photos'] = [ PET_PHOTOS[1], PET_PHOTOS[2] ]
 
     NEW_USER = {
       uuid: '123e4567-e89b-12d3-a456-426614176000',
@@ -271,7 +289,7 @@ describe('Users test case', function() {
       .expect(201);
 
     EXPECTED_USER['password'] = passwordHasher(NEW_USER['password']);
-    
+
     const users = await db.Users.findByPk(NEW_USER['uuid'], {
       attributes: ['uuid', '_ref', 'username', 'email', 'password']
     });
@@ -285,9 +303,9 @@ describe('Users test case', function() {
     });
 
 
-    const photo0 = await db.Photos.findByPk(PHOTOS[0]['uuid'], { attributes: ['uuid', 'photo'] });
-    const photo1 = await db.Photos.findByPk(PHOTOS[1]['uuid'], { attributes: ['uuid', 'photo'] });
-    const photo2 = await db.Photos.findByPk(PHOTOS[2]['uuid'], { attributes: ['uuid', 'photo'] });
+    const photo0 = await db.Photos.findByPk(PET_PHOTOS[0]['uuid'], { attributes: ['uuid', 'photo'] });
+    const photo1 = await db.Photos.findByPk(PET_PHOTOS[1]['uuid'], { attributes: ['uuid', 'photo'] });
+    const photo2 = await db.Photos.findByPk(PET_PHOTOS[2]['uuid'], { attributes: ['uuid', 'photo'] });
 
     const pet0Photos = await db.PetPhotos.findAll({ where: { petId: PETS[0]['uuid'] } ,  attributes: ['petId', 'photoId'] });
     const pet1Photos = await db.PetPhotos.findAll({ where: { petId: PETS[1]['uuid'] } ,  attributes: ['petId', 'photoId'] });
@@ -303,29 +321,29 @@ describe('Users test case', function() {
     expect(Buffer.from(photo0['dataValues']['photo'])).to.equalBytes(IMAGE_CONTENT_BLOB);
     expect(Buffer.from(photo1['dataValues']['photo'])).to.equalBytes(IMAGE_CONTENT_BLOB);
     expect(Buffer.from(photo2['dataValues']['photo'])).to.equalBytes(IMAGE_CONTENT_BLOB);
-    
-    expect(pet0Photos[0]['dataValues']['photoId']).to.equal(PHOTOS[0]['uuid']);
+
+    expect(pet0Photos[0]['dataValues']['photoId']).to.equal(PET_PHOTOS[0]['uuid']);
     expect(pet0Photos[0]['dataValues']['petId']).to.equal(PETS[0]['uuid']);
 
-    expect(pet1Photos[0]['dataValues']['photoId']).to.equal(PHOTOS[1]['uuid']);
+    expect(pet1Photos[0]['dataValues']['photoId']).to.equal(PET_PHOTOS[1]['uuid']);
     expect(pet1Photos[0]['dataValues']['petId']).to.equal(PETS[1]['uuid']);
 
-    expect(pet1Photos[1]['dataValues']['photoId']).to.equal(PHOTOS[2]['uuid']);
+    expect(pet1Photos[1]['dataValues']['photoId']).to.equal(PET_PHOTOS[2]['uuid']);
     expect(pet1Photos[1]['dataValues']['petId']).to.equal(PETS[1]['uuid']);
   });
 
   /*
   it('Post user endpoint if creation fails then no users or pets are created', async () => {
-    
+
   });*/
 
 });
 
 describe('User by id test case', function() {
 
-  this.beforeEach('Before users test', function() {
+  this.beforeEach('Before users test', async function() {
     // Re-initialize database
-    return db.Users.bulkCreate(USERS)
+    await db.Users.bulkCreate(USERS)
           .then((res) => {
             console.log(`TEST LOG: Successfully created user records ${res}`);
             console.log(TEST_SEPARATOR)
@@ -334,11 +352,20 @@ describe('User by id test case', function() {
             console.error(`TEST LOG: Error creating user records ${err}`);
           });
 
+    await db.Photos.bulkCreate(PROFILE_PHOTOS)
+        .then((res) => {
+          console.log(`TEST LOG: Successfully created photo records ${res}`);
+          console.log(TEST_SEPARATOR)
+        })
+        .catch(err => {
+          console.error(`TEST LOG: Error creating photo records ${err}`);
+        });
+
   });
 
-  this.afterEach('After users test', function() {
+  this.afterEach('After users test', async function() {
     // Clean database
-    return db.Users.destroy({
+    await db.Users.destroy({
           where: {},
           force: true,
         })
@@ -348,6 +375,17 @@ describe('User by id test case', function() {
         })
         .catch(err => {
           console.error(`TEST LOG: Error deleting all records from Users table ${err}`);
+          console.log(TEST_SEPARATOR)
+        });
+
+    await db.Photos.destroy({
+          where: {},
+          force: true,
+        }).then(() => {
+          console.log(TEST_SEPARATOR)
+        })
+        .catch(err => {
+          console.error(`AFTER TEST LOG: Error deleting all records from Photos table ${err}`);
           console.log(TEST_SEPARATOR)
         });
   });
@@ -381,7 +419,7 @@ describe('User by id test case', function() {
     return db.Users
       .findAll({ attributes: [ 'uuid', '_ref', 'password', 'username', 'email', 'name', 'phoneNumber',  'profilePicture', 'alertsActivated', 'alertRadius']})
       .then(users => {
-        console.log(`TEST LOG: Response was ${JSON.stringify(users)}`)        
+        console.log(`TEST LOG: Response was ${JSON.stringify(users)}`)
         expect(users[0]['dataValues']).to.deep.equal(USERS[1])
       });
   });
@@ -396,7 +434,7 @@ describe('User by id test case', function() {
       email: 'terrypratchett@goodomens.com',
       name: 'Terry Pratchett',
       phoneNumber: '222-000-666',
-      profilePicture: '126e4567-e89b-12d3-a456-426614176001',
+      profilePicture: PROFILE_PHOTOS[0].uuid,
       alertsActivated: true,
       alertRadius: 1
     }
