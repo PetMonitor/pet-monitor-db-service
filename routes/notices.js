@@ -27,7 +27,8 @@ router.get('/', async (req, res) => {
 
 	let noticeOptions = {
 		include: [petOptions],
-		where: getNoticeFilterConditions(req.query)
+		where: getNoticeFilterConditions(req.query),
+		...getPagination(req.query)
 	}
 
 	try {
@@ -99,6 +100,18 @@ function getPetFilterConditions(queryParams) {
 		}
 	}
 	return where;
+}
+
+function getPagination(queryParams) {
+	let pagination = {}
+	if (!isEmptyObject(queryParams.size)) {
+		let size = parseInt(queryParams.size)
+		pagination.limit = size
+		if (!isEmptyObject(queryParams.page)) {
+			pagination.offset = (parseInt(queryParams.page) - 1) * size
+		}
+	}
+	return pagination;
 }
 
 function getNoticeFilterConditions(queryParams) {
