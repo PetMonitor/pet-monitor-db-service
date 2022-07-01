@@ -69,7 +69,7 @@ router.post('/', async (req, res) => {
 		db.PetsFosterHistory.create({
 			uuid: req.body.uuid,
 			_ref: req.body._ref,
-            petId: req.body.petId,
+            petId: req.params.petId,
 			userId: req.body.userId,
 			contactEmail: req.body.contactEmail,
 			contactPhone: req.body.contactPhone,
