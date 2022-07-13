@@ -19,6 +19,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: web
+    env_file:
+      - .env
     volumes:
       - ./:/usr/src/app
     ports:
