@@ -15,6 +15,8 @@ module.exports = {
         profilePicture: '123e4567-e89b-12d3-a456-556614173000',
         alertsActivated: true,
         alertRadius: 1,
+        alertRegion: 'Palermo',
+        alertCoordinates: Sequelize.fn('ST_GeographyFromText', 'SRID=4326;POINT (-58.421737 -34.585816)'),
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -29,6 +31,8 @@ module.exports = {
         profilePicture: '123e4567-e89b-12d3-a456-556614173001',
         alertsActivated: false,
         alertRadius: 1,
+        alertRegion: 'Palermo',
+        alertCoordinates: Sequelize.fn('ST_GeographyFromText', 'SRID=4326;POINT (-58.421737 -34.585816)'),
         createdAt: new Date(),
         updatedAt: new Date()
       }

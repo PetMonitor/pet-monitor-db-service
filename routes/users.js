@@ -15,9 +15,18 @@ var passwordHasher = require('../utils/passwordHasher.js');
 
 router.get('/', async (req, res) => {
 	try {
-		db.Users.findAll({ attributes: ['uuid', '_ref', 'name', 'username', 'email', 'phoneNumber', 'alertRadius', 'alertsActivated', 'profilePicture'] })
+		db.Users.findAll({ attributes: ['uuid', '_ref', 'name', 'username', 'email', 'phoneNumber', 'alertRadius', 'alertRegion', 'alertCoordinates', 'alertsActivated', 'profilePicture'] })
 			.then((users) => { 
 				logger.info(`Returning users ${JSON.stringify(users)}`);
+				users.map(user => {
+					let response = user.dataValues
+					if (user.alertCoordinates != null) {
+						response["alertLocationLat"] = user.alertCoordinates.coordinates[1];
+						response["alertLocationLong"] = user.alertCoordinates.coordinates[0];
+					}
+					delete response["alertCoordinates"]
+					return response
+				})
 				res.status(http.StatusCodes.OK).json(users); 
 			}).catch(err => {
 				logger.error(err);
@@ -35,9 +44,15 @@ router.get('/', async (req, res) => {
 
 router.get('/:userId', async (req, res) => {
 	try {
-		db.Users.findByPk(req.params.userId, { attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phoneNumber', 'alertsActivated', 'alertRadius', 'profilePicture' ] })
-			.then((user) => { 
-				res.status(http.StatusCodes.OK).json(user); 
+		db.Users.findByPk(req.params.userId, { attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phoneNumber', 'alertsActivated', 'alertRadius', 'alertRegion', 'alertCoordinates', 'profilePicture' ] })
+			.then((user) => {
+				let response = user.dataValues
+				if (user.alertCoordinates != null) {
+					response["alertLocationLat"] = user.alertCoordinates.coordinates[1];
+					response["alertLocationLong"] = user.alertCoordinates.coordinates[0];
+				}
+				delete response["alertCoordinates"]
+				res.status(http.StatusCodes.OK).json(response);
 			}).catch(err => {
 				logger.error(err);
 				res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -57,10 +72,16 @@ router.get('/facebook/:facebookId', async (req, res) => {
 		db.Users.findAll( 
 			{ 
 				where: { facebookId: req.params.facebookId },
-				attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phoneNumber', 'alertsActivated', 'alertRadius', 'profilePicture' ] 
+				attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phoneNumber', 'alertsActivated', 'alertRadius', 'alertRegion', 'alertCoordinates', 'profilePicture' ]
 			})
-			.then((user) => { 
-				res.status(http.StatusCodes.OK).json(user); 
+			.then((user) => {
+				let response = user.dataValues
+				if (user.alertCoordinates != null) {
+					response["alertLocationLat"] = user.alertCoordinates.coordinates[1];
+					response["alertLocationLong"] = user.alertCoordinates.coordinates[0];
+				}
+				delete response["alertCoordinates"]
+				res.status(http.StatusCodes.OK).json(response);
 			}).catch(err => {
 				logger.error(err);
 				res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -102,6 +123,8 @@ router.post('/', async (req, res) => {
 			profilePicture: req.body.profilePicture? req.body.profilePicture.uuid : null,
 			alertsActivated: req.body.alertsActivated? req.body.alertsActivated : false,
 			alertRadius: req.body.alertRadius? req.body.alertRadius : -1,
+			alertCoordinates: (req.body.alertLocationLong != null && req.body.alertLocationLat != null) ? db.sequelize.fn('ST_GeographyFromText', `SRID=4326;POINT (${req.body.alertLocationLong} ${req.body.alertLocationLat})`) : null,
+			alertRegion: req.body.alertRegion,
 			email: req.body.email,
 			createdAt: new Date(),
 			updatedAt: new Date()
@@ -182,8 +205,14 @@ router.post('/', async (req, res) => {
 		await db.PetPhotos.bulkCreate(petPhotosList, { transaction: tx });
 
 		await tx.commit();
+		let response = user.dataValues
+		if (user.alertCoordinates != null) {
+			response["alertLocationLat"] = user.alertCoordinates.coordinates[1];
+			response["alertLocationLong"] = user.alertCoordinates.coordinates[0];
+		}
+		delete response["alertCoordinates"]
 		logger.info('Successfully created user and pets!');
-		return res.status(http.StatusCodes.CREATED).json(user); 
+		return res.status(http.StatusCodes.CREATED).json(response);
 
 	} catch (error) {
 		await tx.rollback();

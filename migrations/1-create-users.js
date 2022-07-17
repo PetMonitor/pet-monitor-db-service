@@ -48,6 +48,12 @@ module.exports = {
         defaultValue: 1,
         allowNull: false
       },
+      alertCoordinates: {
+        type: Sequelize.GEOGRAPHY,
+      },
+      alertRegion: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: true,
         type: Sequelize.DATE
