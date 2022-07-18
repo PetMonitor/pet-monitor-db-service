@@ -6,8 +6,12 @@ const db = require('../models/index.js');
 var http = require('http-status-codes');
 const logger = require('../utils/logger.js');
 const commons = require('../utils/common.js');
+const emails = require('../utils/emails.js');
+var generator = require('generate-password');
 var passwordHasher = require('../utils/passwordHasher.js');
 
+
+const REGENERATED_PWD_LENGTH = 10;
 
 /**
  * User CRUD endpoints.
@@ -195,7 +199,6 @@ router.post('/', async (req, res) => {
 
 });
 
-
 router.delete('/:userId', async (req, res) => {
     try {
         db.Users.destroy({ 
@@ -246,28 +249,16 @@ router.put('/:userId', async (req, res) => {
 router.put('/:userId/password', async (req, res) => {
 	try {
 		//TODO: check for _ref
-
         var updateUserFields = req.body
 
-		const newPassword = { 
-			_ref: updateUserFields._ref,
-			password: passwordHasher(updateUserFields.newPassword),
-			updatedAt: new Date()
-		}
+		result = await updateUserPassword(
+			updateUserFields._ref,
+			req.params.userId,
+			passwordHasher(updateUserFields.oldPassword),
+			updateUserFields.newPassword,
+		)
 
-        db.Users.update(newPassword, { 
-			where: { 
-				uuid: req.params.userId,
-				password: passwordHasher(updateUserFields.oldPassword) 
-			}
-		}).then((affectedRows) => {
-		    res.status(http.StatusCodes.OK).json({ 'updatedCount': affectedRows[0] }); 
-		}).catch(err => {
-			logger.error(err);
-			res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
-			  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
-			});
-		});
+		res.status(http.StatusCodes.OK).json({ 'updatedCount': result[0] });
 	} catch (err) {
 		logger.error(err);
 		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
@@ -275,5 +266,67 @@ router.put('/:userId/password', async (req, res) => {
 	    });		
 	}
 });
+
+router.put('/password/reset', async (req, res) => {
+	try {
+		logger.info(`Resetting password for user with email ${JSON.stringify(req.body)}`)
+
+		var userEmail = req.body.emailAddress;
+
+		const userWithEmail = await db.Users.findOne({ where: { email: userEmail } });
+
+		logger.info(`Found users with email ${JSON.stringify(userWithEmail)}`)
+
+		if (!userWithEmail) {
+			const errorMsg = `Attempted to reset password for user with email ${JSON.stringify(userEmail)}, but no users found with that email address.`
+			logger.error(errorMsg)
+			return res.status(http.StatusCodes.NOT_FOUND).send({ error: errorMsg });
+		}
+
+		var randomSecurePwd = generator.generate({
+			length: REGENERATED_PWD_LENGTH,
+			numbers: true
+		});
+
+		result = await updateUserPassword(
+			userWithEmail._ref,
+			userWithEmail.uuid,
+			userWithEmail.password,
+			randomSecurePwd,
+		)
+
+		await emails.sendEmail(
+			userEmail, 
+			'Cambio de Contraseña!',
+			'../static/emailPasswordResetTemplate.html',
+			{ tempPassword: randomSecurePwd }
+		)
+
+		return res.status(http.StatusCodes.OK).send({ 'updatedCount': result[0] });
+	} catch (err) {
+		logger.error(err);
+		res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).send({ 
+		  error: http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) + ' ' + err 
+	    });		
+	}
+});
+
+updateUserPassword = async (_ref, userId, oldPassword, newPassword) => {
+
+	const newPasswordObj = { 
+		_ref: _ref,
+		password: passwordHasher(newPassword),
+		updatedAt: new Date()
+	}
+
+	result = await db.Users.update(newPasswordObj, { 
+		where: { 
+			uuid: userId,
+			password: oldPassword
+		}
+	})
+
+	return result;
+}
 
 module.exports = router;
