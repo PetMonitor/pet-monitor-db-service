@@ -6,6 +6,7 @@ const db = require('../models/index.js');
 
 const path = require('path')
 const {spawn} = require('child_process')
+const {isEmptyObject} = require("../utils/common");
 
 const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.js')[env];
@@ -20,7 +21,12 @@ router.get('/:noticeId', async (req, res) => {
     const noticeId = req.params.noticeId;
     const databaseCredentials = getDatabaseCredentials();
 
-    getPredictedPets(databaseCredentials, '/python/classifier.py', noticeId)
+    const queryParams = req.query;
+    let region = ''
+    if (!isEmptyObject(queryParams.region)) {
+        region = queryParams.region
+    }
+    getPredictedPets(databaseCredentials, '/python/classifier.py', noticeId, null, region)
     .then(data => {
         return res
         .send({ "closestMatches": data })
@@ -89,14 +95,15 @@ function getDatabaseCredentials() {
     return databaseCredentials;
 }
 
-const getPredictedPets = (databaseCredentials, filePath, sqlCommandPetEmbeddings, sqlCommandExcludePetEmbeddings) => {
+const getPredictedPets = (databaseCredentials, filePath, sqlCommandPetEmbeddings, sqlCommandExcludePetEmbeddings, region) => {
     console.log("About to spawn process...");
 
     var process = spawn('python', [ 
         path.join(__dirname, filePath),
         JSON.stringify(databaseCredentials),
         sqlCommandPetEmbeddings, 
-        sqlCommandExcludePetEmbeddings
+        sqlCommandExcludePetEmbeddings,
+        region
      ]);
     
      console.log("Process spawned!");
@@ -105,7 +112,13 @@ const getPredictedPets = (databaseCredentials, filePath, sqlCommandPetEmbeddings
         process.stdout.on('data', (data) => {
             console.log(`Python process returned raw result ${data}`);
 
-            result = data.toString().match(regexListContent)[0].replaceAll("'","").replaceAll(" ","").split(",");
+            let matchedIds = data.toString().match(regexListContent);
+            console.log(matchedIds);
+            if (matchedIds == null) {
+                result = ""
+            } else {
+                result = matchedIds[0].replaceAll("'", "").replaceAll(" ", "").split(",");
+            }
 
             console.log("Python process returned " + result);
             return result;
@@ -119,7 +132,5 @@ const getPredictedPets = (databaseCredentials, filePath, sqlCommandPetEmbeddings
         });
     });
 }
-
-
 
 module.exports = router;
