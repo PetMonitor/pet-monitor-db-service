@@ -54,6 +54,8 @@ module.exports = (sequelize, DataTypes) => {
     profilePicture: Sequelize.UUIDV4,
     alertsActivated: Sequelize.BOOLEAN,
     alertRadius: Sequelize.INTEGER,
+    alertCoordinates: DataTypes.GEOGRAPHY,
+    alertRegion: DataTypes.STRING,
     password: {
       type: DataTypes.STRING,
       allowNull: false
