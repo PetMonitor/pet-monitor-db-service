@@ -10,7 +10,6 @@ const SOURCE_EMAIL_HOST = process.env.SOURCE_EMAIL_HOST || 'smtp.gmail.com';
 const SOURCE_EMAIL_PORT = process.env.SOURCE_EMAIL_PORT || 465;
 
 
-
 const emailCredentials = {
     port: SOURCE_EMAIL_PORT, // true for 465, false for other ports              
     host: SOURCE_EMAIL_HOST,
@@ -61,6 +60,33 @@ async function sendEmail(emailAddress, emailSubject, emailTemplatePath, variable
     });
 }
 
+async function sendEmailRawHtml(emailAddress, emailSubject, emailTemplatRawHtml) {
+    logger.debug(`Sending raw html ${emailTemplatRawHtml}`)
+
+    const mailData = {
+        from: SOURCE_EMAIL_ADDRESS,  // sender address
+        to: emailAddress,   // list of receivers
+        subject: emailSubject,
+        html: emailTemplatRawHtml,
+        attachments: [{
+            filename: 'complete_logo.png',
+            path: path.resolve(__dirname,__dirname,'../assets/complete_logo.png'),
+            cid: 'logo' 
+        }]
+    }
+
+    await transporter.sendMail(mailData, function (err, info) {
+        if(err) {
+            console.error(`Error sending email with subject ${mailData.subject} to address ${mailData.to}: ${err}`);
+            throw new Error(err);
+        } 
+        console.log(info);
+    });
+}
+
+
+
 module.exports = {
 	sendEmail: sendEmail,
+    sendEmailRawHtml: sendEmailRawHtml,
 }
