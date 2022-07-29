@@ -14,9 +14,10 @@ from sklearn.preprocessing import LabelEncoder
 model = SVC(kernel='rbf', C=100.0, gamma='scale', probability=True)
 
 
-def getTopKNearestNeighbours(dbConnInfo, noticeId, k=15):
+def getTopKNearestNeighbours(dbConnInfo, noticeId, region, k=15):
     labelEncoder = LabelEncoder()
     connString = "host={} port={} dbname={} user={} password={}".format(dbConnInfo['host'], dbConnInfo['port'], dbConnInfo['db'], dbConnInfo['username'], dbConnInfo['pwd'])
+    conditionalRegionFilter = """AND (public."Notices".neighbourhood = '{}' OR public."Notices".locality = '{}' OR public."Notices".street = '{}' OR public."Notices".country = '{}')""".format(region, region, region, region) if region != '' else ''
 
     try:
         sqlCommandPetEmbeddings = """SELECT public."PetPhotos"."petId", public."Notices"."noticeType", embedding FROM "PetPhotos" INNER JOIN public."Notices" ON public."PetPhotos"."petId" = public."Notices"."petId" WHERE public."Notices"."uuid" = '{}' LIMIT 1""".format(noticeId)
@@ -25,10 +26,13 @@ def getTopKNearestNeighbours(dbConnInfo, noticeId, k=15):
             # Select embeddings for searched pet
             searchedPetData = pd.read_sql(sqlCommandPetEmbeddings, conn)
             
-            sqlCommandExcludePetEmbeddings = """SELECT public."Notices"."uuid", embedding FROM public."PetPhotos" INNER JOIN public."Notices" ON public."PetPhotos"."petId" = public."Notices"."petId" WHERE public."Notices"."uuid" != '{}' AND public."Notices"."noticeType" != '{}' """.format(noticeId, searchedPetData.iloc[0]['noticeType'])
+            sqlCommandExcludePetEmbeddings = """SELECT public."Notices"."uuid", embedding FROM public."PetPhotos" INNER JOIN public."Notices" ON public."PetPhotos"."petId" = public."Notices"."petId" WHERE public."Notices"."uuid" != '{}' AND public."Notices"."noticeType" != '{}' {}""".format(noticeId, searchedPetData.iloc[0]['noticeType'], conditionalRegionFilter)
 
             # Select embeddings for all pets that aren't searched pet
             dataTrain = pd.read_sql(sqlCommandExcludePetEmbeddings, conn)
+
+            if len(dataTrain) == 0:
+                return []
 
             # Encode notice ids into numerical values
             noticeIdsSet = pd.unique(dataTrain.uuid.to_numpy())
@@ -56,7 +60,7 @@ def getTopKNearestNeighbours(dbConnInfo, noticeId, k=15):
                     predictedClass = topKPredictions[i][j]
                     if not predictedClass in predictionFreqMap:
                         predictionFreqMap[predictedClass] = []
-                    # store probabilties (weights) for each predicted class
+                    # store probabilities (weights) for each predicted class
                     predictionFreqMap[predictedClass].append(probabilities[i][topK[i][j]])
             
             
@@ -95,8 +99,9 @@ def getTopKNearestNeighbours(dbConnInfo, noticeId, k=15):
 
 try:
     databaseConnectionInfo = json.loads(sys.argv[1])
-    exludedPhotoId = sys.argv[2]
-    print("Output from Python: " + str(getTopKNearestNeighbours(databaseConnectionInfo, exludedPhotoId)))
+    excludedPhotoId = sys.argv[2]
+    region = sys.argv[4]
+    print("Output from Python: " + str(getTopKNearestNeighbours(databaseConnectionInfo, excludedPhotoId, region)))
     #exit()
 except Exception as e:
     print(e)

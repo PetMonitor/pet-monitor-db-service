@@ -30,7 +30,8 @@ module.exports = {
         allowNull: false
       },
       email: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true
       },
       phoneNumber: {
         type: Sequelize.STRING
@@ -47,6 +48,12 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 1,
         allowNull: false
+      },
+      alertCoordinates: {
+        type: Sequelize.GEOGRAPHY,
+      },
+      alertRegion: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: true,

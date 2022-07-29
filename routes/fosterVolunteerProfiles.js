@@ -4,6 +4,7 @@ var http = require('http-status-codes');
 const db = require('../models/index.js');
 const logger = require('../utils/logger.js');
 const { isEmptyObject } = require("../utils/common");
+const {Op} = require("sequelize");
 
 var router = express.Router({mergeParams: true});
 
@@ -14,16 +15,19 @@ var router = express.Router({mergeParams: true});
 router.get('/', async (req, res) => {
 	try {
 		const queryParams = req.query;
-		const where = {}
+		let profileConditions = [];
 		if (!isEmptyObject(queryParams.userId)) {
-			where.userId = queryParams.userId;
+			profileConditions.push({ userId: queryParams.userId });
 		}
 		if (!isEmptyObject(queryParams.available)) {
-			where.available = queryParams.available;
+			profileConditions.push({ available: queryParams.available });
 		}
-        db.FosterVolunteerProfiles.findAll({
-			where: where
+		if (!isEmptyObject(queryParams.profileRegion)) {
+			profileConditions.push(getProfileRegionFilter(queryParams.profileRegion))
+		}
 
+        db.FosterVolunteerProfiles.findAll({
+			where: {[Op.and]: [...profileConditions]}
 		}).then((profiles) => {
 			logger.info(`Returning foster volunteer profiles ${JSON.stringify(profiles)}`);
             res.status(http.StatusCodes.OK).json(profiles);
@@ -151,5 +155,22 @@ router.delete('/:profileId', async (req, res) => {
 	    });
 	} 
 });
+
+function getProfileRegionFilter(profileRegion) {
+	return {
+		[Op.or]: [
+			{
+				location: {
+					[Op.iLike]: `%${profileRegion}%`
+				}
+			},
+			{
+				province: {
+					[Op.iLike]: `%${profileRegion}%`
+				}
+			}
+		]
+	};
+}
 
 module.exports = router;

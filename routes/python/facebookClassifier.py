@@ -57,7 +57,7 @@ def getTopKNearestNeighbours(dbConnInfo, postId, k=3):
                     predictedClass = topKPredictions[i][j]
                     if not predictedClass in predictionFreqMap:
                         predictionFreqMap[predictedClass] = []
-                    # store probabilties (weights) for each predicted class
+                    # store probabilities (weights) for each predicted class
                     predictionFreqMap[predictedClass].append(probabilities[i][topK[i][j]])
             
             
