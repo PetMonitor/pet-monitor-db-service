@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+            font-family: 'Roboto', 
+            sans-serif;
+        }
+
+        .content {
+            width: 100%;
+            background-color: #f7f9fa;
+            position: relative;
+            /* padding: 18px; */
+            box-sizing: border-box;
+        }
+
+        .content-email {
+            width: 100%;
+            background-color: white;
+            max-width: 600px;
+            height: auto;
+            position: relative;
+            left: 0;
+            right: 0;
+            margin: 0px auto;
+        }
+
+        header {
+            padding: 32px;
+            text-align: center;
+            background-color: #73B1A2;
+            margin-bottom: 48px;
+        }
+
+        p {
+            margin: 15px;
+            align-content: center;
+            text-align: justify;
+            color: #727375;
+        }
+
+        h4 {
+            margin: 15px;
+            color: rgba(0, 0, 0, 0.6)
+        }
+        
+        .msgBox {
+            margin: 15px;
+            font-size: 14px;
+            color: #676767;
+            padding: 10px;
+            font-family: 'Courier, Monaco, monospace';
+            background-color: #f6f2f2;
+        }
+
+        .logo-wrapper {
+            margin-left: 5%;
+        }
+
+        .contactInfo {
+            text-align: center;
+            font-size: 12px;
+        }
+    </style>
+</head>
+</head>
+<body>
+    <div class="content">
+        <div class="content-email">
+            <header>
+                <div class="logo-wrapper">
+                    <img src="cid:logo" alt="Logo" title="Logo" width="175" height="100"/>
+                </div>    
+            </header>
+
+            <table style="width:100%;">
+                <tr>
+                    <h4><strong>Hola {{recipientUsername}}!</strong></h4>
+                </tr>
+                <tr>
+                    <p style="font-size: 14px;">Recibiste un mensaje...</p>
+                </tr>
+                <tr>
+                    <div class="msgBox">
+                        <p>{{message}}</p>
+                    </div>
+                </tr>
+                <tr >
+                    <div class="contactInfo">
+                        <p style="margin-top: 5px; margin-bottom: 5px;">Email de contacto: <strong>{{senderContactEmail}}</strong></p>
+                        <p style="margin-top: 5px; margin-bottom: 5px;">Teléfono de contacto: <strong>{{senderContactPhone}}</strong></p>
+                    </div>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
