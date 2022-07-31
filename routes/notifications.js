@@ -1,10 +1,9 @@
 var express = require('express');
 
-const fs = require('fs');
 const db = require('../models/index.js');
-const path = require('path');
 const logger = require('../utils/logger.js');
 const emailUtils = require('../utils/emails.js');
+const translations = require('../utils/translations.js');
 
 var http = require('http-status-codes');
 
@@ -68,30 +67,7 @@ router.post('/notices/closestMatches', async (req, res) => {
 function buildNotificationEmail(deeplinkBaseUri, closestNotices) {
 
     let deeplinks = '';
-    const classLostStolen = 'lostStolenTitle';
-    const classFound = 'foundTitle';
-    const classAdoption = 'adoptionTitle';
-
-    const classTitleMatcher = { 
-        'LOST': { cssClass: classLostStolen, translation: 'PERDIDO!' },
-        'STOLEN': { cssClass: classLostStolen, translation: 'ROBADO!' },
-        'FOUND': { cssClass: classFound, translation: 'ENCONTRADO!' },
-        'FOR_ADOPTION': { cssClass: classAdoption, translation: 'EN ADOPCIÓN!' }
-    }
-
-    const petTranslationMatcher = { 
-        'DOG': { translation: 'PERRO', icon: path.resolve(__dirname, '../assets/dog.png') },
-        'CAT': { translation: 'GATO', icon: '../assets/cat.png'},
-        'ADULT': { translation: 'ADULTO' },
-        'PUPPY': { translation: 'CACHORRO' },
-        'SENIOR': { translation: 'MAYOR' },
-        'SMALL': { translation: 'PEQUEÑO' },
-        'MEDIUM': { translation: 'MEDIANO' },
-        'LARGE': { translation: 'GRANDE' },
-        'MALE': { translation: 'MACHO' },
-        'FEMALE': { translation: 'HEMBRA' },
-    }
-
+    
     for (var i = 0; i < closestNotices.length; i++) {
 
         logger.info(`Formatting notice ${JSON.stringify(closestNotices[i])}`)
@@ -100,11 +76,11 @@ function buildNotificationEmail(deeplinkBaseUri, closestNotices) {
         const reportId = closestNotices[i]['uuid'];
         const deeplink =  deeplinkBaseUri + `/${reportOwnerId}/reports/${reportId}`;
         const type = closestNotices[i]['noticeType'];
-        const titleStyle = classTitleMatcher[type].cssClass;
+        const titleStyle = translations.classTitleMatcher[type].cssClass;
 
-        const title = petTranslationMatcher[closestNotices[i].Pet.type].translation  + ' ' + classTitleMatcher[type].translation
+        const title = translations.petTranslationMatcher[closestNotices[i].Pet.type].translation  + ' ' + translations.classTitleMatcher[type].translation
 
-        const icon = fs.readFileSync(petTranslationMatcher[closestNotices[i].Pet.type].icon, {encoding: 'base64'});
+        const icon = translations.petTranslationMatcher[closestNotices[i].Pet.type].iconBase64;
 
         logger.info(`Formatting notice ${JSON.stringify(closestNotices[i])}`)
 
@@ -112,9 +88,9 @@ function buildNotificationEmail(deeplinkBaseUri, closestNotices) {
         const location = closestNotices[i]['locality'] + ', ' + closestNotices[i]['neighbourhood'] + ', ' + closestNotices[i]['street'];
         const dateTime = closestNotices[i]['createdAt'].toISOString().split('.')[0].replace('T',' ');
 
-        const petSex = petTranslationMatcher[closestNotices[i].Pet.sex].translation;
-        const petSize = petTranslationMatcher[closestNotices[i].Pet.size].translation;
-        const petLifeStage = petTranslationMatcher[closestNotices[i].Pet.lifeStage].translation;
+        const petSex = translations.petTranslationMatcher[closestNotices[i].Pet.sex].translation;
+        const petSize = translations.petTranslationMatcher[closestNotices[i].Pet.size].translation;
+        const petLifeStage = translations.petTranslationMatcher[closestNotices[i].Pet.lifeStage].translation;
         const petName = closestNotices[i].Pet.name.length > 0 ? 
         `<tr><td colspan="1"><strong>Nombre:</strong></td><td colspan="2" class="description">${closestNotices[i].Pet.name}</td></tr> `  : '<tr></tr>';
 
@@ -123,7 +99,7 @@ function buildNotificationEmail(deeplinkBaseUri, closestNotices) {
 
 
         deeplinks += `<tr class="blank_row" ></tr> <tr class="blank_row" ></tr>` +
-            '<tr class="section" ><td colspan="1"><div style="image-wrapper"><img width="40" height="40" alt="My Image" src="data:image/jpeg;base64,'+ icon +'" /></div></td><td colspan="2"><strong class="' + titleStyle + '">' + title + '</strong></td></tr> ' +
+            '<tr class="section" ><td colspan="1"><div class="image-wrapper"><img width="40" height="40" alt="My Image" src="data:image/jpeg;base64,'+ icon +'" /></div></td><td colspan="1"><strong class="' + titleStyle + '">' + title + '</strong></td> <td colspan="1"></td></tr> ' +
             `<tr class="blank_row" ></tr>` +
 
             `${petName}` + 
@@ -153,12 +129,12 @@ function buildNotificationEmail(deeplinkBaseUri, closestNotices) {
             'h3 { margin: 15px; color: rgba(0, 0, 0, 0.6) } ' +
             '.wrapper { text-align: center;  padding: 20px; padding-top: 30px; } .image-wrapper { text-align: center;  } ' +
             '.confirmation-button { padding: 15px; width: 25%; border: none; background-color: #73B1A2; } ' +
-            'a {color: white !important; font-family: "Roboto"; sans-serif; text-decoration: none !important; } ' +
+            'a {color: white !important; font-family: "Roboto"; text-decoration: none !important; } ' +
             '.logo-wrapper { margin-left: 5%; } ' +
-            `.${classLostStolen} { font-size: 20px; text-align:center; margin: 10px; margin-bottom: 40px; padding-bottom: 40px;  color: #EB7568 } ` +
-            `.${classFound} { font-size: 20px; text-align:center; margin: 10px;  margin-bottom: 40px;  padding-bottom: 40px; color: #73B1A2; } ` +
-            `.${classAdoption} { font-size: 20px; text-align:center; margin: 10px;  margin-bottom: 40px;  padding-bottom: 40px; color: #FFD966 } ` +
-            `.description { text-align:left; font-family: "Roboto"; sans-serif; margin: 10px; color: #5b5b5b } ` +
+            `.${translations.classLostStolen} { font-size: 20px; text-align:center; margin: 10px; margin-bottom: 40px; padding-bottom: 40px;  color: #EB7568 } ` +
+            `.${translations.classFound} { font-size: 20px; text-align:center; margin: 10px;  margin-bottom: 40px;  padding-bottom: 40px; color: #73B1A2; } ` +
+            `.${translations.classAdoption} { font-size: 20px; text-align:center; margin: 10px;  margin-bottom: 40px;  padding-bottom: 40px; color: #FFD966 } ` +
+            `.description { text-align:left; font-family: "Roboto"; margin: 10px; color: #5b5b5b } ` +
             `.section { margin-top: 40px; padding-top: 40px; } ` +
             `.col { padding-right: 40px; padding-top: 10px; padding-bottom: 10px;} .blank_row { height: 10px !important; border-bottom: 1pt solid grey; } ` +
 

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+            font-family: 'Roboto', 
+            sans-serif;
+        }
+
+        .content {
+            width: 100%;
+            background-color: #f7f9fa;
+            position: relative;
+            /* padding: 18px; */
+            box-sizing: border-box;
+        }
+
+        .content-email {
+            width: 100%;
+            background-color: white;
+            max-width: 600px;
+            height: auto;
+            position: relative;
+            left: 0;
+            right: 0;
+            margin: 0px auto;
+        }
+
+        header {
+            padding: 32px;
+            text-align: center;
+            background-color: #73B1A2;
+            margin-bottom: 48px;
+        }
+
+        p {
+            margin: 15px;
+            align-content: center;
+            text-align: justify;
+            color: #727375;
+        }
+
+        h3 {
+            margin: 15px;
+            color: rgba(0, 0, 0, 0.6)
+        }
+
+        .logo-wrapper {
+            margin-left: 5%;
+        }
+
+        .contactInfo {
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .button-wrapper {
+            text-align: center;
+            padding: 20px;
+            padding-top: 30px;
+        }
+
+        .confirmation-button {
+            padding: 15px;
+            width: 25%;
+            border: none;
+            background-color: #73B1A2;
+        }
+
+        a {
+            color: white !important; 
+            font-family: 'Roboto';
+            text-decoration: none !important; 
+        }
+
+        .lostStolenTitle { 
+            font-size: 20px; 
+            text-align:center; 
+            margin: 10px; 
+            margin-bottom: 40px; 
+            padding-bottom: 40px;  
+            color: #EB7568 
+        }
+        
+        .foundTitle { 
+            font-size: 20px; 
+            text-align:center; 
+            margin: 10px;  
+            margin-bottom: 40px;  
+            padding-bottom: 40px; 
+            color: #73B1A2; 
+        }
+        
+        .adoptionTitle { 
+            font-size: 20px; 
+            text-align:center; 
+            margin: 10px;  
+            margin-bottom: 40px;  
+            padding-bottom: 40px; 
+            color: #FFD966 
+        }
+  
+        .image-wrapper { text-align: center;  }
+
+        .blank_row { 
+            height: 10px !important; 
+            border-bottom: 1pt solid grey; 
+        }
+
+        td { 
+            text-align:left; 
+            padding-top: 10px; 
+            padding-bottom: 10px;
+        }
+
+        .description { 
+            color: #5b5b5b 
+        }
+
+        .blank_col { 
+            width: 120px 
+        }
+
+    </style>
+</head>
+</head>
+<body>
+    <div class="content">
+        <div class="content-email">
+            <header>
+                <div class="logo-wrapper">
+                    <img src="cid:logo" alt="Logo" title="Logo" width="175" height="100"/>
+                </div>    
+            </header>
+
+            <table style="width:100%;">
+                <tr>
+                    <h3><strong>Hola {{recipientUsername}}!</strong></h3>
+                </tr>
+                <tr>
+                    <p style="font-size: 16px;">Hay un nuevo reporte abierto en tu zona...</p>
+                </tr>
+                <tr>
+                    <table style="width:90%; text-align: center; margin-left: 5%; margin-top: 20px; ">
+                        <tr class="section">
+                            <td colspan="1">
+                                <div class="image-wrapper">
+                                    <img src="cid:petIcon" alt="PetIcon" title="PetIcon" width="40" height="40"/>
+                                </div>
+                            </td>
+                            <td colspan="1"><strong class="{{titleStyle}}">{{title}}</strong></td>
+                            <td colspan="2"></td>
+                        </tr> 
+
+                        <tr class="blank_row" ></tr>
+                        <tr >
+                            <td colspan="1"><strong>Nombre:</strong></td>
+                            <td colspan="3" class="description">{{petName}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="1"><strong>Color de pelo:</strong></td>
+                            <td colspan="3" class="description">{{petFurColor}}</td>
+                        </tr>                       
+                        <tr>
+                            <td colspan="1"><strong>Sexo</strong></td>
+                            <td colspan="1"><strong>Tamaño</strong></td>
+                            <td colspan="1"><strong>Edad</strong></td>
+                            <td colspan="1" class="blank_col"></td>
+                        </tr>
+                        <tr class="description">
+                            <td colspan="1">{{petSex}}</td>
+                            <td colspan="1">{{petSize}}</td>
+                            <td colspan="1">{{petLifeStage}}</td>
+                            <td colspan="1"></td>
+                        </tr>
+                        <tr><td colspan="4"><strong>Descripción</strong></td></tr>
+                        <tr><td colspan="4" class="description"><p>{{description}}</p></td></tr> 
+                        <tr>
+                            <td colspan="1"><strong>Ubicación:</strong></td> 
+                            <td colspan="3" class="description">{{location}}</td>
+                        </tr> 
+                        <tr>
+                            <td colspan="1"><strong>Fecha y hora:</strong></td> 
+                            <td colspan="3" class="description">{{dateTime}}</td>
+                        </tr> 
+                    </table>
+                </tr>
+                <tr >
+                    <div class="button-wrapper">
+                        <a class="confirmation-button" href="{{deeplink}}">Ver en la app</a>
+                    </div>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
