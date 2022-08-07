@@ -24,7 +24,21 @@ const emailCredentials = {
 const transporter = nodemailer.createTransport(emailCredentials);
 
 
-async function sendEmail(emailAddress, emailSubject, emailTemplatePath, variables, additionalAttachments) {
+async function replaceInHtml(htmlFilePath, variables) {
+    var htmlFile = fs.readFileSync(htmlFilePath, 'utf8');
+
+    var replacements = "{{" + Object.keys(variables).join("}}|{{") + "}}";
+    var re = new RegExp(replacements, "gi");
+
+    htmlFile = htmlFile.replace(re, function (matchedString) {
+        varName = matchedString.replace("{{","").replace("}}","")
+        return variables[ varName ];
+    })
+
+    return htmlFile;
+}
+
+async function sendEmail(emailAddress, emailSubject, emailTemplatePath, variables, additionalAttachments=[]) {
 
     var emailTemplateHtml = fs.readFileSync(path.resolve(__dirname, emailTemplatePath), 'utf8');
 
@@ -36,7 +50,7 @@ async function sendEmail(emailAddress, emailSubject, emailTemplatePath, variable
         return variables[ varName ];
     })
 
-    logger.debug(`Replaced variables ${emailTemplateHtml}`)
+    //logger.debug(`Replaced variables ${emailTemplateHtml}`)
 
     const mailData = {
         from: SOURCE_EMAIL_ADDRESS,  // sender address
@@ -91,5 +105,6 @@ async function sendEmailRawHtml(emailAddress, emailSubject, emailTemplatRawHtml)
 
 module.exports = {
 	sendEmail: sendEmail,
+    replaceInHtml: replaceInHtml,
     sendEmailRawHtml: sendEmailRawHtml,
 }

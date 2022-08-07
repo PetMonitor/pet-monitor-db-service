@@ -114,7 +114,7 @@ router.get('/confirmation/:confirmationToken', async (req, res) => {
         if (!emailAddress) {
             logger.error(`Session expired for token ${confirmationToken}`);
             var sessionExpiredView = fs.readFileSync(path.resolve(__dirname, '../static/sessionExpiredView.html'), 'utf8');
-            res.send(sessionExpiredView);
+            return res.status(http.StatusCodes.UNAUTHORIZED).send(sessionExpiredView);
         }
         // If confirmation token available, then confirm email and return success view
         logger.info(`Email confirmed ${emailAddress}`);
@@ -123,7 +123,7 @@ router.get('/confirmation/:confirmationToken', async (req, res) => {
         cache.set(emailAddress, true, EMAIL_CONFIRMED_TTL_SECONDS);
 
         var emailConfirmedView = fs.readFileSync(path.resolve(__dirname, '../static/emailVerifiedView.html'), 'utf8');
-        return res.send(emailConfirmedView);
+        return res.status(http.StatusCodes.OK).send(emailConfirmedView);
     } catch (err) {
         logger.error(`Failed to confirm email for session token ${req.params.confirmationToken}: ${err}`)
         return res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ 
