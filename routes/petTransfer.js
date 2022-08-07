@@ -18,8 +18,9 @@ const TRANSFER_ACCEPTANCE_PERIOD_DAYS = 15;
 const EXPO_METRO_SERVER_URI =
   process.env.EXPO_METRO_SERVER_URI || "http://127.0.0.1:19000";
 const TRANSFER_BASE_URL = `http://localhost:${port}/pets/`;
-const PET_TRANSFER_ERROR_HTML_PATH = path.resolve(__dirname, '../static/petTransferedErrorView.html');
-const PET_TRANSFER_SUCCESS_HTML_PATH = path.resolve(__dirname, '../static/petTransferedView.html');
+
+const PET_TRANSFER_ERROR_HTML = fs.readFileSync(path.resolve(__dirname, '../static/petTransferedErrorView.html'), 'utf8');
+const PET_TRANSFER_SUCCESS_HTML = fs.readFileSync(path.resolve(__dirname, '../static/petTransferedView.html'), 'utf8');
 
 router.get("/", async (req, res) => {
   try {
@@ -138,17 +139,16 @@ router.get("/accept/:transferId", async (req, res) => {
   try {
     const transferInfo = await db.PetTransfers.findOne({
       where: { uuid: req.params.transferId },
-    });
+    }, { transaction: tx });
 
     const user = await db.Users.findOne({
         where: { uuid: transferInfo.transferToUser }
-    })
+    }, { transaction: tx });
 
     if (transferInfo == null || user == null) {
       const errorMsg = `No transfer found for id ${req.params.transferId}`;
-      emails.replaceInHtml(PET_TRANSFER_ERROR_HTML_PATH, { errorDescription: errorMsg })  
       logger.error(errorMsg);
-      return res.status(http.StatusCodes.BAD_REQUEST).send(transferFailedView);
+      return res.status(http.StatusCodes.BAD_REQUEST).send(PET_TRANSFER_ERROR_HTML);
     }
 
     logger.info(
@@ -158,22 +158,19 @@ router.get("/accept/:transferId", async (req, res) => {
     if (transferInfo.cancelled) {
       const errorMsg = `Pet transfer ${transferInfo.uuid} cannot be completed because it was cancelled.`
       logger.error(errorMsg);
-      emails.replaceInHtml(PET_TRANSFER_ERROR_HTML_PATH, { errorDescription: errorMsg })  
-      return res.status(http.StatusCodes.BAD_REQUEST).send(transferFailedView);
+      return res.status(http.StatusCodes.BAD_REQUEST).send(PET_TRANSFER_ERROR_HTML);
     }
 
     if (transferInfo.completedOn != null) {
       const errorMsg = `Pet transfer ${transferInfo.uuid} has already been completed.`
       logger.error(errorMsg);
-      emails.replaceInHtml(PET_TRANSFER_ERROR_HTML_PATH, { errorDescription: errorMsg })  
-      return res.status(http.StatusCodes.BAD_REQUEST).send(transferFailedView);
+      return res.status(http.StatusCodes.BAD_REQUEST).send(PET_TRANSFER_ERROR_HTML);
     }
 
     if (transferInfo.activeUntil < new Date()) {
       const errorMsg = `Attempted to accept pet transfer ${transferInfo.uuid}, but transfer is no longer active.`;
       logger.error(errorMsg);
-      emails.replaceInHtml(PET_TRANSFER_ERROR_HTML_PATH, { errorDescription: errorMsg })  
-      return res.status(http.StatusCodes.BAD_REQUEST).send(transferFailedView);
+      return res.status(http.StatusCodes.BAD_REQUEST).send(PET_TRANSFER_ERROR_HTML);
     }
 
     await db.Pets.update(
@@ -193,10 +190,8 @@ router.get("/accept/:transferId", async (req, res) => {
       { where: { uuid: transferInfo.uuid } },
       { transaction: tx }
     );
-
-    // TODO: notify transfer completed
+    
     // Update current pet history    
-
     const lastHistory = await db.PetsFosterHistory.findOne(
         {
           where: {
@@ -247,8 +242,19 @@ router.get("/accept/:transferId", async (req, res) => {
 
     await tx.commit();
 
+    // TODO: notify transfer completed
+    const originalOwner = await db.Users.findOne({
+        where: { uuid: transferInfo.transferFromUser }
+    });
+
+    await emails.sendEmail(
+        originalOwner.email, 
+        'Transferencia de mascota completada!',
+        '../static/petTransferConfirmedEmailView.html',
+    );
+
     logger.info(`Successfully pet transfer ${transferInfo.uuid}`);
-    return res.status(http.StatusCodes.CREATED).send(fs.readFileSync(PET_TRANSFER_SUCCESS_HTML_PATH, 'utf8'));
+    return res.status(http.StatusCodes.CREATED).send(PET_TRANSFER_SUCCESS_HTML);
   } catch (err) {
     await tx.rollback();
     logger.error(err);
