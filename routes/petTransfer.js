@@ -1,9 +1,10 @@
 var express = require("express");
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 var http = require("http-status-codes");
 var uuid = require("uuid");
+const { Op } = require("sequelize");
 
 const db = require("../models/index.js");
 const logger = require("../utils/logger.js");
@@ -17,10 +18,16 @@ const port = process.env.PORT || "8000";
 const TRANSFER_ACCEPTANCE_PERIOD_DAYS = 15;
 const EXPO_METRO_SERVER_URI =
   process.env.EXPO_METRO_SERVER_URI || "http://127.0.0.1:19000";
-const TRANSFER_BASE_URL = `http://localhost:${port}/pets/`;
+const TRANSFER_BASE_URL = `http://localhost:${port}/pets`;
 
-const PET_TRANSFER_ERROR_HTML = fs.readFileSync(path.resolve(__dirname, '../static/petTransferedErrorView.html'), 'utf8');
-const PET_TRANSFER_SUCCESS_HTML = fs.readFileSync(path.resolve(__dirname, '../static/petTransferedView.html'), 'utf8');
+const PET_TRANSFER_ERROR_HTML = fs.readFileSync(
+  path.resolve(__dirname, "../static/petTransferedErrorView.html"),
+  "utf8"
+);
+const PET_TRANSFER_SUCCESS_HTML = fs.readFileSync(
+  path.resolve(__dirname, "../static/petTransferedView.html"),
+  "utf8"
+);
 
 router.get("/", async (req, res) => {
   try {
@@ -30,17 +37,39 @@ router.get("/", async (req, res) => {
       where: {
         petId: req.params.petId,
         cancelled: false,
+        completedOn: null,
         activeUntil: {
-          [Op.lte]: new Date(),
+          [Op.gte]: new Date(),
         },
       },
     });
 
-    logger.info(`Obtained transfer ${JSON.stringify(transfer)}`);
 
     if (transfer == null) {
-      return res.status(http.StatusCodes.NOT_FOUND);
+      return res.status(http.StatusCodes.NOT_FOUND).send();
     }
+
+    const transferToUserData = await db.Users.findOne({
+      where: {
+        uuid: transfer.transferToUser
+      },
+      attributes: [ 'username', 'name' ]
+    });
+
+    const volunteerData = await db.FosterVolunteerProfiles.findOne({
+      where: {
+        userId: transfer.transferToUser
+      },
+      attributes: [ 'userId', 'petTypesToFoster', 'petSizesToFoster', 'province', 'location', 'averageRating' ]
+    });
+
+    transfer['transferToUser'] = {
+      volunteerData,
+      username: transferToUserData.username,
+      name: transferToUserData.name
+    };
+
+    logger.info(`Obtained transfer ${JSON.stringify(transfer)}`);
 
     return res.status(http.StatusCodes.OK).json(transfer);
   } catch (err) {
@@ -87,7 +116,7 @@ router.post("/", async (req, res) => {
     const deeplink =
       deeplinkBaseUri + `/${petInfo.userId}/pets/${petInfo.uuid}`;
     const acceptTransferLink =
-      TRANSFER_BASE_URL + petInfo.uuid + "/transfer/accept/" + transfer.uuid;
+      TRANSFER_BASE_URL + `/${petInfo.uuid}/transfer/${transfer.uuid}/accept`;
 
     const petName = petInfo.name.length > 0 ? petInfo.name : "-";
     const petFurColor = petInfo.furColor.length > 0 ? petInfo.furColor : "-";
@@ -133,44 +162,56 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.get("/accept/:transferId", async (req, res) => {
+router.get("/:transferId/accept", async (req, res) => {
   const tx = await db.sequelize.transaction();
   // TODO: replace errors with error screens and success with success screen
   try {
-    const transferInfo = await db.PetTransfers.findOne({
-      where: { uuid: req.params.transferId },
-    }, { transaction: tx });
+    const transferInfo = await db.PetTransfers.findOne(
+      {
+        where: { uuid: req.params.transferId },
+      },
+      { transaction: tx }
+    );
 
-    const user = await db.Users.findOne({
-        where: { uuid: transferInfo.transferToUser }
-    }, { transaction: tx });
+    const user = await db.Users.findOne(
+      {
+        where: { uuid: transferInfo.transferToUser },
+      },
+      { transaction: tx }
+    );
 
     if (transferInfo == null || user == null) {
       const errorMsg = `No transfer found for id ${req.params.transferId}`;
       logger.error(errorMsg);
-      return res.status(http.StatusCodes.BAD_REQUEST).send(PET_TRANSFER_ERROR_HTML);
+      return res
+        .status(http.StatusCodes.BAD_REQUEST)
+        .send(PET_TRANSFER_ERROR_HTML);
     }
 
-    logger.info(
-        `Transfer info ${JSON.stringify(transferInfo)}.`
-    );
+    logger.info(`Transfer info ${JSON.stringify(transferInfo)}.`);
 
     if (transferInfo.cancelled) {
-      const errorMsg = `Pet transfer ${transferInfo.uuid} cannot be completed because it was cancelled.`
+      const errorMsg = `Pet transfer ${transferInfo.uuid} cannot be completed because it was cancelled.`;
       logger.error(errorMsg);
-      return res.status(http.StatusCodes.BAD_REQUEST).send(PET_TRANSFER_ERROR_HTML);
+      return res
+        .status(http.StatusCodes.BAD_REQUEST)
+        .send(PET_TRANSFER_ERROR_HTML);
     }
 
     if (transferInfo.completedOn != null) {
-      const errorMsg = `Pet transfer ${transferInfo.uuid} has already been completed.`
+      const errorMsg = `Pet transfer ${transferInfo.uuid} has already been completed.`;
       logger.error(errorMsg);
-      return res.status(http.StatusCodes.BAD_REQUEST).send(PET_TRANSFER_ERROR_HTML);
+      return res
+        .status(http.StatusCodes.BAD_REQUEST)
+        .send(PET_TRANSFER_ERROR_HTML);
     }
 
     if (transferInfo.activeUntil < new Date()) {
       const errorMsg = `Attempted to accept pet transfer ${transferInfo.uuid}, but transfer is no longer active.`;
       logger.error(errorMsg);
-      return res.status(http.StatusCodes.BAD_REQUEST).send(PET_TRANSFER_ERROR_HTML);
+      return res
+        .status(http.StatusCodes.BAD_REQUEST)
+        .send(PET_TRANSFER_ERROR_HTML);
     }
 
     await db.Pets.update(
@@ -190,36 +231,34 @@ router.get("/accept/:transferId", async (req, res) => {
       { where: { uuid: transferInfo.uuid } },
       { transaction: tx }
     );
-    
-    // Update current pet history    
-    const lastHistory = await db.PetsFosterHistory.findOne(
-        {
-          where: {
-            petId: transferInfo.petId,
-            userId: transferInfo.transferFromUser,
-            untilDate: null
-          },
-          order: [
-            ['sinceDate', 'DESC']
-          ]
-        },
 
-        { transaction: tx }
-    )
+    // Update current pet history
+    const lastHistory = await db.PetsFosterHistory.findOne(
+      {
+        where: {
+          petId: transferInfo.petId,
+          userId: transferInfo.transferFromUser,
+          untilDate: null,
+        },
+        order: [["sinceDate", "DESC"]],
+      },
+
+      { transaction: tx }
+    );
 
     if (lastHistory != null) {
-        await db.PetsFosterHistory.update(
-            {
-              updatedAt: new Date(),
-              untilDate: new Date(),
-            },
-            {
-              where: {
-                uuid: lastHistory.uuid,
-              },
-            },
-            { transaction: tx }
-        );
+      await db.PetsFosterHistory.update(
+        {
+          updatedAt: new Date(),
+          untilDate: new Date(),
+        },
+        {
+          where: {
+            uuid: lastHistory.uuid,
+          },
+        },
+        { transaction: tx }
+      );
     }
 
     // Create new history entry for pet
@@ -240,34 +279,35 @@ router.get("/accept/:transferId", async (req, res) => {
       { transaction: tx }
     );
 
+    logger.info(`Successfully pet transfer ${transferInfo.uuid}`);
     await tx.commit();
 
-    // TODO: notify transfer completed
-    const originalOwner = await db.Users.findOne({
-        where: { uuid: transferInfo.transferFromUser }
-    });
+    try {
+      // notify transfer completed
+      const originalOwner = await db.Users.findOne({
+        where: { uuid: transferInfo.transferFromUser },
+      });
 
-    await emails.sendEmail(
-        originalOwner.email, 
-        'Transferencia de mascota completada!',
-        '../static/petTransferConfirmedEmailView.html',
-    );
+      emails.sendEmail(
+        originalOwner.email,
+        "Transferencia de mascota completada!",
+        "../static/petTransferConfirmedEmailView.html"
+      );
+    } catch (error) {
+      logger.error(`Failed to notify user ${error}`);
+    }
 
-    logger.info(`Successfully pet transfer ${transferInfo.uuid}`);
     return res.status(http.StatusCodes.CREATED).send(PET_TRANSFER_SUCCESS_HTML);
   } catch (err) {
-    await tx.rollback();
     logger.error(err);
-    return res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({
-      error:
-        http.getReasonPhrase(http.StatusCodes.INTERNAL_SERVER_ERROR) +
-        " " +
-        err,
-    });
+    await tx.rollback();
+    return res
+      .status(http.StatusCodes.BAD_REQUEST)
+      .send(PET_TRANSFER_ERROR_HTML);
   }
 });
 
-router.post("/cancel/:transferId", async (req, res) => {
+router.post("/:transferId/cancel", async (req, res) => {
   try {
     const affectedRows = await db.PetTransfers.update(
       { cancelled: true },

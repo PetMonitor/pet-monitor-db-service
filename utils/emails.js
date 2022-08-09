@@ -24,7 +24,7 @@ const emailCredentials = {
 const transporter = nodemailer.createTransport(emailCredentials);
 
 
-async function sendEmail(emailAddress, emailSubject, emailTemplatePath, variables, additionalAttachments=[]) {
+async function sendEmail(emailAddress, emailSubject, emailTemplatePath, variables={}, additionalAttachments=[]) {
 
     var emailTemplateHtml = fs.readFileSync(path.resolve(__dirname, emailTemplatePath), 'utf8');
 
