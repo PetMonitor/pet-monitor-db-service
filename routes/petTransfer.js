@@ -29,6 +29,16 @@ const PET_TRANSFER_SUCCESS_HTML = fs.readFileSync(
   "utf8"
 );
 
+const PET_TRANSFER_REJECTION_ERROR_HTML = fs.readFileSync(
+  path.resolve(__dirname, "../static/petTransferRejectedErrorView.html"),
+  "utf8"
+);
+
+const PET_TRANSFER_REJECTION_SUCCESS_HTML = fs.readFileSync(
+  path.resolve(__dirname, "../static/petTransferRejectedSuccessView.html"),
+  "utf8"
+);
+
 router.get("/", async (req, res) => {
   try {
     logger.info(`Fetching active pet transfer for pet ${req.params.petId}`);
@@ -117,6 +127,8 @@ router.post("/", async (req, res) => {
       deeplinkBaseUri + `/${petInfo.userId}/pets/${petInfo.uuid}`;
     const acceptTransferLink =
       TRANSFER_BASE_URL + `/${petInfo.uuid}/transfer/${transfer.uuid}/accept`;
+    const rejectTransferLink = 
+      TRANSFER_BASE_URL + `/${petInfo.uuid}/transfer/${transfer.uuid}/reject`;
 
     const petName = petInfo.name.length > 0 ? petInfo.name : "-";
     const petFurColor = petInfo.furColor.length > 0 ? petInfo.furColor : "-";
@@ -137,6 +149,7 @@ router.post("/", async (req, res) => {
       endDate: endDate,
       deeplink: deeplink,
       acceptLink: acceptTransferLink,
+      rejectLink: rejectTransferLink
     };
 
     logger.info(`Replacements ${JSON.stringify(replacements)}`);
@@ -313,6 +326,9 @@ router.post("/:transferId/cancel", async (req, res) => {
       { cancelled: true },
       { where: { petId: req.params.petId, uuid: req.params.transferId } }
     );
+
+    await notifyTransferCancelled(req.params.transferId);
+
     return res
       .status(http.StatusCodes.CREATED)
       .json({ updatedCount: affectedRows[0] });
@@ -326,5 +342,87 @@ router.post("/:transferId/cancel", async (req, res) => {
     });
   }
 });
+
+router.get("/:transferId/reject", async (req, res) => {
+  try {
+    await db.PetTransfers.update(
+      { cancelled: true },
+      { 
+        where: { petId: req.params.petId, uuid: req.params.transferId },
+      },
+    );
+
+    await notifyTransferRejected(req.params.transferId);
+
+    return res.status(http.StatusCodes.CREATED).send(PET_TRANSFER_REJECTION_SUCCESS_HTML);
+  } catch (err) {
+    logger.error(err);
+    return res
+      .status(http.StatusCodes.BAD_REQUEST)
+      .send(PET_TRANSFER_REJECTION_ERROR_HTML);
+    }
+});
+
+async function notifyTransferCancelled(petTransferId) {
+  try {
+    const transfer = await db.PetTransfers.findOne({
+      where: { uuid: petTransferId }
+    })
+
+    if (transfer == null) {
+      throw new Error(`Failed to notify user ${transfer.transferToUser} that transfer ${transfer.uuid} was cancelled`)
+    }
+
+    const user = await db.Users.findOne(
+      { where: { uuid: transfer.transferToUser } }
+    );
+
+    const transferFromUser = await db.Users.findOne(
+      { where: { uuid: transfer.transferFromUser } }
+    );
+
+    emails.sendEmail(
+      user.email,
+      "Transferencia de mascota cancelada!",
+      "../static/petTransferCancelledEmailView.html",
+      {
+        transferFrom: transferFromUser.name.length > 0? transferFromUser.name : transferFromUser.username
+      }
+    );
+  } catch(err) {
+    logger.error(err)
+  }
+}
+
+async function notifyTransferRejected(petTransferId) {
+  try {
+    const transfer = await db.PetTransfers.findOne({
+      where: { uuid: petTransferId }
+    })
+
+    if (transfer == null) {
+      throw new Error(`Failed to notify user ${transfer.transferFromUser} that transfer ${transfer.uuid} was rejected`)
+    }
+
+    const user = await db.Users.findOne(
+      { where: { uuid: transfer.transferFromUser } }
+    );
+
+    const transferToUser = await db.Users.findOne(
+      { where: { uuid: transfer.transferToUser } }
+    );
+
+    emails.sendEmail(
+      user.email,
+      "Transferencia de mascota rechazada!",
+      "../static/petTransferRejectedEmailView.html",
+      { 
+        transferTo: transferToUser.name.length > 0? transferToUser.name : transferToUser.username
+      }
+    );
+  } catch (err) {
+    logger.error(err);
+  }
+}
 
 module.exports = router;

@@ -63,11 +63,18 @@
             
         }
 
-        .deeplink-button {
+        .rejection-button {
             padding: 15px;
             width: 25%;
             border: none;
             background-color: #EB7568;
+        }
+
+        .deeplink-button {
+            padding: 15px;
+            width: 25%;
+            border: none;
+            background-color: #e1ad01;
         }
 
         a {
@@ -153,7 +160,12 @@
                 <tr>
                     <div class="button-wrapper">
                         <a class="deeplink-button" href="{{deeplink}}">Ver en la app</a>
+                    </div>
+                </tr>
+                <tr>
+                    <div class="button-wrapper">
                         <a class="confirmation-button" href="{{acceptLink}}">Aceptar Mascota</a>
+                        <a class="rejection-button" href="{{rejectLink}}">Rechazar Mascota</a>
                     </div>
                 </tr>
             </table>
