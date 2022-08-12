@@ -52,9 +52,15 @@ router.get('/facebook/posts/:postId', async (req, res) => {
         .status(http.StatusCodes.OK); 
     }
 
+    const queryParams = req.query;
+    let region = ''
+    if (!isEmptyObject(queryParams.region)) {
+        region = queryParams.region
+    }
+
     //TODO: FILTER BY NOTICE TYPE (LOST, FOUND, NONE)
     
-    getPredictedPets(databaseCredentials, '/python/facebookClassifier.py', postId)
+    getPredictedPets(databaseCredentials, '/python/facebookClassifier.py', postId, region)
     .then(async data => {
 
         const closestPosts = await db.FacebookPosts.findAll({

@@ -255,6 +255,14 @@ router.put('/:userId', async (req, res) => {
 		//TODO: check for _ref
         var updateUserFields = req.body
         updateUserFields['updatedAt'] = new Date();
+		if ((req.body.alertLocationLong != null && req.body.alertLocationLat != null)) {
+			updateUserFields['alertCoordinates'] = db.sequelize.fn('ST_GeographyFromText', `SRID=4326;POINT (${req.body.alertLocationLong} ${req.body.alertLocationLat})`);
+			delete updateUserFields['alertLocationLat'];
+			delete updateUserFields['alertLocationLong'];
+		}
+
+		logger.info(`Updating user fields ${JSON.stringify(updateUserFields)}`)
+
         db.Users.update(updateUserFields, { 
 			where: { 
 				uuid: req.params.userId 

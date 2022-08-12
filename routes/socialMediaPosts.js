@@ -40,6 +40,7 @@ router.post('/', async (req, res) => {
 			message: req.body.message,
 			noticeType: req.body.type,
 			eventTimestamp: req.body.eventTimestamp,
+			location: req.body.location,
 			createdAt: new Date(),
 			updatedAt: new Date()
 		}, { transaction: tx });

@@ -14,7 +14,7 @@ if [[ "${ENVIRONMENT}" != "production" ]]; then
    tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.6.1.tar.gz
 
    echo "Running dockerize..."
-   dockerize -wait tcp://db:5432 -timeout 10m
+   dockerize -wait tcp://db:5432 -timeout 1m
 else
    echo "Don't wait. Run migrations."
 fi

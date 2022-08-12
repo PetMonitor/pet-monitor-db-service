@@ -24,7 +24,7 @@ const emailCredentials = {
 const transporter = nodemailer.createTransport(emailCredentials);
 
 
-async function sendEmail(emailAddress, emailSubject, emailTemplatePath, variables) {
+async function sendEmail(emailAddress, emailSubject, emailTemplatePath, variables={}, additionalAttachments=[]) {
 
     var emailTemplateHtml = fs.readFileSync(path.resolve(__dirname, emailTemplatePath), 'utf8');
 
@@ -36,18 +36,21 @@ async function sendEmail(emailAddress, emailSubject, emailTemplatePath, variable
         return variables[ varName ];
     })
 
-    logger.debug(`Replaced variables ${emailTemplateHtml}`)
+    //logger.debug(`Replaced variables ${emailTemplateHtml}`)
 
     const mailData = {
         from: SOURCE_EMAIL_ADDRESS,  // sender address
         to: emailAddress,   // list of receivers
         subject: emailSubject,
         html: emailTemplateHtml,
-        attachments: [{
-            filename: 'complete_logo.png',
-            path: path.resolve(__dirname,__dirname,'../assets/complete_logo.png'),
-            cid: 'logo' 
-        }]
+        attachments: [
+            ...additionalAttachments,
+            {
+                filename: 'complete_logo.png',
+                path: path.resolve(__dirname,__dirname,'../assets/complete_logo.png'),
+                cid: 'logo' 
+            }
+        ]
     }
 
 

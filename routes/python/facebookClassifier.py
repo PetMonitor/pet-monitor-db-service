@@ -14,13 +14,14 @@ from sklearn.preprocessing import LabelEncoder
 model = SVC(kernel='rbf', C=100.0, gamma='scale', probability=True)
 
 
-def getTopKNearestNeighbours(dbConnInfo, postId, k=3):
+def getTopKNearestNeighbours(dbConnInfo, postId, region, k=3):
     labelEncoder = LabelEncoder()
     connString = "host={} port={} dbname={} user={} password={}".format(dbConnInfo['host'], dbConnInfo['port'], dbConnInfo['db'], dbConnInfo['username'], dbConnInfo['pwd'])
+    conditionalRegionFilter = """AND public."FacebookPosts".location = '{}'""".format(region) if region != '' else ''
 
     try:
 
-        sqlCommandExcludePetEmbeddings = """SELECT public."FacebookPosts"."postId", embedding FROM public."FacebookPosts" INNER JOIN public."FacebookPostsEmbeddings" ON public."FacebookPosts"."uuid" = public."FacebookPostsEmbeddings"."postId" WHERE public."FacebookPosts"."postId" != '{}'""".format(postId)
+        sqlCommandExcludePetEmbeddings = """SELECT public."FacebookPosts"."postId", embedding FROM public."FacebookPosts" INNER JOIN public."FacebookPostsEmbeddings" ON public."FacebookPosts"."uuid" = public."FacebookPostsEmbeddings"."postId" WHERE public."FacebookPosts"."postId" != '{}' {}""".format(postId, conditionalRegionFilter)
         sqlCommandPetEmbeddings = """SELECT public."FacebookPosts"."postId", embedding FROM public."FacebookPosts" INNER JOIN public."FacebookPostsEmbeddings" ON public."FacebookPosts"."uuid" = public."FacebookPostsEmbeddings"."postId" WHERE public."FacebookPosts"."postId" = '{}'""".format(postId)
 
         with psycopg2.connect(connString) as conn:
@@ -97,8 +98,9 @@ def getTopKNearestNeighbours(dbConnInfo, postId, k=3):
 
 try:
     databaseConnectionInfo = json.loads(sys.argv[1])
-    exludedPhotoId = sys.argv[2]
-    print("Output from Python: " + str(getTopKNearestNeighbours(databaseConnectionInfo, exludedPhotoId)))
+    excludedPhotoId = sys.argv[2]
+    region = sys.argv[4]
+    print("Output from Python: " + str(getTopKNearestNeighbours(databaseConnectionInfo, excludedPhotoId, region)))
     #exit()
 except Exception as e:
     print(e)
