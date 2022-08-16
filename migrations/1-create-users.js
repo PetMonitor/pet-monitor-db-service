@@ -44,10 +44,8 @@ module.exports = {
         defaultValue: false,
         allowNull: false
       },
-      alertRadius: {
-        type: Sequelize.INTEGER,
-        defaultValue: 1,
-        allowNull: false
+      alertsForReportTypes: {
+        type:  Sequelize.STRING
       },
       alertCoordinates: {
         type: Sequelize.GEOGRAPHY,

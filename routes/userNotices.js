@@ -138,7 +138,8 @@ router.post('/', async (req, res) => {
 			where: {
 				[Op.and]: [
 					{ uuid:  { [Op.not]: req.params.userId } },
-					{ alertsActivated: true },
+					{ alertsActivated: true  },
+					{ alertsForReportTypes: { [Op.like]: `%${req.body.noticeType}%` } },
 					getUsersWithinRadiusFilter(req.body.eventLocationLat, req.body.eventLocationLong, ALERT_RADIUS_MTS)
 				]
 			},
