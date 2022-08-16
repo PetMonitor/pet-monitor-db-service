@@ -28,7 +28,7 @@ router.post('/', async (req, res) => {
 
 
         db.Users.findOne({ 
-            attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phoneNumber', 'alertRadius', 'alertsActivated', 'profilePicture'],
+            attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phoneNumber', 'alertsActivated', 'profilePicture'],
             where: { 
                 ...searchCriteria
             } 

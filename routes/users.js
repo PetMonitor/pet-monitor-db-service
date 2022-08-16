@@ -19,7 +19,7 @@ const REGENERATED_PWD_LENGTH = 10;
 
 router.get('/', async (req, res) => {
 	try {
-		db.Users.findAll({ attributes: ['uuid', '_ref', 'name', 'username', 'email', 'phoneNumber', 'alertRadius', 'alertRegion', 'alertCoordinates', 'alertsActivated', 'profilePicture'] })
+		db.Users.findAll({ attributes: ['uuid', '_ref', 'name', 'username', 'email', 'phoneNumber', 'alertsForReportTypes', 'alertRegion', 'alertCoordinates', 'alertsActivated', 'profilePicture'] })
 			.then((users) => { 
 				logger.info(`Returning users ${JSON.stringify(users)}`);
 				users.map(user => {
@@ -48,13 +48,18 @@ router.get('/', async (req, res) => {
 
 router.get('/:userId', async (req, res) => {
 	try {
-		db.Users.findByPk(req.params.userId, { attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phoneNumber', 'alertsActivated', 'alertRadius', 'alertRegion', 'alertCoordinates', 'profilePicture' ] })
+		db.Users.findByPk(req.params.userId, { attributes: ['uuid', '_ref', 'username', 'email', 'name', 'phoneNumber', 'alertsActivated', 'alertsForReportTypes', 'alertRegion', 'alertCoordinates', 'profilePicture' ] })
 			.then((user) => {
 				let response = user.dataValues
 				if (user.alertCoordinates != null) {
 					response["alertLocationLat"] = user.alertCoordinates.coordinates[1];
 					response["alertLocationLong"] = user.alertCoordinates.coordinates[0];
 				}
+
+				if (user.alertsForReportTypes != null && user.alertsForReportTypes.length > 0) {
+					response["alertsForReportTypes"] = user.alertsForReportTypes.split(',');
+				}
+
 				delete response["alertCoordinates"]
 				res.status(http.StatusCodes.OK).json(response);
 			}).catch(err => {
@@ -102,8 +107,6 @@ router.get('/facebook/:facebookId', async (req, res) => {
 
 router.post('/', async (req, res) => {
 	// TODO: improve password hashing method
-	//logger.info(`Attempting to create new user... ${JSON.stringify(req.body)}`);
-
 	const tx = await db.sequelize.transaction();
 	try {
 
@@ -255,10 +258,15 @@ router.put('/:userId', async (req, res) => {
 		//TODO: check for _ref
         var updateUserFields = req.body
         updateUserFields['updatedAt'] = new Date();
+
 		if ((req.body.alertLocationLong != null && req.body.alertLocationLat != null)) {
 			updateUserFields['alertCoordinates'] = db.sequelize.fn('ST_GeographyFromText', `SRID=4326;POINT (${req.body.alertLocationLong} ${req.body.alertLocationLat})`);
 			delete updateUserFields['alertLocationLat'];
 			delete updateUserFields['alertLocationLong'];
+		}
+
+		if (req.body.alertsForReportTypes != null && req.body.alertsForReportTypes.length > 0) {
+			updateUserFields['alertsForReportTypes'] = req.body.alertsForReportTypes.join();
 		}
 
 		logger.info(`Updating user fields ${JSON.stringify(updateUserFields)}`)
