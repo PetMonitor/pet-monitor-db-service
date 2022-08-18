@@ -65,12 +65,22 @@ router.get('/facebook/posts/:postId', async (req, res) => {
 
         const closestPosts = await db.FacebookPosts.findAll({
             where: {
-                postId: data
+                postId: data.flat()
+            }
+        })
+
+        let foundPosts = []
+        let foundPostsFromRegion = []
+        closestPosts.map(value => {
+            if (data[0].includes(value.postId)) {
+                foundPosts.push(value)
+            } else if (data[1].includes(value.postId)) {
+                foundPostsFromRegion.push(value)
             }
         })
 
         return res
-        .send({ "foundPosts": closestPosts })
+        .send({ "foundPosts": foundPosts, "foundPostsFromRegion": foundPostsFromRegion})
         .status(http.StatusCodes.OK);
     })
     .catch(err => {
@@ -118,15 +128,19 @@ const getPredictedPets = (databaseCredentials, filePath, sqlCommandPetEmbeddings
         process.stdout.on('data', (data) => {
             console.log(`Python process returned raw result ${data}`);
 
-            let matchedIds = data.toString().match(regexListContent);
-            console.log(matchedIds);
+            let a = data.toString().replace(/'/g, '"');
+            let matchedIds = JSON.parse(a)
+            // console.log(JSON.parse(a));
+            // let matchedIds = data.toString().match(regexListContent);
+            // console.log(matchedIds[0]);
             if (matchedIds == null) {
                 result = ""
             } else {
-                result = matchedIds[0].replaceAll("'", "").replaceAll(" ", "").split(",");
+                result = matchedIds;
+                // result = matchedIds[0].replaceAll("'", "").replaceAll(" ", "").split(",");
             }
 
-            console.log("Python process returned " + result);
+            console.log("Python process returned " + result.toString());
             return result;
         });
         process.on('close', () => {
