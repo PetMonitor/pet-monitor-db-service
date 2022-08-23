@@ -29,7 +29,7 @@ router.get('/:noticeId', async (req, res) => {
     getPredictedPets(databaseCredentials, '/python/classifier.py', noticeId, null, region)
     .then(data => {
         return res
-        .send({ "closestMatches": data })
+        .send({ "closestMatches": data["foundPosts"] })
         .status(http.StatusCodes.OK);
     })
     .catch(err => {
@@ -48,7 +48,7 @@ router.get('/facebook/posts/:postId', async (req, res) => {
 
     if (totalPosts < MIN_POSTS) {
         return res
-        .send({ "foundPosts": [] })
+        .send({ "foundPosts": [], "foundPostsFromRegion": [] })
         .status(http.StatusCodes.OK); 
     }
 
@@ -62,19 +62,24 @@ router.get('/facebook/posts/:postId', async (req, res) => {
     
     getPredictedPets(databaseCredentials, '/python/facebookClassifier.py', postId, region)
     .then(async data => {
+        let foundPostIds = data["foundPosts"]
+        let foundPostIdsFromRegion = []
+        if ("foundPostsFromRegion" in data) {
+            foundPostIdsFromRegion = data["foundPostsFromRegion"]
+        }
 
         const closestPosts = await db.FacebookPosts.findAll({
             where: {
-                postId: data.flat()
+                postId: foundPostIds.concat(foundPostIdsFromRegion)
             }
         })
 
         let foundPosts = []
         let foundPostsFromRegion = []
         closestPosts.map(value => {
-            if (data[0].includes(value.postId)) {
+            if (foundPostIds.includes(value.postId)) {
                 foundPosts.push(value)
-            } else if (data[1].includes(value.postId)) {
+            } else if (foundPostIdsFromRegion.includes(value.postId)) {
                 foundPostsFromRegion.push(value)
             }
         })
@@ -123,21 +128,16 @@ const getPredictedPets = (databaseCredentials, filePath, sqlCommandPetEmbeddings
      ]);
     
      console.log("Process spawned!");
-     const regexListContent = /(?<=\[).+?(?=\])/g;
      return new Promise((resolve, reject) => {
         process.stdout.on('data', (data) => {
             console.log(`Python process returned raw result ${data}`);
 
-            let a = data.toString().replace(/'/g, '"');
-            let matchedIds = JSON.parse(a)
-            // console.log(JSON.parse(a));
-            // let matchedIds = data.toString().match(regexListContent);
-            // console.log(matchedIds[0]);
-            if (matchedIds == null) {
+            let formattedJson = data.toString().replace(/'/g, '"');
+            let matchedPosts = JSON.parse(formattedJson)
+            if (matchedPosts == null) {
                 result = ""
             } else {
-                result = matchedIds;
-                // result = matchedIds[0].replaceAll("'", "").replaceAll(" ", "").split(",");
+                result = matchedPosts;
             }
 
             console.log("Python process returned " + result.toString());

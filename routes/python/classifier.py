@@ -32,12 +32,15 @@ def getTopKNearestNeighbours(dbConnInfo, noticeId, region, k=15):
             dataTrain = pd.read_sql(sqlCommandExcludePetEmbeddings, conn)
 
             if len(dataTrain) == 0:
-                return []
+                return { "foundPosts": [] }
 
             # Encode notice ids into numerical values
             noticeIdsSet = pd.unique(dataTrain.uuid.to_numpy())
             labelEncoder.fit(noticeIdsSet)
             numericPetIds = labelEncoder.transform(dataTrain.uuid.to_numpy())
+
+            if len(noticeIdsSet) <= 1:
+                return { "foundPosts": noticeIdsSet }
 
             # train the classifier model
             model.fit(np.array(dataTrain.embedding.values.tolist()), numericPetIds)
@@ -93,7 +96,7 @@ def getTopKNearestNeighbours(dbConnInfo, noticeId, region, k=15):
             for i in range(k):
                 if len(maxScoreHeap) > 0:
                     topKNoticeIds.append(heapq.heappop(maxScoreHeap)[1])
-            return topKNoticeIds
+            return { "foundPosts": topKNoticeIds }
     except Exception as e:
         print(e)
 
@@ -101,7 +104,7 @@ try:
     databaseConnectionInfo = json.loads(sys.argv[1])
     excludedPhotoId = sys.argv[2]
     region = sys.argv[4]
-    print("Output from Python: " + str(getTopKNearestNeighbours(databaseConnectionInfo, excludedPhotoId, region)))
+    print(str(getTopKNearestNeighbours(databaseConnectionInfo, excludedPhotoId, region)))
     #exit()
 except Exception as e:
     print(e)
