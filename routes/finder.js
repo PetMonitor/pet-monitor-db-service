@@ -29,7 +29,7 @@ router.get('/:noticeId', async (req, res) => {
     getPredictedPets(databaseCredentials, '/python/classifier.py', noticeId, null, region)
     .then(data => {
         return res
-        .send({ "closestMatches": data })
+        .send({ "closestMatches": data["foundPosts"] })
         .status(http.StatusCodes.OK);
     })
     .catch(err => {
@@ -48,7 +48,7 @@ router.get('/facebook/posts/:postId', async (req, res) => {
 
     if (totalPosts < MIN_POSTS) {
         return res
-        .send({ "foundPosts": [] })
+        .send({ "foundPosts": [], "foundPostsFromRegion": [] })
         .status(http.StatusCodes.OK); 
     }
 
@@ -58,19 +58,32 @@ router.get('/facebook/posts/:postId', async (req, res) => {
         region = queryParams.region
     }
 
-    //TODO: FILTER BY NOTICE TYPE (LOST, FOUND, NONE)
-    
     getPredictedPets(databaseCredentials, '/python/facebookClassifier.py', postId, region)
     .then(async data => {
+        let foundPostIds = data["foundPosts"]
+        let foundPostIdsFromRegion = []
+        if ("foundPostsFromRegion" in data) {
+            foundPostIdsFromRegion = data["foundPostsFromRegion"]
+        }
 
         const closestPosts = await db.FacebookPosts.findAll({
             where: {
-                postId: data
+                postId: foundPostIds.concat(foundPostIdsFromRegion)
+            }
+        })
+
+        let foundPosts = []
+        let foundPostsFromRegion = []
+        closestPosts.map(value => {
+            if (foundPostIds.includes(value.postId)) {
+                foundPosts.push(value)
+            } else if (foundPostIdsFromRegion.includes(value.postId)) {
+                foundPostsFromRegion.push(value)
             }
         })
 
         return res
-        .send({ "foundPosts": closestPosts })
+        .send({ "foundPosts": foundPosts, "foundPostsFromRegion": foundPostsFromRegion})
         .status(http.StatusCodes.OK);
     })
     .catch(err => {
@@ -113,20 +126,19 @@ const getPredictedPets = (databaseCredentials, filePath, sqlCommandPetEmbeddings
      ]);
     
      console.log("Process spawned!");
-     const regexListContent = /(?<=\[).+?(?=\])/g;
      return new Promise((resolve, reject) => {
         process.stdout.on('data', (data) => {
             console.log(`Python process returned raw result ${data}`);
 
-            let matchedIds = data.toString().match(regexListContent);
-            console.log(matchedIds);
-            if (matchedIds == null) {
+            let formattedJson = data.toString().replace(/'/g, '"');
+            let matchedPosts = JSON.parse(formattedJson)
+            if (matchedPosts == null) {
                 result = ""
             } else {
-                result = matchedIds[0].replaceAll("'", "").replaceAll(" ", "").split(",");
+                result = matchedPosts;
             }
 
-            console.log("Python process returned " + result);
+            console.log("Python process returned " + result.toString());
             return result;
         });
         process.on('close', () => {
