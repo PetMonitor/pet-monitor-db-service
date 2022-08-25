@@ -58,8 +58,6 @@ router.get('/facebook/posts/:postId', async (req, res) => {
         region = queryParams.region
     }
 
-    //TODO: FILTER BY NOTICE TYPE (LOST, FOUND, NONE)
-    
     getPredictedPets(databaseCredentials, '/python/facebookClassifier.py', postId, region)
     .then(async data => {
         let foundPostIds = data["foundPosts"]

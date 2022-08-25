@@ -19,19 +19,20 @@ def getTopKNearestNeighbours(dbConnInfo, postId, region, k=3):
 
     try:
 
-        sqlCommandExcludePetEmbeddings = """SELECT public."FacebookPosts"."postId", embedding, location FROM public."FacebookPosts" INNER JOIN public."FacebookPostsEmbeddings" ON public."FacebookPosts"."uuid" = public."FacebookPostsEmbeddings"."postId" WHERE public."FacebookPosts"."postId" != '{}'""".format(postId)
-        sqlCommandPetEmbeddings = """SELECT public."FacebookPosts"."postId", embedding FROM public."FacebookPosts" INNER JOIN public."FacebookPostsEmbeddings" ON public."FacebookPosts"."uuid" = public."FacebookPostsEmbeddings"."postId" WHERE public."FacebookPosts"."postId" = '{}'""".format(postId)
-
+        sqlCommandPetEmbeddings = """SELECT public."FacebookPosts"."postId", embedding, public."FacebookPosts"."noticeType" FROM public."FacebookPosts" INNER JOIN public."FacebookPostsEmbeddings" ON public."FacebookPosts"."uuid" = public."FacebookPostsEmbeddings"."postId" WHERE public."FacebookPosts"."postId" = '{}'""".format(postId)
         with psycopg2.connect(connString) as conn:
-            
+
+            # Select embeddings for searched pet
+            searchedPetData = pd.read_sql(sqlCommandPetEmbeddings, conn)
+            postType = searchedPetData.iloc[0]['noticeType']
+            conditionalPostFilter = """AND public."FacebookPosts"."noticeType" != '{}'""".format(postType) if postType is not None else ''
+            sqlCommandExcludePetEmbeddings = """SELECT public."FacebookPosts"."postId", embedding, location FROM public."FacebookPosts" INNER JOIN public."FacebookPostsEmbeddings" ON public."FacebookPosts"."uuid" = public."FacebookPostsEmbeddings"."postId" WHERE public."FacebookPosts"."postId" != '{}' {}""".format(postId, conditionalPostFilter)
+
             # Select embeddings for all pets that aren't searched pet
             dataTrain = pd.read_sql(sqlCommandExcludePetEmbeddings, conn)
 
             if len(dataTrain) == 0:
                 return { "foundPosts": [], "foundPostsFromRegion": [] }
-            
-            # Select embeddings for searched pet
-            searchedPetData = pd.read_sql(sqlCommandPetEmbeddings, conn)
 
             # Encode post ids into numerical values
             dataTrainPostIds = dataTrain.postId.to_numpy()
@@ -48,7 +49,7 @@ def getTopKNearestNeighbours(dbConnInfo, postId, region, k=3):
 
             # train the classifier model
             model.fit(np.array(dataTrain.embedding.values.tolist()), numericPostIds)
-            
+
             # predict probabilities for each embedding
             probabilities = model.predict_proba(searchedPetData.embedding.values.tolist())
             # returns ordered predictions: from least to most probable
