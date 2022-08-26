@@ -38,7 +38,7 @@ def getTopKNearestNeighbours(dbConnInfo, postId, region, k=3):
             dataTrainPostIds = dataTrain.postId.to_numpy()
             postIdsSet = pd.unique(dataTrainPostIds)
             if len(postIdsSet) <= 1:
-                return { "foundPosts": postIdsSet, "foundPostsFromRegion": [] }
+                return { "foundPosts": list(postIdsSet), "foundPostsFromRegion": [] }
 
             labelEncoder.fit(postIdsSet)
             numericPostIds = labelEncoder.transform(dataTrainPostIds)
