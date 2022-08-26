@@ -40,7 +40,7 @@ def getTopKNearestNeighbours(dbConnInfo, noticeId, region, k=15):
             numericPetIds = labelEncoder.transform(dataTrain.uuid.to_numpy())
 
             if len(noticeIdsSet) <= 1:
-                return { "foundPosts": noticeIdsSet }
+                return { "foundPosts": list(noticeIdsSet) }
 
             # train the classifier model
             model.fit(np.array(dataTrain.embedding.values.tolist()), numericPetIds)
@@ -89,7 +89,7 @@ def getTopKNearestNeighbours(dbConnInfo, noticeId, region, k=15):
                 score = (-1 * freq * mean) / var
                 heapq.heappush(maxScoreHeap, (score, noticeId))
 
-            topKNoticeIds = [ ]
+            topKNoticeIds = []
             # TODO: should find out which of the returned classes is seen most
             # frequently and with more probability.
             # Return top K from that
