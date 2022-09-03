@@ -56,7 +56,7 @@ def initDatabase():
                 "facebookId": row['facebookId'],
                 "profilePicture": None if row['profilePicture'] == "null" else row['profilePicture'],
                 "alertsActivated": bool(row['alertsActivated']),
-                "alertsForReportTypes": "",
+                "alertRadius": int(row['alertRadius']),
                 "pets": []
             })
 
@@ -132,8 +132,8 @@ def initDatabase():
 
 def createFoundNotice(row, isInAdoption = False, photos = []):
     # Find assigned userId for pet in PET_PROFILES_PATH file.
-    # Create pet profile associated to that userId, 
-    # DO NOT include 'name' or 'age' attributes. 
+    # Create pet profile associated to that userId,
+    # DO NOT include 'name' or 'age' attributes.
 
     pet = pets[row['petId']]
     userId = pet['userId']
@@ -170,8 +170,8 @@ def createFoundNotice(row, isInAdoption = False, photos = []):
         "country": row['country'],
         "eventLocationLat": row['latitude'],
         "eventLocationLong": row['longitude'],
-        "description": row['description'],
-        "eventTimestamp":row['eventTimestamp'],
+        "description": row['descriptionFound'],
+        "eventTimestamp": row['eventTimestamp'],
     })
 
     return
@@ -179,7 +179,7 @@ def createFoundNotice(row, isInAdoption = False, photos = []):
 
 def createLostNotice(row, isStolen = False, photos = []):
     # Use assigned userId for pet (from PET_PROFILES_PATH file).
-    # Create pet profile associated to that userId, INCLUDE FULL set of attributes. 
+    # Create pet profile associated to that userId, INCLUDE FULL set of attributes.
     pet = pets[row['petId']]
     userId = pet['userId']
 
@@ -218,7 +218,7 @@ def createLostNotice(row, isStolen = False, photos = []):
         "eventLocationLat": row['latitude'],
         "eventLocationLong": row['longitude'],
         "description": row['description'],
-        "eventTimestamp":row['eventTimestamp'],
+        "eventTimestamp": row['eventTimestamp'],
     })
 
     return
@@ -237,8 +237,8 @@ def imagesToBase64(photoFiles):
 
 def createLostAndFoundNotices(row, isStolen = False):
     # Find assigned userId for pet in PET_PROFILES_PATH file.
-    # Create pet profile associated to that userId using ONLY SOME 
-    # of the available images from the dataset. Include 'name' attribute. 
+    # Create pet profile associated to that userId using ONLY SOME
+    # of the available images from the dataset. Include 'name' attribute.
     # Create LOST notice for pet.
 
     pet = pets[row['petId']]
@@ -255,9 +255,9 @@ def createLostAndFoundNotices(row, isStolen = False):
     photosFound = photos[lenPhotosTrain:]
 
     # If 'userIdFound' specified, use that one, otherwise, pick one at random.
-    # Create pet profile associated to that userId using ONLY SOME 
-    # of the available images from the dataset. If 'petIdFound' specified, 
-    # use that one, otherwise, pick one at random. DO NOT include 'name' attribute. 
+    # Create pet profile associated to that userId using ONLY SOME
+    # of the available images from the dataset. If 'petIdFound' specified,
+    # use that one, otherwise, pick one at random. DO NOT include 'name' attribute.
     # Create FOUND notice for pet.
 
     if (len(userIdFound) <= 0 or len(petIdFound) <= 0):
@@ -289,7 +289,7 @@ def createLostAndFoundNotices(row, isStolen = False):
         "photos": imagesToBase64(photosFound),  #TODO: load photos
     })
 
-    # Create LOST notice for pet.
+    # Create FOUND notice for pet.
 
     requests.post(DB_SERVICE_URL + '/users/' + userIdFound + '/notices', json={
         "uuid": str(uuid.uuid4()),
@@ -302,8 +302,8 @@ def createLostAndFoundNotices(row, isStolen = False):
         "country": row['country'],
         "eventLocationLat": row['latitudeFound'],
         "eventLocationLong": row['longitudeFound'],
-        "description": row['description'],
-        "eventTimestamp":row['eventTimestamp'],
+        "description": row['descriptionFound'],
+        "eventTimestamp": row['eventTimestamp'],
     })
     return
 
