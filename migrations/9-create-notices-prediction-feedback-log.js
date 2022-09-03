@@ -14,7 +14,7 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
         allowNull: false
       },
-      predictedNoticeIds: Sequelize.STRING,
+      predictedNoticeIds: Sequelize.TEXT,
       predictionResult: Sequelize.STRING,
       createdAt: Sequelize.DATE,
       updatedAt: Sequelize.DATE
