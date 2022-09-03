@@ -40,7 +40,6 @@
         p {
             margin: 15px;
             align-content: center;
-            text-align: justify;
             color: #727375;
         }
 
@@ -60,7 +59,7 @@
             width: 25%;
             border: none;
             background-color: #73B1A2;
-            
+            border-radius: 5px;
         }
 
         .rejection-button {
@@ -68,6 +67,7 @@
             width: 25%;
             border: none;
             background-color: #EB7568;
+            border-radius: 5px;
         }
 
         .deeplink-button {
@@ -75,6 +75,7 @@
             width: 25%;
             border: none;
             background-color: #e1ad01;
+            border-radius: 5px;
         }
 
         a {
@@ -82,6 +83,24 @@
             font-family: 'Roboto', 
             sans-serif;
             text-decoration: none !important; 
+        }
+
+        table {
+            padding-left: 15px;
+            padding-right: 15px;
+            table-layout: fixed;
+        }
+
+        td {
+            text-align:left;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .blank_row {
+            height: 10px !important;
+            border-bottom: 1pt solid grey;
         }
 
         .title { 
@@ -104,7 +123,7 @@
         <div class="content-email">
             <header>
                 <div class="logo-wrapper">
-                    <img src="cid:logo" alt="Logo" title="Logo" width="175" height="100"/>
+                    <img src="cid:logo" alt="Logo" title="Logo" width="210" height="100"/>
                 </div>    
             </header>
 
@@ -119,40 +138,37 @@
                 </tr>
 
                 <tr>
-                    <table style="width:90%; text-align: center; margin-left: 5%; margin-top: 20px; ">
+                    <table style="width:100%; margin-top: 20px; ">
                         <tr class="section">
                             <td colspan="1">
                                 <div class="image-wrapper">
                                     <img src="cid:petIcon" alt="PetIcon" title="PetIcon" width="40" height="40"/>
                                 </div>
                             </td>
-                            <td colspan="1"><strong class="title">{{title}}</strong></td>
-                            <td colspan="2"></td>
-                        </tr> 
+                            <td colspan="2"><strong class="title">{{title}}</strong></td>
+                        </tr>
 
                         <tr class="blank_row" ></tr>
                         <tr>
                             <td colspan="1"><strong>Nombre:</strong></td>
-                            <td colspan="3" class="description">{{petName}}</td>
+                            <td colspan="2" class="description">{{petName}}</td>
                         </tr>
                         <tr>
                             <td colspan="1"><strong>Color de pelo:</strong></td>
-                            <td colspan="3" class="description">{{petFurColor}}</td>
+                            <td colspan="2" class="description">{{petFurColor}}</td>
                         </tr>                       
                         <tr>
                             <td colspan="1"><strong>Sexo</strong></td>
                             <td colspan="1"><strong>Tamaño</strong></td>
                             <td colspan="1"><strong>Edad</strong></td>
-                            <td colspan="1" class="blank_col"></td>
                         </tr>
                         <tr class="description">
                             <td colspan="1">{{petSex}}</td>
                             <td colspan="1">{{petSize}}</td>
                             <td colspan="1">{{petLifeStage}}</td>
-                            <td colspan="1"></td>
                         </tr>
-                        <tr><td colspan="4"><strong>Descripción</strong></td></tr>
-                        <tr><td colspan="4" class="description"><p>{{description}}</p></td></tr> 
+                        <tr><td colspan="3"><strong>Descripción</strong></td></tr>
+                        <tr><td colspan="3" class="description">{{description}}</td></tr>
                     </table>
                 </tr>
 
@@ -162,10 +178,11 @@
                         <a class="deeplink-button" href="{{deeplink}}">Ver en la app</a>
                     </div>
                 </tr>
+
                 <tr>
-                    <div class="button-wrapper">
-                        <a class="confirmation-button" href="{{acceptLink}}">Aceptar Mascota</a>
-                        <a class="rejection-button" href="{{rejectLink}}">Rechazar Mascota</a>
+                    <div class="button-wrapper" style="margin-top: 20px">
+                        <a class="confirmation-button" href="{{acceptLink}}" style="margin: 10px">Aceptar mascota</a>
+                        <a class="rejection-button" href="{{rejectLink}}" style="margin: 10px">Rechazar mascota</a>
                     </div>
                 </tr>
             </table>

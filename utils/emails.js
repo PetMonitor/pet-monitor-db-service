@@ -71,6 +71,7 @@ async function sendEmailRawHtml(emailAddress, emailSubject, emailTemplatRawHtml)
         to: emailAddress,   // list of receivers
         subject: emailSubject,
         html: emailTemplatRawHtml,
+        attachDataUrls: true,
         attachments: [{
             filename: 'complete_logo.png',
             path: path.resolve(__dirname,__dirname,'../assets/complete_logo.png'),

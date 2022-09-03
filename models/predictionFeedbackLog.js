@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: DataTypes.UUIDV4,
             allowNull: false
         },
-        predictedNoticeIds: DataTypes.STRING,
+        predictedNoticeIds: DataTypes.TEXT,
         predictionResult: DataTypes.STRING,
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE
