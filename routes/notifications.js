@@ -91,52 +91,57 @@ function buildNotificationEmail(deeplinkBaseUri, closestNotices) {
         const petSex = translations.petTranslationMatcher[closestNotices[i].Pet.sex].translation;
         const petSize = translations.petTranslationMatcher[closestNotices[i].Pet.size].translation;
         const petLifeStage = translations.petTranslationMatcher[closestNotices[i].Pet.lifeStage].translation;
-        const petName = closestNotices[i].Pet.name.length > 0 ? 
-        `<tr><td colspan="1"><strong>Nombre:</strong></td><td colspan="2" class="description">${closestNotices[i].Pet.name}</td></tr> `  : '<tr></tr>';
+        const petName = closestNotices[i].Pet.name != null && closestNotices[i].Pet.name.length > 0 ?
+        `<tr><td colspan="1"><strong>Nombre:</strong></td><td colspan="2" class="description">${closestNotices[i].Pet.name}</td></tr> ` : '<tr></tr>';
 
-        const furColour = closestNotices[i].Pet.furColor.length > 0 ? 
-        `<tr><td colspan="1"><strong>Color de pelaje:</strong></td><td colspan="2" class="description">${closestNotices[i].Pet.furColor}</td></tr> `  : '<tr></tr>';
+        const furColour = closestNotices[i].Pet.furColor != null && closestNotices[i].Pet.furColor.length > 0 ?
+        `<tr><td colspan="1"><strong>Color de pelaje:</strong></td><td colspan="2" class="description">${closestNotices[i].Pet.furColor}</td></tr> ` : '<tr></tr>';
 
 
         deeplinks += `<tr class="blank_row" ></tr> <tr class="blank_row" ></tr>` +
-            '<tr class="section" ><td colspan="1"><div class="image-wrapper"><img width="40" height="40" alt="My Image" src="data:image/jpeg;base64,'+ icon +'" /></div></td><td colspan="1"><strong class="' + titleStyle + '">' + title + '</strong></td> <td colspan="1"></td></tr> ' +
+            '<tr class="section" ><td colspan="1"><div class="image-wrapper"><img width="40" height="40" alt="Pet Type" src="data:image/png;base64,'+ icon +'" /></div></td><td colspan="2"><strong class="' + titleStyle + '">' + title + '</strong></td></tr> ' +
             `<tr class="blank_row" ></tr>` +
 
-            `${petName}` + 
-            `${furColour}` + 
+            `${petName}` +
+            `${furColour}` +
 
-            `<tr><td class="col">Sexo</td><td class="col">Tamaño</td><td class="col">Edad</td></tr>` +
-            `<tr class="description"><td class="col">${petSex}</td><td class="col">${petSize}</td><td class="col">${petLifeStage}</td></tr>` +
+            `<tr><td><strong>Sexo</strong></td><td><strong>Tamaño</strong></td><td><strong>Edad</strong></td></tr>` +
+            `<tr class="description"><td>${petSex}</td><td>${petSize}</td><td>${petLifeStage}</td></tr>` +
 
             `<tr><td colspan="3"><strong>Descripción</strong></td></tr> ` + 
-            `<tr><td colspan="3" class="description"><p>${description.length > 0 ? description : ' -' } </p></td></tr> ` + 
+            `<tr><td colspan="3" class="description">${description.length > 0 ? description : ' -' }</td></tr> ` +
 
             `<tr><td colspan="1"><strong>Ubicación:</strong></td> ` + 
-            `<td colspan="2" class="description">${location}</td></tr> ` + 
+            `<td colspan="2" class="description">${location}</td></tr> ` +
 
-            `<tr><td colspan="1" ><strong>Fecha y hora:</strong></td><td colspan="2" class="description">${dateTime}</td></tr> ` + 
-            `<tr><td colspan="3" class="wrapper"><a class="confirmation-button" href="${deeplink}">Ver en la app</a></td></tr>` 
+            `<tr><td colspan="1" ><strong>Fecha y hora:</strong></td><td colspan="2" class="description">${dateTime}</td></tr> ` +
+            `<tr><td colspan="3" class="wrapper"><a class="confirmation-button" href="${deeplink}">Ver en la app</a></td></tr>` +
+            `<tr class="blank_row" ></tr>` +
+            `<tr><td colspan="3"><hr class="dotted"></td></tr>`
     }
 
     const emailHtml = '<!DOCTYPE html> <html lang="en">' +
         '<head>' +
         '<style>html, ' +
-            'body { padding: 0; margin: 0; font-family: "Roboto"; sans-serif; } ' +
+            'body { padding: 0; margin: 0; font-family: "Roboto", sans-serif; } ' +
             '.content { width: 100%; background-color: #f7f9fa; position: relative; box-sizing: border-box; } ' +
-            '.content-email { width: 100%; background-color: white; max-width: 600px; height: auto; position: relative; left: 0; right: 0; margin: 0px auto; margin: 0px auto; } ' +
+            '.content-email { width: 100%; background-color: white; max-width: 600px; height: auto; position: relative; left: 0; right: 0; margin: 0px auto; } ' +
             'header { padding: 32px; text-align: center; background-color: #73B1A2; margin-bottom: 48px;} ' +
-            'p { margin: 15px; align-content: center; text-align: justify; color: #727375; font-family: "Roboto"; sans-serif; } ' +
+            'p { margin: 15px; align-content: center; color: #727375; font-family: "Roboto", sans-serif; } ' +
             'h3 { margin: 15px; color: rgba(0, 0, 0, 0.6) } ' +
             '.wrapper { text-align: center;  padding: 20px; padding-top: 30px; } .image-wrapper { text-align: center;  } ' +
-            '.confirmation-button { padding: 15px; width: 25%; border: none; background-color: #73B1A2; } ' +
-            'a {color: white !important; font-family: "Roboto"; text-decoration: none !important; } ' +
+            '.confirmation-button { padding: 15px; width: 25%; border: none; background-color: #73B1A2; border-radius: 5px; } ' +
+            'a {color: white !important; font-family: "Roboto", sans-serif; text-decoration: none !important; } ' +
             '.logo-wrapper { margin-left: 5%; } ' +
-            `.${translations.classLostStolen} { font-size: 20px; text-align:center; margin: 10px; margin-bottom: 40px; padding-bottom: 40px;  color: #EB7568 } ` +
-            `.${translations.classFound} { font-size: 20px; text-align:center; margin: 10px;  margin-bottom: 40px;  padding-bottom: 40px; color: #73B1A2; } ` +
-            `.${translations.classAdoption} { font-size: 20px; text-align:center; margin: 10px;  margin-bottom: 40px;  padding-bottom: 40px; color: #FFD966 } ` +
-            `.description { text-align:left; font-family: "Roboto"; margin: 10px; color: #5b5b5b } ` +
+            `.${translations.classLostStolen} { font-size: 20px; text-align:left; margin-bottom: 40px; padding-bottom: 40px;  color: #EB7568 } ` +
+            `.${translations.classFound} { font-size: 20px; text-align:left; margin-bottom: 40px;  padding-bottom: 40px; color: #73B1A2; } ` +
+            `.${translations.classAdoption} { font-size: 20px; text-align:left; margin-bottom: 40px;  padding-bottom: 40px; color: #FFD966 } ` +
+            `.description { text-align:left; font-family: "Roboto", sans-serif; color: #727375 } ` +
             `.section { margin-top: 40px; padding-top: 40px; } ` +
-            `.col { padding-right: 40px; padding-top: 10px; padding-bottom: 10px;} .blank_row { height: 10px !important; border-bottom: 1pt solid grey; } ` +
+            `.blank_row { height: 10px !important; border-bottom: 1pt solid grey; } ` +
+            `hr.dotted { border-top: 3px dotted #bbb ; border-bottom: 0; }` +
+            'table { padding-left: 15px; padding-right: 15px; table-layout: fixed; }' +
+            'td { padding-top: 10px; color: rgba(0, 0, 0, 0.7) }' +
 
 
         '</style>' +
@@ -145,10 +150,10 @@ function buildNotificationEmail(deeplinkBaseUri, closestNotices) {
         '<body>' +
             '<div class="content">' +
                 '<div class="content-email">' +
-                    '<header><div class="logo-wrapper"><img src="cid:logo" alt="Logo" title="Logo" width="175" height="100"/></div></header>' +
+                    '<header><div class="logo-wrapper"><img src="cid:logo" alt="Logo" title="Logo" width="210" height="100"/></div></header>' +
+                    '<h3>Buenas Noticias!</h3>' +
+                    '<p>Estás recibiendo este email porque encontramos algunos resultados relevantes para tu búsqueda...</p>' +
                     '<table width="100%" border="0" cellspacing="0" cellpadding="0" border-collapse: "collapse">' +
-                        '<tr><h3>Buenas Noticias!</h3></tr>' +
-                        '<tr><p>Estás recibiendo este email porque encontramos algunos resultados relevantes para tu búsqueda...</p></tr>' +
                         deeplinks +
                     '</table>' +
                 '</div>' +

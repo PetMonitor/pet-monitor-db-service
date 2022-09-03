@@ -151,8 +151,8 @@ router.post('/', async (req, res) => {
 		const deeplinkBaseUri = `exp://${EXPO_METRO_SERVER_URI}/--/users`;
 
 		const petInfo = await db.Pets.findOne({ where: { uuid: req.body.petId }});
-		const petName = petInfo.name.length > 0 ? petInfo.name : '-';
-		const petFurColor = petInfo.furColor.length > 0 ? petInfo.furColor : '-';
+		const petName = petInfo.name != null && petInfo.name.length > 0 ? petInfo.name : '-';
+		const petFurColor = petInfo.furColor != null && petInfo.furColor.length > 0 ? petInfo.furColor : '-';
         const dateTime = new Date().toISOString().split('.')[0].replace('T',' ');
 		const deeplink =  deeplinkBaseUri + `/${req.params.userId}/reports/${newNotice.uuid}`;
 
@@ -164,7 +164,7 @@ router.post('/', async (req, res) => {
 			petSex: translations.petTranslationMatcher[petInfo.sex].translation,
 			petSize: translations.petTranslationMatcher[petInfo.size].translation,
 			petLifeStage: translations.petTranslationMatcher[petInfo.lifeStage].translation,
-			description: petInfo.description,
+			description: petInfo.description.length > 0 ? petInfo.description : '-',
 			location: `${newNotice.locality} ,  ${newNotice.neighbourhood} , ${newNotice.street}`,
 			dateTime: dateTime,
 			deeplink: deeplink
