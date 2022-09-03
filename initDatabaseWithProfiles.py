@@ -56,7 +56,7 @@ def initDatabase():
                 "facebookId": row['facebookId'],
                 "profilePicture": None if row['profilePicture'] == "null" else row['profilePicture'],
                 "alertsActivated": bool(row['alertsActivated']),
-                "alertRadius": int(row['alertRadius']),
+                "alertsForReportTypes": "",
                 "pets": []
             })
 
