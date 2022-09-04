@@ -15,7 +15,6 @@
             width: 100%;
             background-color: #f7f9fa;
             position: relative;
-            /* padding: 18px; */
             box-sizing: border-box;
         }
 
@@ -40,8 +39,9 @@
         p {
             margin: 15px;
             align-content: center;
-            text-align: justify;
             color: #727375;
+            font-family: "Roboto",
+            sans-serif;
         }
 
         h3 {
@@ -69,37 +69,36 @@
             width: 25%;
             border: none;
             background-color: #73B1A2;
+            border-radius: 5px;
         }
 
         a {
             color: white !important; 
-            font-family: 'Roboto';
+            font-family: 'Roboto',
+            sans-serif;
             text-decoration: none !important; 
         }
 
         .lostStolenTitle { 
             font-size: 20px; 
-            text-align:center; 
-            margin: 10px; 
-            margin-bottom: 40px; 
+            text-align: left;
+            margin-bottom: 40px;
             padding-bottom: 40px;  
             color: #EB7568 
         }
         
         .foundTitle { 
             font-size: 20px; 
-            text-align:center; 
-            margin: 10px;  
-            margin-bottom: 40px;  
+            text-align: left;
+            margin-bottom: 40px;
             padding-bottom: 40px; 
             color: #73B1A2; 
         }
         
         .adoptionTitle { 
             font-size: 20px; 
-            text-align:center; 
-            margin: 10px;  
-            margin-bottom: 40px;  
+            text-align: left;
+            margin-bottom: 40px;
             padding-bottom: 40px; 
             color: #FFD966 
         }
@@ -111,19 +110,23 @@
             border-bottom: 1pt solid grey; 
         }
 
+        table {
+            padding-left: 15px;
+            padding-right: 15px;
+            table-layout: fixed;
+        }
+
         td { 
             text-align:left; 
             padding-top: 10px; 
             padding-bottom: 10px;
+            color: rgba(0, 0, 0, 0.7);
         }
 
         .description { 
             color: #5b5b5b 
         }
 
-        .blank_col { 
-            width: 120px 
-        }
 
     </style>
 </head>
@@ -133,59 +136,52 @@
         <div class="content-email">
             <header>
                 <div class="logo-wrapper">
-                    <img src="cid:logo" alt="Logo" title="Logo" width="175" height="100"/>
+                    <img src="cid:logo" alt="Logo" title="Logo" width="210" height="100"/>
                 </div>    
             </header>
+            <h3><strong>Hola {{recipientUsername}}!</strong></h3>
+            <p style="font-size: 16px;">Hay un nuevo reporte abierto en tu zona...</p>
 
             <table style="width:100%;">
                 <tr>
-                    <h3><strong>Hola {{recipientUsername}}!</strong></h3>
-                </tr>
-                <tr>
-                    <p style="font-size: 16px;">Hay un nuevo reporte abierto en tu zona...</p>
-                </tr>
-                <tr>
-                    <table style="width:90%; text-align: center; margin-left: 5%; margin-top: 20px; ">
+                    <table style="width:100%; margin-top: 20px;">
                         <tr class="section">
                             <td colspan="1">
                                 <div class="image-wrapper">
                                     <img src="cid:petIcon" alt="PetIcon" title="PetIcon" width="40" height="40"/>
                                 </div>
                             </td>
-                            <td colspan="1"><strong class="{{titleStyle}}">{{title}}</strong></td>
-                            <td colspan="2"></td>
-                        </tr> 
+                            <td colspan="2"><strong class="{{titleStyle}}">{{title}}</strong></td>
+                        </tr>
 
                         <tr class="blank_row" ></tr>
                         <tr>
                             <td colspan="1"><strong>Nombre:</strong></td>
-                            <td colspan="3" class="description">{{petName}}</td>
+                            <td colspan="2" class="description">{{petName}}</td>
                         </tr>
                         <tr>
                             <td colspan="1"><strong>Color de pelo:</strong></td>
-                            <td colspan="3" class="description">{{petFurColor}}</td>
+                            <td colspan="2" class="description">{{petFurColor}}</td>
                         </tr>                       
                         <tr>
                             <td colspan="1"><strong>Sexo</strong></td>
                             <td colspan="1"><strong>Tamaño</strong></td>
                             <td colspan="1"><strong>Edad</strong></td>
-                            <td colspan="1" class="blank_col"></td>
                         </tr>
                         <tr class="description">
                             <td colspan="1">{{petSex}}</td>
                             <td colspan="1">{{petSize}}</td>
                             <td colspan="1">{{petLifeStage}}</td>
-                            <td colspan="1"></td>
                         </tr>
-                        <tr><td colspan="4"><strong>Descripción</strong></td></tr>
-                        <tr><td colspan="4" class="description"><p>{{description}}</p></td></tr> 
+                        <tr><td colspan="3"><strong>Descripción</strong></td></tr>
+                        <tr><td colspan="3" class="description">{{description}}</td></tr>
                         <tr>
                             <td colspan="1"><strong>Ubicación:</strong></td> 
-                            <td colspan="3" class="description">{{location}}</td>
+                            <td colspan="2" class="description">{{location}}</td>
                         </tr> 
                         <tr>
                             <td colspan="1"><strong>Fecha y hora:</strong></td> 
-                            <td colspan="3" class="description">{{dateTime}}</td>
+                            <td colspan="2" class="description">{{dateTime}}</td>
                         </tr> 
                     </table>
                 </tr>
