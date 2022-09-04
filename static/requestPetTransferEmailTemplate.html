@@ -52,6 +52,8 @@
             text-align: center;
             padding: 20px;
             padding-top: 30px;
+            margin-bottom: 30px;
+            margin-top: 20px;
         }
 
         .confirmation-button {
@@ -73,8 +75,8 @@
         .deeplink-button {
             padding: 15px;
             width: 25%;
-            border: none;
-            background-color: #e1ad01;
+            border: 2pt solid #73B1A2;
+            background-color: #ffffff;
             border-radius: 5px;
         }
 
@@ -82,7 +84,7 @@
             color: white !important; 
             font-family: 'Roboto', 
             sans-serif;
-            text-decoration: none !important; 
+            text-decoration: none !important;
         }
 
         table {
@@ -105,9 +107,8 @@
 
         .title { 
             font-size: 20px; 
-            text-align:center; 
-            margin: 10px; 
-            margin-bottom: 40px; 
+            text-align: left;
+            margin-bottom: 40px;
             padding-bottom: 40px;  
             color: #EB7568 
         }
@@ -115,6 +116,10 @@
         .logo-wrapper {
             margin-left: 5%;
         }
+
+        hr.dotted {
+            border-top: 3px dotted #bbb;
+            border-bottom: 0; }
     </style>
 </head>
 </head>
@@ -138,7 +143,8 @@
                 </tr>
 
                 <tr>
-                    <table style="width:100%; margin-top: 20px; ">
+                    <table style="width:100%; ">
+                        <tr><td colspan="3"><hr class="dotted"></td></tr>
                         <tr class="section">
                             <td colspan="1">
                                 <div class="image-wrapper">
@@ -172,15 +178,15 @@
                     </table>
                 </tr>
 
+                <tr>
+                    <div class="button-wrapper">
+                        <a class="deeplink-button" href="{{deeplink}}" style="color: #73B1A2 !important;">Ver en la app</a>
+                    </div>
+                </tr>
+                <tr><td colspan="3"><hr class="dotted"></td></tr>
 
                 <tr>
                     <div class="button-wrapper">
-                        <a class="deeplink-button" href="{{deeplink}}">Ver en la app</a>
-                    </div>
-                </tr>
-
-                <tr>
-                    <div class="button-wrapper" style="margin-top: 20px">
                         <a class="confirmation-button" href="{{acceptLink}}" style="margin: 10px">Aceptar mascota</a>
                         <a class="rejection-button" href="{{rejectLink}}" style="margin: 10px">Rechazar mascota</a>
                     </div>

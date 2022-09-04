@@ -139,7 +139,7 @@ function buildNotificationEmail(deeplinkBaseUri, closestNotices) {
             `.description { text-align:left; font-family: "Roboto", sans-serif; color: #727375 } ` +
             `.section { margin-top: 40px; padding-top: 40px; } ` +
             `.blank_row { height: 10px !important; border-bottom: 1pt solid grey; } ` +
-            `hr.dotted { border-top: 3px dotted #bbb ; border-bottom: 0; }` +
+            `hr.dotted { border-top: 3px dotted #bbb; border-bottom: 0; }` +
             'table { padding-left: 15px; padding-right: 15px; table-layout: fixed; }' +
             'td { padding-top: 10px; color: rgba(0, 0, 0, 0.7) }' +
 
