@@ -259,14 +259,28 @@ router.put('/:userId', async (req, res) => {
         var updateUserFields = req.body
         updateUserFields['updatedAt'] = new Date();
 
+		if (req.body.profilePicture != null) {
+			let uuid = req.body.profilePicture.uuid;
+			let photo = req.body.profilePicture.photo;
+			const photoBuffer = Buffer.from(photo,'base64');
+			await db.Photos.create({
+				uuid: uuid,
+				photo: photoBuffer,
+				createdAt: new Date(),
+				updatedAt: new Date()
+			});
+
+			updateUserFields['profilePicture'] = uuid;
+		}
+
 		if ((req.body.alertLocationLong != null && req.body.alertLocationLat != null)) {
 			updateUserFields['alertCoordinates'] = db.sequelize.fn('ST_GeographyFromText', `SRID=4326;POINT (${req.body.alertLocationLong} ${req.body.alertLocationLat})`);
 			delete updateUserFields['alertLocationLat'];
 			delete updateUserFields['alertLocationLong'];
 		}
 
-		if (req.body.alertsForReportTypes != null && req.body.alertsForReportTypes.length > 0) {
-			updateUserFields['alertsForReportTypes'] = req.body.alertsForReportTypes.join();
+		if (req.body.alertsForReportTypes != null) {
+			updateUserFields['alertsForReportTypes'] = req.body.alertsForReportTypes.length > 0 ? req.body.alertsForReportTypes.join() : ""
 		}
 
 		logger.info(`Updating user fields ${JSON.stringify(updateUserFields)}`)

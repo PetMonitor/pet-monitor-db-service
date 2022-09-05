@@ -145,7 +145,7 @@ router.post("/", async (req, res) => {
       petSize: translations.petTranslationMatcher[petInfo.size].translation,
       petLifeStage:
         translations.petTranslationMatcher[petInfo.lifeStage].translation,
-      description: petInfo.description,
+      description: petInfo.description.length > 0 ? petInfo.description : "-",
       endDate: endDate,
       deeplink: deeplink,
       acceptLink: acceptTransferLink,

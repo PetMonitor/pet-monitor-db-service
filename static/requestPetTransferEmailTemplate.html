@@ -15,7 +15,6 @@
             width: 100%;
             background-color: #f7f9fa;
             position: relative;
-            /* padding: 18px; */
             box-sizing: border-box;
         }
 
@@ -44,7 +43,7 @@
         }
 
         h3 {
-            margin: 15px;
+            margin-left: 15px;
             color: rgba(0, 0, 0, 0.6)
         }
 
@@ -52,8 +51,8 @@
             text-align: center;
             padding: 20px;
             padding-top: 30px;
-            margin-bottom: 30px;
-            margin-top: 20px;
+            margin-bottom: 20px;
+            margin-top: 10px;
         }
 
         .confirmation-button {
@@ -119,7 +118,8 @@
 
         hr.dotted {
             border-top: 3px dotted #bbb;
-            border-bottom: 0; }
+            border-bottom: 0;
+        }
     </style>
 </head>
 </head>
@@ -134,17 +134,17 @@
 
             <table>
                 <tr>
-                    <h3>Hola {{username}}!</h3>
+                    <h3 style="margin-bottom: 0;">Hola {{username}}!</h3>
                 </tr>
                 <tr>
                     <p>Estás recibiendo este email porque recientemente recibiste una transferencia de mascota.</p>
                     <p>Si presionás el botón de 'Aceptar Mascota' se transferirán la mascota y todos sus reportes asociados a tu cuenta de PetMonitor.</p>
-                    <p>Tené en cuenta que la petición permanecerá válida hasta el día {{endDate}}. Luego de esta fecha, deberás solicitar que el dueño actual realice nuevamente la transferencia de la mascota.</p>
+                    <p style="margin-bottom: 0;">Tené en cuenta que la petición permanecerá válida hasta el día {{endDate}}. Luego de esta fecha, deberás solicitar que el dueño actual realice nuevamente la transferencia de la mascota.</p>
                 </tr>
 
                 <tr>
-                    <table style="width:100%; ">
-                        <tr><td colspan="3"><hr class="dotted"></td></tr>
+                    <table style="width:100%;">
+                        <tr><td colspan="3" style="padding-top: 0; padding-bottom: 0;"><hr class="dotted"></td></tr>
                         <tr class="section">
                             <td colspan="1">
                                 <div class="image-wrapper">
@@ -179,16 +179,16 @@
                 </tr>
 
                 <tr>
-                    <div class="button-wrapper">
+                    <div class="button-wrapper" style="padding-top: 0; padding-bottom: 5px;">
                         <a class="deeplink-button" href="{{deeplink}}" style="color: #73B1A2 !important;">Ver en la app</a>
                     </div>
                 </tr>
-                <tr><td colspan="3"><hr class="dotted"></td></tr>
+                <tr><td colspan="3" style="padding-top: 0; padding-bottom: 0;"><hr class="dotted"></td></tr>
 
                 <tr>
-                    <div class="button-wrapper">
-                        <a class="confirmation-button" href="{{acceptLink}}" style="margin: 10px">Aceptar mascota</a>
-                        <a class="rejection-button" href="{{rejectLink}}" style="margin: 10px">Rechazar mascota</a>
+                    <div class="button-wrapper" style="padding-top: 15px; padding-bottom: 15px;">
+                        <a class="confirmation-button" href="{{acceptLink}}" style="margin-left: 5px; margin-right: 5px;">Aceptar mascota</a>
+                        <a class="rejection-button" href="{{rejectLink}}" style="margin-left: 5px; margin-right: 5px;">Rechazar mascota</a>
                     </div>
                 </tr>
             </table>
