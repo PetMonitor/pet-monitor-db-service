@@ -17,7 +17,6 @@ VALIDATION_USERS = [
       phoneNumber: '222-000-777',
       profilePicture: null,
       alertsActivated: true,
-      alertRadius: 1,
     }
   ]
 

@@ -43,7 +43,8 @@ USERS = [
       phoneNumber: '222-000-666',
       profilePicture: null,
       alertsActivated: true,
-      alertRadius: 1
+      alertRegion: "Belgrano",
+      alertsForReportTypes: "LOST,FOUND"
     },
     {
       uuid: '123e4567-e89b-12d3-a456-426614175000',
@@ -55,7 +56,8 @@ USERS = [
       phoneNumber: '222-000-777',
       profilePicture: null,
       alertsActivated: true,
-      alertRadius: 1,
+      alertRegion: "Belgrano",
+      alertsForReportTypes: "LOST"
     }
 ]
 
@@ -176,7 +178,7 @@ describe('Users test case', function() {
       .expect('Content-Type', /json/)
       .expect(200)
       .then(response => {
-        console.log(`TEST LOG: Response was ${JSON.stringify(response.body)}`)
+        //console.log(`TEST LOG: Response was ${JSON.stringify(response.body)}`)
         expect(response.body).to.have.deep.members(EXPECTED_USERS)
       });
   });
@@ -208,7 +210,7 @@ describe('Users test case', function() {
       attributes: ['uuid', '_ref', 'username', 'email', 'password']
     });
 
-    console.log(`TEST LOG: Response was ${JSON.stringify(users)}`);
+    //console.log(`TEST LOG: Response was ${JSON.stringify(users)}`);
     expect(users['dataValues']).to.deep.equal(EXPECTED_USER);
   });
 
@@ -253,7 +255,7 @@ describe('Users test case', function() {
       attributes: ['uuid', '_ref', 'type', 'name', 'furColor', 'size', 'lifeStage', 'sex', 'breed', 'description']
     });
 
-    console.log(`TEST LOG: Response was ${JSON.stringify(users)}`);
+    //console.log(`TEST LOG: Response was ${JSON.stringify(users)}`);
     expect(users['dataValues']).to.deep.equal(EXPECTED_USER);
     expect(pet0['dataValues']).to.deep.equal(PETS[0]);
     expect(pet1['dataValues']).to.deep.equal(PETS[1]);
@@ -352,14 +354,14 @@ describe('User by id test case', function() {
             console.error(`TEST LOG: Error creating user records ${err}`);
           });
 
-    await db.Photos.bulkCreate(PROFILE_PHOTOS)
+    /*await db.Photos.bulkCreate(PROFILE_PHOTOS)
         .then((res) => {
           console.log(`TEST LOG: Successfully created photo records ${res}`);
           console.log(TEST_SEPARATOR)
         })
         .catch(err => {
           console.error(`TEST LOG: Error creating photo records ${err}`);
-        });
+        });*/
 
   });
 
@@ -393,6 +395,7 @@ describe('User by id test case', function() {
   it('Get endpoint retrieves user with specified id', async () => {
     EXPECTED_USER = Object.assign({}, USERS[0]);
     delete EXPECTED_USER['password']
+    EXPECTED_USER['alertsForReportTypes'] = EXPECTED_USER['alertsForReportTypes'].split(',')
 
     await request(server)
       .get('/users/123e4567-e89b-12d3-a456-426614174000')
@@ -400,7 +403,7 @@ describe('User by id test case', function() {
       .expect('Content-Type', /json/)
       .expect(200)
       .then(response => {
-        console.log(`TEST LOG: Response was ${JSON.stringify(response.body)}`)
+        //console.log(`TEST LOG: Response was ${JSON.stringify(response.body)}`)
         expect(response.body).to.deep.equal(EXPECTED_USER)
       });
   });
@@ -412,14 +415,14 @@ describe('User by id test case', function() {
       .expect('Content-Type', /json/)
       .expect(200)
       .then(response => {
-        console.log(`TEST LOG: Response was ${JSON.stringify(response.body)}`)
+        //console.log(`TEST LOG: Response was ${JSON.stringify(response.body)}`)
         expect(response.body['deletedCount']).to.equal(1)
       });
 
     return db.Users
-      .findAll({ attributes: [ 'uuid', '_ref', 'password', 'username', 'email', 'name', 'phoneNumber',  'profilePicture', 'alertsActivated', 'alertRadius']})
+      .findAll({ attributes: [ 'uuid', '_ref', 'password', 'username', 'email', 'name', 'phoneNumber',  'profilePicture', 'alertsActivated', 'alertRegion', 'alertsForReportTypes']})
       .then(users => {
-        console.log(`TEST LOG: Response was ${JSON.stringify(users)}`)
+        //console.log(`TEST LOG: Response was ${JSON.stringify(users)}`)
         expect(users[0]['dataValues']).to.deep.equal(USERS[1])
       });
   });
@@ -434,10 +437,16 @@ describe('User by id test case', function() {
       email: 'terrypratchett@goodomens.com',
       name: 'Terry Pratchett',
       phoneNumber: '222-000-666',
-      profilePicture: PROFILE_PHOTOS[0].uuid,
-      alertsActivated: true,
-      alertRadius: 1
+      profilePicture: PROFILE_PHOTOS[0],
+      alertsActivated: true
     }
+
+    EXPECTED_USER = Object.assign(
+      { uuid: "123e4567-e89b-12d3-a456-426614174000", alertRegion: "Belgrano", alertsForReportTypes: ["LOST", "FOUND"], username: "TerryPratchett" }, 
+      UPDATED_USER
+    )
+
+    EXPECTED_USER["profilePicture"] = PROFILE_PHOTOS[0].uuid;
 
     await request(server)
       .put('/users/123e4567-e89b-12d3-a456-426614174000')
@@ -446,7 +455,7 @@ describe('User by id test case', function() {
       .expect('Content-Type', /json/)
       .expect(200)
       .then(response => {
-        console.log(`TEST LOG: Response was ${JSON.stringify(response.body)}`)
+        //console.log(`TEST LOG: Response was ${JSON.stringify(response.body)}`)
         expect(response.body['updatedCount']).to.equal(1)
       });
 
@@ -456,8 +465,8 @@ describe('User by id test case', function() {
       .expect('Content-Type', /json/)
       .expect(200)
       .then(response => {
-        console.log(`TEST LOG: Response was ${JSON.stringify(response.body)}`)
-        expect(response.body).to.deep.equal(UPDATED_USER)
+        //console.log(`TEST LOG: Response was ${JSON.stringify(response.body)}`)
+        expect(response.body).to.deep.equal(EXPECTED_USER)
       });
   });
 
