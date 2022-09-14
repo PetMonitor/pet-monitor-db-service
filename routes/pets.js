@@ -125,7 +125,7 @@ router.post('/', async (req, res) => {
 	const tx = await db.sequelize.transaction();
 
     try {
-		console.log(`Creating pet ${JSON.stringify(req.body)}`);
+		// console.log(`Creating pet ${JSON.stringify(req.body)}`);
 
 		let resEmbeddings = []
 		if (req.body.photos.length > 0) {

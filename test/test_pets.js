@@ -2,6 +2,7 @@ const request = require('supertest');
 const server = require('../app');
 const { expect } = require('chai');
 var db = require('../models/index.js');
+const nock = require('nock');
 
 TEST_SEPARATOR = '=====================================================================';
 
@@ -14,7 +15,6 @@ USERS = [
       password: 'discworld123',
       name: 'Terry Pratchett',
       phoneNumber: '222-000-666',
-      profilePicture: '126e4567-e89b-12d3-a456-426614176001',
       alertsActivated: true,
       alertRadius: 1
     },
@@ -26,7 +26,6 @@ USERS = [
       password: 'goodOmens2022',
       name: 'Neil Gaiman',
       phoneNumber: '222-000-777',
-      profilePicture: '126e4567-e89b-12d3-a456-426614176002',
       alertsActivated: true,
       alertRadius: 1,
     }
@@ -114,6 +113,16 @@ describe('Pets test case', function() {
               console.error(`TEST LOG: Error deleting all records from Users table ${err}`);
               console.log(TEST_SEPARATOR)
             });
+
+        await db.PetPhotos.destroy({
+          where: {},
+          force: true,
+        });
+
+        await db.Photos.destroy({
+          where: {},
+          force: true,
+        });
     });
 
 
@@ -127,14 +136,149 @@ describe('Pets test case', function() {
         .expect('Content-Type', /json/)
         .expect(200)
         .then(response => {
-            console.log(`TEST LOG: Response was ${JSON.stringify(response.body)}`)
+            //console.log(`TEST LOG: Response was ${JSON.stringify(response.body)}`)
             expect(response.body).to.have.deep.members(USER_PETS)
         });
     });
 
-    //TODO: Get pet by id test (also test photos join)
-    //TODO: Create pets test
-    //TODO: Update pet test
-    //TODO: Delete pet test
+    it('Get all user pets by id returns specific pet', async () => {
+      await request(server)
+      .get('/users/123e4567-e89b-12d3-a456-426614174000/pets/123e4567-e89b-12d3-a456-426614174001')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then(response => {
+          expect(response.body).to.deep.equal(EXPECTED_PETS[0])
+      });
+    });
 
+    it('Create pet endpoint creates new pet', async () => {
+      const NEW_PET = {
+        uuid: '09c8d976-7f05-43ea-8016-8c7d2cd7d302',
+        _ref: 'dbdeaa55-2d03-4ca4-9de2-f587c9b11edc',
+        type: 'CAT',
+        name: 'greebo',
+        furColor: 'grey',
+        breed: 'persian',
+        size: 'LARGE',
+        lifeStage: 'ADULT',
+        sex: 'MALE',
+        description: "Greebo is nanny's cat",
+        photos: []
+      }
+
+      const EXPECTED_PET = Object.assign({}, NEW_PET);
+      delete EXPECTED_PET['photos']
+
+      await request(server)
+        .post('/users/123e4567-e89b-12d3-a456-426614174000/pets')
+        .set('Accept', 'application/json')
+        .send(NEW_PET)
+        .expect('Content-Type', /json/)
+        .expect(201);
+
+      const pet = await db.Pets.findOne({ 
+          where: { 
+            uuid: NEW_PET.uuid, 
+            userId: '123e4567-e89b-12d3-a456-426614174000'
+          }
+      });  
+
+      expect(pet).to.include(EXPECTED_PET);
+      
+    });
+
+    it('Create pet endpoint creates new pet with photos', async () => {
+
+      const PHOTO = { 'uuid':'44d26749-c3d7-4b12-975d-40811014acd0', 'photo':'someBase64Img' } ;
+
+      const NEW_PET = {
+        uuid: '09c8d976-7f05-43ea-8016-8c7d2cd7d302',
+        _ref: 'dbdeaa55-2d03-4ca4-9de2-f587c9b11edc',
+        type: 'CAT',
+        name: 'greebo',
+        furColor: 'grey',
+        breed: 'persian',
+        size: 'LARGE',
+        lifeStage: 'ADULT',
+        sex: 'MALE',
+        description: "Greebo is nanny's cat",
+        photos: [ PHOTO ]
+      }
+
+      const mockEmbedding = new Array(128);
+      mockEmbedding.fill(0);
+
+      const scope = nock('http://host.docker.internal:5001')
+        .post('/api/v0/dogs/embedding')
+        .reply((uri, requestBody) => {
+          return [
+            201, 
+            {
+              embeddings: {
+                  '44d26749-c3d7-4b12-975d-40811014acd0': mockEmbedding
+                }
+            },
+          ]
+        })
+
+      const EXPECTED_PET = Object.assign({}, NEW_PET);
+      delete EXPECTED_PET['photos']
+
+      await request(server)
+        .post('/users/123e4567-e89b-12d3-a456-426614174000/pets')
+        .set('Accept', 'application/json')
+        .send(NEW_PET)
+        .expect('Content-Type', /json/)
+        .expect(201);
+
+      const pet = await db.Pets.findOne({ 
+          where: { 
+            uuid: NEW_PET.uuid, 
+            userId: '123e4567-e89b-12d3-a456-426614174000'
+          }
+      });  
+
+      
+      const petPhoto = await db.PetPhotos.findOne({ 
+          where: { 
+            petId: NEW_PET.uuid, 
+            photoId: PHOTO.uuid
+          }
+      });  
+
+      const photo = await db.Photos.findOne({ 
+          where: { 
+            uuid: PHOTO.uuid
+          }
+      });  
+
+
+      expect(pet).to.include(EXPECTED_PET);
+      expect(petPhoto).to.include({ petId: NEW_PET.uuid, photoId: PHOTO.uuid });
+      expect(photo).to.include({ uuid: PHOTO.uuid });
+      expect(photo.photo).to.not.be.null;
+
+
+    });
+
+
+    //TODO: Update pet test
+
+    it('Delete pet removes pet from database', async () => {
+      await request(server)
+        .delete('/users/123e4567-e89b-12d3-a456-426614174000/pets/123e4567-e89b-12d3-a456-426614174001')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200);
+
+      const pets = await db.Pets.findOne({ 
+          where: { 
+            uuid: '123e4567-e89b-12d3-a456-426614174001', 
+            userId: '123e4567-e89b-12d3-a456-426614174000'
+          }
+      });
+
+      expect(pets).to.be.a('null');
+    });
 });
