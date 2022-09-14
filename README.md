@@ -1,4 +1,5 @@
-# Pet Monitor Database Service [![Build Status](https://app.travis-ci.com/PetMonitor/pet-monitor-db-service.svg?branch=master)](https://app.travis-ci.com/PetMonitor/pet-monitor-db-service)
+# Pet Monitor Database Service [![Build Status](https://app.travis-ci.com/PetMonitor/pet-monitor-db-service.svg?branch=master)](https://app.travis-ci.com/PetMonitor/pet-monitor-db-service) [![Coverage Status](https://coveralls.io/repos/github/PetMonitor/pet-monitor-db-service/badge.svg?branch=master)](https://coveralls.io/github/PetMonitor/pet-monitor-db-service?branch=master)
+
 
 ## Requirements
 

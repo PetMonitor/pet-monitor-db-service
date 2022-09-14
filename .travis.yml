@@ -21,7 +21,8 @@ install:
 
 # run tests
 script:
-  - npm test --coverage
+  - npm test
+after_success: npm run coverage
 notifications:
   email:
     recipients:

@@ -6,7 +6,8 @@
   "scripts": {
     "pretest": "cross-env NODE_ENV=test npm run db:reset",
     "db:reset": "npx sequelize-cli db:migrate",
-    "test": "NODE_ENV=test mocha --reporter spec --exit --timeout 20000"
+    "test": "NODE_ENV=test mocha --reporter spec --exit --timeout 20000",
+    "coverage": "npm run test --coverage && cat ./coverage/lcov.info | coveralls"
   },
   "keywords": [],
   "license": "ISC",
@@ -36,6 +37,8 @@
     "winston": "^3.7.2"
   },
   "devDependencies": {
-    "axios-mock-adapter": "^1.20.0"
+    "axios-mock-adapter": "^1.20.0",
+    "coveralls": "^3.1.1",
+    "nock": "^13.2.9"
   }
 }
