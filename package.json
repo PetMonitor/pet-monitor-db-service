@@ -6,7 +6,7 @@
   "scripts": {
     "pretest": "cross-env NODE_ENV=test npm run db:reset",
     "db:reset": "npx sequelize-cli db:migrate",
-    "test": "NODE_ENV=test mocha --reporter spec --exit --timeout 20000",
+    "test": "NODE_ENV=test mocha --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js",
     "coverage": "npm run test --coverage && cat ./coverage/lcov.info | coveralls"
   },
   "keywords": [],
@@ -38,7 +38,9 @@
   },
   "devDependencies": {
     "axios-mock-adapter": "^1.20.0",
+    "blanket": "^1.2.3",
     "coveralls": "^3.1.1",
+    "mocha-lcov-reporter": "^1.3.0",
     "nock": "^13.2.9"
   }
 }
