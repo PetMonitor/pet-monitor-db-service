@@ -130,8 +130,8 @@ router.post("/", async (req, res) => {
     const rejectTransferLink = 
       TRANSFER_BASE_URL + `/${petInfo.uuid}/transfer/${transfer.uuid}/reject`;
 
-    const petName = petInfo.name.length > 0 ? petInfo.name : "-";
-    const petFurColor = petInfo.furColor.length > 0 ? petInfo.furColor : "-";
+    const petName = petInfo.name != null && petInfo.name.length > 0 ? petInfo.name : "-";
+    const petFurColor = petInfo.furColor != null && petInfo.furColor.length > 0 ? petInfo.furColor : "-";
     const endDate = activeUntil.toISOString().split(".")[0].replace("T", " ");
 
     const replacements = {
